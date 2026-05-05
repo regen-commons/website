@@ -70,7 +70,7 @@ function commitmentLabel(value) {
   return (
     {
       "yes": "Yes",
-      "yes-with-constraints": "Yes, with constraints",
+      "yes-with-constraints": "Yes with constraints",
       "unsure": "Unsure",
     }[value] || ""
   );
@@ -82,7 +82,7 @@ function consentLabel(value) {
 
 function authorizedLabel(value) {
   return (
-    { "yes": "Yes", "yes-with-limits": "Yes, with limits" }[value] || ""
+    { "yes": "Yes", "yes-with-limits": "Yes with limits" }[value] || ""
   );
 }
 
