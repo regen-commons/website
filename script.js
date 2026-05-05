@@ -107,9 +107,24 @@
 
     var page = document.body.dataset.page;
     if (page === "learn")       initLearnPage();
-    if (page === "seeds")       initDeclarationPage();
+    if (page === "seeds")       { loadSeedsFromApi(); initDeclarationPage(); }
     if (page === "map")         initMapPage();
   });
+
+  // ─── Seeds: replace inline SEEDED fallback with Notion-managed list ────────
+  function loadSeedsFromApi() {
+    fetch("/api/seeds")
+      .then(function (r) { if (!r.ok) throw new Error("seeds_fetch_failed"); return r.json(); })
+      .then(function (data) {
+        var items = ((data && data.seeds) || []).map(function (s) { return s.text; }).filter(Boolean);
+        if (!items.length) return;
+        SEEDED.length = 0;
+        items.forEach(function (t) { SEEDED.push(t); });
+      })
+      .catch(function (err) {
+        console.warn("seeds using inline fallback:", err && err.message);
+      });
+  }
 
   // ─── Blob button injection ───────────────────────────────────────────────
   function injectBlobButtons() {
@@ -393,10 +408,11 @@
     // ── Filter / view buttons ──────────────────────────────────────────────
     if (!grid) return;
 
-    var cards        = Array.from(grid.querySelectorAll(".commons-card"));
     var activeType   = "all";
     var activeView   = "grid";
-    var originalOrder = cards.slice();
+    function getCards() {
+      return Array.from(grid.querySelectorAll(".commons-card"));
+    }
 
     document.querySelectorAll(".filter-btn[data-filter]").forEach(function (btn) {
       btn.addEventListener("click", function () {
@@ -422,22 +438,19 @@
 
     function applyFilter() {
       var isStageFilter = stageFilters.indexOf(activeType) !== -1;
-      var visible = originalOrder.filter(function (c) {
-        if (activeType === "all") return true;
-        if (isStageFilter) return c.dataset.stage === activeType;
-        return c.dataset.type === activeType;
-      });
-
-      cards.forEach(function (c) {
-        if (visible.indexOf(c) !== -1) {
+      getCards().forEach(function (c) {
+        var match =
+          activeType === "all" ||
+          (isStageFilter ? c.dataset.stage === activeType : c.dataset.type === activeType);
+        if (match) {
           c.classList.remove("hidden");
         } else {
-          // Close before hiding
           c.classList.remove("open");
           c.classList.add("hidden");
         }
       });
     }
+    window.applyCommonsFilter = applyFilter;
 
     // ── Directory toggle ──────────────────────────────────────────────────
     var dirToggle = document.getElementById("directory-toggle");
@@ -645,15 +658,73 @@
 
     // Submit
     if (form) {
-      form.addEventListener("submit", function (e) {
+      var submitBtn = document.getElementById("join-submit");
+      var errorEl = document.getElementById("join-error");
+
+      function serializeForm() {
+        var fd = new FormData(form);
+        var payload = {};
+        var multiKeys = new Set();
+        fd.forEach(function (_, key) {
+          var els = form.querySelectorAll('[name="' + key + '"]');
+          var isMulti = els.length > 1 && els[0].type === "checkbox";
+          if (isMulti) multiKeys.add(key);
+        });
+        multiKeys.forEach(function (key) {
+          payload[key] = fd.getAll(key);
+        });
+        fd.forEach(function (value, key) {
+          if (multiKeys.has(key)) return;
+          payload[key] = value;
+        });
+        return payload;
+      }
+
+      function showError(msg) {
+        if (!errorEl) return;
+        errorEl.textContent = msg;
+        errorEl.style.display = "block";
+      }
+      function clearSubmitError() {
+        if (errorEl) errorEl.style.display = "none";
+      }
+
+      form.addEventListener("submit", async function (e) {
         e.preventDefault();
         if (!validateStep(6)) return;
+        clearSubmitError();
 
-        // Hide form, show confirmation
-        form.style.display = "none";
-        document.querySelector(".join-progress").style.display = "none";
-        confirm.classList.add("active");
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        var originalLabel = submitBtn ? submitBtn.querySelector(".btn-label").textContent : "";
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.querySelector(".btn-label").textContent = "Sending…";
+        }
+
+        try {
+          var res = await fetch("/api/apply", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(serializeForm()),
+          });
+          if (!res.ok) {
+            var data = await res.json().catch(function () { return {}; });
+            throw new Error(data.error || "request_failed");
+          }
+          form.style.display = "none";
+          document.querySelector(".join-progress").style.display = "none";
+          confirm.classList.add("active");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        } catch (err) {
+          showError(
+            err && err.message === "rate_limited"
+              ? "Too many submissions from this connection. Please try again later."
+              : "Something went wrong sending your application. Please try again, or email a steward directly."
+          );
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.querySelector(".btn-label").textContent = originalLabel || "Submit application";
+          }
+        }
       });
     }
   }

@@ -131,6 +131,12 @@
 
     <form class="join-form" id="join-form" novalidate>
 
+      <div aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;height:0;width:0;overflow:hidden">
+        <label>Confirm website (leave blank)
+          <input type="text" name="website_confirm" tabindex="-1" autocomplete="off" />
+        </label>
+      </div>
+
       <!-- ══════════ STEP 1: ABOUT YOU ══════════ -->
       <div class="join-step active" data-step="1">
         <span class="join-eyebrow">Step 1 of 6</span>
@@ -347,6 +353,7 @@
           <button type="button" class="join-back" data-to="5">&larr; Back</button>
           <button type="submit" class="btn join-submit" id="join-submit"><span class="btn-label">Submit application</span> &rarr;</button>
         </div>
+        <p class="join-error" id="join-error" role="alert" style="display:none;color:#a33;margin-top:1em;font-style:italic"></p>
       </div>
 
     </form>

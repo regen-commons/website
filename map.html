@@ -1486,6 +1486,87 @@ body.rc-modal-locked { overflow: hidden; }
   <script src="logo-canvas.js"></script>
   <script src="canvas.js"></script>
   <script src="script.js"></script>
+
+  <script>
+    // ══════════════════════════════════════════════════════════════════════
+    //  COMMONS LIBRARY — fetch contributions from Notion via /api/contributions
+    //  Falls back silently to the static cards already in the DOM if the API
+    //  is unreachable (e.g. local dev without env vars).
+    // ══════════════════════════════════════════════════════════════════════
+    (function () {
+      var grid = document.getElementById("commons-grid");
+      if (!grid) return;
+
+      var TYPE_TO_DATA = {
+        "Knowledge": "knowledge",
+        "Infrastructure": "infrastructure",
+        "Brand & IP": "brand",
+        "Governance & Legal": "governance",
+        "Coordination": "coordination"
+      };
+      var STAGE_TO_DATA = {
+        "Seed": "seed",
+        "Sprout": "sprout",
+        "Flowering": "flowering",
+        "Tree": "tree"
+      };
+
+      function escapeHtml(s) {
+        return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+          return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+        });
+      }
+
+      function renderCard(c) {
+        var type = TYPE_TO_DATA[c.type] || "knowledge";
+        var stage = STAGE_TO_DATA[c.stage] || "seed";
+        var contributorsHtml = (c.contributors || [])
+          .map(function (p) {
+            return '<button type="button" class="contributor-link" data-name="' +
+              escapeHtml(p.name) + '">' + escapeHtml(p.name) + "</button>";
+          })
+          .join(", ") || "—";
+        var tagsHtml = [
+          c.type ? '<span class="card-type">' + escapeHtml(c.type) + "</span>" : "",
+          c.capitalForm ? '<span class="card-capital">' + escapeHtml(c.capitalForm) + "</span>" : "",
+          c.tier ? '<span class="card-tier"><strong>' + escapeHtml(c.tier) + "</strong></span>" : "",
+          c.stage ? '<span class="experiment-stage">' + escapeHtml(c.stage) + "</span>" : ""
+        ].filter(Boolean).join("");
+
+        return (
+          '<article class="commons-card" data-type="' + type + '" data-stage="' + stage + '">' +
+            '<div class="card-header">' +
+              '<div class="card-header-text">' +
+                '<h3 class="card-name">' + escapeHtml(c.title) + "</h3>" +
+                (c.description
+                  ? '<span class="card-teaser">' + escapeHtml(c.description) + "</span>"
+                  : "") +
+                '<span class="card-contributor">Contributed by ' + contributorsHtml + "</span>" +
+                '<div class="card-tags">' + tagsHtml + "</div>" +
+              "</div>" +
+              '<button class="card-toggle" aria-label="Open details">&rarr;</button>' +
+            "</div>" +
+            '<div class="card-body-wrap"><div class="card-body"><div class="card-body-inner">' +
+              (c.description ? "<p>" + escapeHtml(c.description) + "</p>" : "") +
+            "</div></div></div>" +
+          "</article>"
+        );
+      }
+
+      fetch("/api/contributions")
+        .then(function (r) { if (!r.ok) throw new Error("contributions_fetch_failed"); return r.json(); })
+        .then(function (data) {
+          var items = (data && data.contributions) || [];
+          if (!items.length) return;
+          grid.innerHTML = items.map(renderCard).join("");
+          if (typeof window.applyCommonsFilter === "function") window.applyCommonsFilter();
+        })
+        .catch(function (err) {
+          console.warn("commons library using static fallback:", err && err.message);
+        });
+    })();
+  </script>
+
   <script>
     initCanvas(4);
   </script>
@@ -1566,48 +1647,65 @@ body.rc-modal-locked { overflow: hidden; }
     }
 
     // ─── Node / edge data ─────────────────────────────────────────────────
-    // type: "org" (larger) or "person" (smaller)
-    var nodeData = [
-      // Organizations
-      { id: "regen",      label: "Regen Network",    type: "org",    color: "forest", role: "Knowledge, Infrastructure" },
-      { id: "refi",       label: "ReFi DAO",         type: "org",    color: "teal",   role: "Knowledge, Community" },
-      { id: "opencivics", label: "OpenCivics",       type: "org",    color: "copper", role: "Governance, Coordination" },
-      { id: "greenpill",  label: "Greenpill Network", type: "org",   color: "gold",   role: "Knowledge, Education" },
-      { id: "gaiaai",     label: "GaiaAI",           type: "org",    color: "teal",   role: "Infrastructure, AI" },
-      { id: "mill",       label: "Mill Law Center",  type: "org",    color: "copper", role: "Governance, Legal" },
-      // Individuals
-      { id: "patricia",   label: "Patricia Parkinson",  type: "person", color: "copper", role: "Coordination, Brand" },
-      { id: "gregory",    label: "Gregory Landua",      type: "person", color: "forest", role: "Governance, Knowledge" },
-      { id: "monty",      label: "Monty Bryant",        type: "person", color: "forest", role: "Governance, Coordination" },
-      { id: "eve",        label: "Eve Marenghi",        type: "person", color: "forest", role: "Coordination" },
-      { id: "roxanna",    label: "Roxanna Shohadaee",   type: "person", color: "gold",   role: "Identity, Design" }
+    // Live data is fetched from /api/members; arrays below are the fallback
+    // shown if the API is unreachable so the page never appears broken.
+    var FALLBACK_NODE_DATA = [
+      { id: "regen",      label: "Regen Network",     type: "org",    color: "forest", role: "Knowledge, Infrastructure" },
+      { id: "refi",       label: "ReFi DAO",          type: "org",    color: "teal",   role: "Knowledge, Community" },
+      { id: "opencivics", label: "OpenCivics",        type: "org",    color: "copper", role: "Governance, Coordination" },
+      { id: "greenpill",  label: "Greenpill Network", type: "org",    color: "gold",   role: "Knowledge, Education" },
+      { id: "gaiaai",     label: "GaiaAI",            type: "org",    color: "teal",   role: "Infrastructure, AI" },
+      { id: "mill",       label: "Mill Law Center",   type: "org",    color: "copper", role: "Governance, Legal" },
+      { id: "patricia",   label: "Patricia Parkinson", type: "person", color: "copper", role: "Coordination, Brand" },
+      { id: "gregory",    label: "Gregory Landua",     type: "person", color: "forest", role: "Governance, Knowledge" },
+      { id: "monty",      label: "Monty Bryant",       type: "person", color: "forest", role: "Governance, Coordination" },
+      { id: "eve",        label: "Eve Marenghi",       type: "person", color: "forest", role: "Coordination" },
+      { id: "roxanna",    label: "Roxanna Shohadaee",  type: "person", color: "gold",   role: "Identity, Design" }
+    ];
+    var FALLBACK_EDGE_DATA = [
+      ["regen", "gregory"], ["regen", "monty"], ["regen", "eve"], ["regen", "gaiaai"], ["regen", "refi"],
+      ["refi", "monty"], ["opencivics", "mill"], ["opencivics", "patricia"], ["gaiaai", "patricia"],
+      ["patricia", "roxanna"], ["patricia", "regen"], ["gregory", "opencivics"],
+      ["greenpill", "refi"], ["greenpill", "regen"], ["mill", "regen"]
     ];
 
-    var edgeData = [
-      // Regen Network connections
-      ["regen", "gregory"],
-      ["regen", "monty"],
-      ["regen", "eve"],
-      ["regen", "gaiaai"],
-      ["regen", "refi"],
-      // ReFi DAO connections
-      ["refi", "monty"],
-      // OpenCivics connections
-      ["opencivics", "mill"],
-      ["opencivics", "patricia"],
-      // GaiaAI connections
-      ["gaiaai", "patricia"],
-      // Patricia connections
-      ["patricia", "roxanna"],
-      ["patricia", "regen"],
-      // Gregory connections
-      ["gregory", "opencivics"],
-      // Greenpill connections
-      ["greenpill", "refi"],
-      ["greenpill", "regen"],
-      // Mill connections
-      ["mill", "regen"]
-    ];
+    var nodeData = [];
+    var edgeData = [];
+
+    var FOCUS_TO_COLOR = {
+      "Ecological restoration": "forest",
+      "Regenerative agriculture": "forest",
+      "Governance & coordination": "copper",
+      "Regenerative finance": "teal",
+      "Community building": "gold",
+      "Education & knowledge": "gold",
+      "Technology & infrastructure": "teal",
+      "Indigenous & traditional knowledge": "forest",
+      "Health & wellbeing": "forest",
+      "Arts & culture": "copper",
+      "Policy & advocacy": "copper"
+    };
+
+    function buildGraphFromMembers(members) {
+      var nodes = members.map(function (m) {
+        var primaryFocus = (m.focusAreas && m.focusAreas[0]) || "";
+        return {
+          id: m.id,
+          label: m.name || "Unnamed",
+          type: m.type === "Organization" ? "org" : "person",
+          color: FOCUS_TO_COLOR[primaryFocus] || "forest",
+          role: (m.contributionAreas || []).join(", ") || (m.focusAreas || []).join(", ")
+        };
+      });
+      var ids = new Set(nodes.map(function (n) { return n.id; }));
+      var edges = [];
+      members.forEach(function (m) {
+        (m.affiliationIds || []).forEach(function (orgId) {
+          if (ids.has(orgId) && orgId !== m.id) edges.push([m.id, orgId]);
+        });
+      });
+      return { nodes: nodes, edges: edges };
+    }
 
     // ─── Build simulation nodes ───────────────────────────────────────────
     var nodes = [];
@@ -1645,7 +1743,26 @@ body.rc-modal-locked { overflow: hidden; }
         if (src && tgt) edges.push({ source: src, target: tgt });
       }
     }
-    initGraph();
+
+    function loadGraph() {
+      fetch("/api/members")
+        .then(function (r) { if (!r.ok) throw new Error("members_fetch_failed"); return r.json(); })
+        .then(function (data) {
+          var members = (data && data.members) || [];
+          if (!members.length) throw new Error("no_active_members");
+          var built = buildGraphFromMembers(members);
+          nodeData = built.nodes;
+          edgeData = built.edges;
+          initGraph();
+        })
+        .catch(function (err) {
+          console.warn("ecosystem graph using fallback:", err && err.message);
+          nodeData = FALLBACK_NODE_DATA;
+          edgeData = FALLBACK_EDGE_DATA;
+          initGraph();
+        });
+    }
+    loadGraph();
 
     // ─── Force simulation ─────────────────────────────────────────────────
     var REPULSION = 3200;
