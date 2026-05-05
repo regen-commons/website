@@ -8,6 +8,7 @@ import {
   richText,
   select,
 } from "./_lib/notion.js";
+import { notifyTelegram } from "./_lib/notify.js";
 
 const rateLimitBuckets = new Map();
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
@@ -89,8 +90,9 @@ async function handlePost(req, res) {
 
   const author = String(body.author || "").trim().slice(0, 80);
 
+  let seedPage;
   try {
-    await notion.pages.create({
+    seedPage = await notion.pages.create({
       parent: { database_id: SEEDS_DB },
       properties: {
         Text: title(text),
@@ -98,11 +100,25 @@ async function handlePost(req, res) {
         Status: select("Active"),
       },
     });
-    return res.status(200).json({ ok: true });
   } catch (err) {
     console.error("seeds_create_failed", err);
     return res.status(500).json({ error: "notion_failed" });
   }
+
+  const notionPageUrl =
+    seedPage.url || `https://www.notion.so/${seedPage.id.replace(/-/g, "")}`;
+
+  try {
+    await notifyTelegram({
+      type: "seed",
+      text: author ? `${text}\n\n— ${author}` : text,
+      url: notionPageUrl,
+    });
+  } catch (err) {
+    console.error("seeds_notify_failed", err);
+  }
+
+  return res.status(200).json({ ok: true });
 }
 
 export default async function handler(req, res) {

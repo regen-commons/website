@@ -10,6 +10,7 @@ import {
   email,
   date,
 } from "./_lib/notion.js";
+import { notifyTelegram } from "./_lib/notify.js";
 
 let _resend = null;
 function getResend() {
@@ -163,6 +164,14 @@ function stewardEmailHtml(body, notionPageUrl) {
   `;
 }
 
+function applicationSummary(body) {
+  const isOrg = body["applicant-type"] === "organization";
+  const name = body["full-name"] || "(no name)";
+  const type = isOrg ? "Organization" : "Individual";
+  const location = body["location"] ? `\nBased in: ${body["location"]}` : "";
+  return `${name} (${type})${location}`;
+}
+
 function escapeHtml(s) {
   return String(s || "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
@@ -233,6 +242,13 @@ export default async function handler(req, res) {
       })
     );
   }
+  tasks.push(
+    notifyTelegram({
+      type: "application",
+      text: applicationSummary(body),
+      url: notionPageUrl,
+    })
+  );
 
   const results = await Promise.allSettled(tasks);
   results.forEach((r, i) => {
