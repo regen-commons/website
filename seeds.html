@@ -61,9 +61,15 @@
         id="vision-input"
         class="declaration-textarea"
         rows="3"
+        maxlength="240"
         placeholder="Write here…"
         aria-label="Your vision for the commons"
       ></textarea>
+      <div aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;height:0;width:0;overflow:hidden">
+        <label>Confirm website (leave blank)
+          <input type="text" id="seed-website-confirm" tabindex="-1" autocomplete="off" />
+        </label>
+      </div>
       <button class="btn" id="offer-btn"><span class="btn-label">Plant this seed</span> &rarr;</button>
     </div>
   </div>

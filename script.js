@@ -252,12 +252,28 @@
         setTimeout(function () { input.classList.remove("shake"); }, 400);
         return;
       }
+      if (text.length > 240) {
+        input.classList.add("shake");
+        setTimeout(function () { input.classList.remove("shake"); }, 400);
+        return;
+      }
 
       // Save for map page
       try {
         localStorage.setItem("regen_vision", text);
         localStorage.setItem("regen_vision_time", Date.now().toString());
       } catch (_) {}
+
+      // Plant the seed in Notion (fire-and-forget; UX never blocks)
+      var honeypot = document.getElementById("seed-website-confirm");
+      fetch("/api/seeds", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: text,
+          website_confirm: honeypot ? honeypot.value : "",
+        }),
+      }).catch(function () { /* silent — local experience already works */ });
 
       // ── Phase 1: Form fades slowly (1.5s) ──
       formUI.style.transition = "opacity 1.5s ease";

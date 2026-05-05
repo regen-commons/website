@@ -36,17 +36,17 @@ export default async function handler(req, res) {
         const props = page.properties;
         members.push({
           id: page.id,
-          name: readTitle(props["Name"]),
-          type: readSelect(props["Type"]) || "Individual",
+          name: readTitle(props["Org/Individual Name"]),
+          type: readSelect(props["Membership Type"]) || "Individual",
           status: readSelect(props["Status"]),
-          location: readRichText(props["Location"]),
+          location: readRichText(props["Based In"]),
           focusAreas: readMultiSelect(props["Focus areas"]),
-          contributionAreas: readMultiSelect(props["Contribution areas"]),
-          vision: readRichText(props["Vision"]),
-          website: readUrl(props["Website"]),
+          contributionAreas: readMultiSelect(props["Contribution to Commons' Work"]),
+          vision: readRichText(props["Relationship to Regenerative work"]),
+          website: readUrl(props["Website/Portfolio"]),
           avatar: readFirstFileUrl(props["Avatar"]),
-          affiliationIds: readRelationIds(props["Affiliation"]),
-          dateJoined: readDate(props["Date joined"]),
+          affiliationIds: readRelationIds(props["Affiliations"]),
+          dateApplied: readDate(props["Date Applied"]),
         });
       }
       cursor = response.has_more ? response.next_cursor : undefined;
