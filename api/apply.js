@@ -11,7 +11,12 @@ import {
   date,
 } from "./_lib/notion.js";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let _resend = null;
+function getResend() {
+  if (!process.env.RESEND_API_KEY) return null;
+  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY);
+  return _resend;
+}
 
 const rateLimitBuckets = new Map();
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
@@ -51,6 +56,15 @@ const CONTRIB_AREA_LABELS = {
   "communications": "Communications",
   "other": "Other",
 };
+
+function telegramUrl(value) {
+  if (!value) return null;
+  const s = String(value).trim();
+  if (!s) return null;
+  if (/^https?:\/\//i.test(s)) return s;
+  if (/^t\.me\//i.test(s)) return "https://" + s;
+  return "https://t.me/" + s.replace(/^@/, "");
+}
 
 function commitmentLabel(value) {
   return (
@@ -92,33 +106,32 @@ function buildProperties(body) {
   );
 
   return {
-    Name: title(body["full-name"]),
-    Type: select(isOrg ? "Organization" : "Individual"),
-    Status: select("Pending"),
-    Location: richText(body["location"]),
-    "Focus areas": multiSelect(focusAreas),
-    "Contribution areas": multiSelect(contributionAreaNames),
-    Vision: richText(body["regen-relationship"]),
-    Website: url(body["website"]),
-    "Date joined": date(new Date().toISOString().slice(0, 10)),
+    "Org/Individual Name":               title(body["full-name"]),
+    "Membership Type":                   select(isOrg ? "Organization" : "Individual"),
+    "Status":                            select("Pending"),
+    "Based In":                          richText(body["location"]),
+    "Focus areas":                       multiSelect(focusAreas),
+    "Contribution to Commons' Work":     multiSelect(contributionAreaNames),
+    "Website/Portfolio":                 url(body["website"]),
+    "Date Applied":                      date(new Date().toISOString().slice(0, 10)),
 
-    Email: email(body["email"]),
-    Telegram: richText(body["telegram"]),
-    "Org rep": richText(body["org-rep"]),
-    "Org description": richText(body["org-description"]),
-    Nominator: richText(body["nominator"]),
-    "Regen relationship": richText(body["regen-relationship"]),
-    "Values resonance": richText(body["values-resonance"]),
-    "Meaningful participation": richText(body["meaningful-participation"]),
-    "Capital contribution": richText(body["capital-contribution"]),
-    "Contribution other": richText(body["contribution-area-other"]),
-    Commitment: select(commitmentLabel(body["commitment"])),
-    Constraints: richText(body["constraints"]),
-    Authorized: select(authorizedLabel(body["authorized"])),
-    "Other colleagues": richText(body["other-colleagues"]),
-    "Agreement reviewed": select(consentLabel(body["agreement-reviewed"])),
-    "Governance consent": select(consentLabel(body["governance-consent"])),
-    "Closing notes": richText(body["closing-notes"]),
+    "Email":                             email(body["email"]),
+    "Telegram":                          url(telegramUrl(body["telegram"])),
+    "Name and Role of Org Rep":          richText(body["org-rep"]),
+    "Org mission, Size and activities":  richText(body["org-description"]),
+    "Invited By":                        richText(body["nominator"]),
+    "Relationship to Regenerative work": richText(body["regen-relationship"]),
+    "Alignment with Core Values":        richText(body["values-resonance"]),
+    "Meaningful Participation":          richText(body["meaningful-participation"]),
+    "Pathways to Contribution":          richText(body["capital-contribution"]),
+    "Contribution other":                richText(body["contribution-area-other"]),
+    "Participation Commitment":          select(commitmentLabel(body["commitment"])),
+    "Participation Constraint":          richText(body["constraints"]),
+    "Decision making authorization":     select(authorizedLabel(body["authorized"])),
+    "Colleague Name/Email":              richText(body["other-colleagues"]),
+    "Membership Agreement Reviewed":     select(consentLabel(body["agreement-reviewed"])),
+    "Consent to Governance Protocol":    select(consentLabel(body["governance-consent"])),
+    "Anything else for Steward Council to Know?": richText(body["closing-notes"]),
   };
 }
 
@@ -199,7 +212,8 @@ export default async function handler(req, res) {
   const fromEmail = process.env.RESEND_FROM_EMAIL;
 
   const tasks = [];
-  if (fromEmail && body["email"]) {
+  const resend = getResend();
+  if (resend && fromEmail && body["email"]) {
     tasks.push(
       resend.emails.send({
         from: `Regen Commons <${fromEmail}>`,
@@ -209,7 +223,7 @@ export default async function handler(req, res) {
       })
     );
   }
-  if (fromEmail && stewardEmails.length) {
+  if (resend && fromEmail && stewardEmails.length) {
     tasks.push(
       resend.emails.send({
         from: `Regen Commons <${fromEmail}>`,
