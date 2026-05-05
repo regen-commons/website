@@ -1526,12 +1526,28 @@ body.rc-modal-locked { overflow: hidden; }
               escapeHtml(p.name) + '">' + escapeHtml(p.name) + "</button>";
           })
           .join(", ") || "—";
+
+        var capitalArr = Array.isArray(c.capitalForm) ? c.capitalForm : (c.capitalForm ? [c.capitalForm] : []);
+        var capitalHtml = capitalArr.map(function (k) {
+          return '<span class="card-capital" data-capital="' + escapeHtml(k.toLowerCase()) + '">' + escapeHtml(k) + "</span>";
+        }).join("");
+
+        var tierHtml = "";
+        if (c.tier) {
+          var tierNum = (String(c.tier).match(/Tier\s*(\d)/i) || [])[1] || "";
+          tierHtml = '<span class="card-tier" data-tier="' + escapeHtml(tierNum) + '"><strong>' + escapeHtml(c.tier) + "</strong></span>";
+        }
+
         var tagsHtml = [
           c.type ? '<span class="card-type">' + escapeHtml(c.type) + "</span>" : "",
-          c.capitalForm ? '<span class="card-capital">' + escapeHtml(c.capitalForm) + "</span>" : "",
-          c.tier ? '<span class="card-tier"><strong>' + escapeHtml(c.tier) + "</strong></span>" : "",
+          capitalHtml,
+          tierHtml,
           c.stage ? '<span class="experiment-stage">' + escapeHtml(c.stage) + "</span>" : ""
         ].filter(Boolean).join("");
+
+        var termsHtml = c.terms
+          ? '<p class="card-terms"><strong>Terms:</strong> ' + escapeHtml(c.terms) + "</p>"
+          : "";
 
         return (
           '<article class="commons-card" data-type="' + type + '" data-stage="' + stage + '">' +
@@ -1548,6 +1564,7 @@ body.rc-modal-locked { overflow: hidden; }
             "</div>" +
             '<div class="card-body-wrap"><div class="card-body"><div class="card-body-inner">' +
               (c.description ? "<p>" + escapeHtml(c.description) + "</p>" : "") +
+              termsHtml +
             "</div></div></div>" +
           "</article>"
         );
