@@ -90,8 +90,9 @@ async function handlePost(req, res) {
 
   const author = String(body.author || "").trim().slice(0, 80);
 
+  let seedPage;
   try {
-    await notion.pages.create({
+    seedPage = await notion.pages.create({
       parent: { database_id: SEEDS_DB },
       properties: {
         Text: title(text),
@@ -103,10 +104,14 @@ async function handlePost(req, res) {
     return res.status(500).json({ error: "notion_failed" });
   }
 
+  const notionPageUrl =
+    seedPage.url || `https://www.notion.so/${seedPage.id.replace(/-/g, "")}`;
+
   try {
     await notifyTelegram({
       type: "seed",
       text,
+      url: notionPageUrl,
     });
   } catch (err) {
     console.error("seeds_notify_failed", err);
