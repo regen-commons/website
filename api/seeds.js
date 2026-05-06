@@ -110,7 +110,7 @@ async function handlePost(req, res) {
   try {
     await notifyTelegram({
       type: "seed",
-      text: author ? `${text}\n\n— ${author}` : text,
+      text,
       url: notionPageUrl,
     });
   } catch (err) {
