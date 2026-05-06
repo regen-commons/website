@@ -42,6 +42,7 @@
       width: 100vw;
       min-height: 100vh;
       scroll-snap-align: start;
+      scroll-snap-stop: always;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -63,6 +64,24 @@
       flex-direction: column;
       justify-content: center;
       overflow: hidden;
+    }
+
+    /* Mobile: shrink the card to fit the viewport, allow inner scroll for long
+       text, and reduce padding so content isn't clipped. */
+    @media (max-width: 540px) {
+      .panel {
+        align-items: flex-start;
+        padding: 4.5rem 1rem 2rem;
+      }
+      .panel-inner {
+        height: auto;
+        min-height: calc(100vh - 6.5rem);
+        max-height: calc(100vh - 6.5rem);
+        padding: 1.5rem 1.2rem;
+        overflow-y: auto;
+        justify-content: flex-start;
+        -webkit-overflow-scrolling: touch;
+      }
     }
 
     /* ── PROGRESS DOTS ───────────────────────────────────────────────────── */

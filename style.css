@@ -2194,7 +2194,37 @@ p:last-child { margin-bottom: 0; }
   white-space: nowrap;
 }
 @media (max-width: 540px) {
-  .logo-mark-label { display: none; }
+  /* Keep the wordmark visible on mobile, just slightly smaller */
+  .logo-mark-label {
+    font-size: 0.52rem;
+    letter-spacing: 0.18em;
+  }
+  .logo-mark { gap: 0.5rem; }
+
+  /* Bubble-CTA on the seed page: give it a solid backdrop so the label and
+     button read clearly above the swirling bubble field. */
+  .bubble-cta {
+    top: auto;
+    right: 1rem;
+    bottom: 1.4rem;
+    transform: none;
+    background: var(--paper);
+    border: 1px solid rgba(var(--copper-rgb), 0.25);
+    padding: 0.9rem 1.2rem;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+  }
+  [data-theme="dark"] .bubble-cta {
+    background: rgba(20, 16, 8, 0.92);
+  }
+
+  /* Stage-of-growth filters (Seed / Sprout / Flowering / Tree) get one
+     full-row each on mobile so they don't get crowded inline. */
+  .filter-btn[data-filter="seed"],
+  .filter-btn[data-filter="sprout"],
+  .filter-btn[data-filter="flowering"],
+  .filter-btn[data-filter="tree"] {
+    flex: 0 0 100%;
+  }
 }
 
 
