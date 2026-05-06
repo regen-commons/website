@@ -168,8 +168,10 @@ function applicationSummary(body) {
   const isOrg = body["applicant-type"] === "organization";
   const name = body["full-name"] || "(no name)";
   const type = isOrg ? "Organization" : "Individual";
-  const location = body["location"] ? `\nBased in: ${body["location"]}` : "";
-  return `${name} (${type})${location}`;
+  const lines = [`${name} (${type})`];
+  if (body["location"]) lines.push(`Based in: ${body["location"]}`);
+  if (body["website"]) lines.push(`Website: ${body["website"]}`);
+  return lines.join("\n");
 }
 
 function escapeHtml(s) {
