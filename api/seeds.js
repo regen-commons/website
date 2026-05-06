@@ -96,7 +96,6 @@ async function handlePost(req, res) {
       parent: { database_id: SEEDS_DB },
       properties: {
         Text: title(text),
-        Author: richText(author),
         Status: select("Active"),
       },
     });
