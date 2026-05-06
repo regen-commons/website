@@ -12,89 +12,8 @@
 
   // ─── Pre-seeded community visions ─────────────────────────────────────────
   // Authentic practitioner voices — drawn from real regenerative movement struggles.
-  var SEEDED = [
-    "Knowledge that outlasts the organizations that made it.",
-    "Coordination without burning out the coordinator.",
-    "A place to return to — not a platform that extracts and moves on.",
-    "What we've been trying to build for fifteen years, finally held somewhere.",
-    "Commons for my watershed. For the whole bioregion.",
-    "Governance that doesn't require a lawyer to understand.",
-    "A network where contributing makes you richer, not just busier.",
-    "Experiments that can fail safely, with other people watching and learning.",
-    "No more silos. No more re-inventing the same wheels.",
-    "Connection that crosses sectors without needing a middleman.",
-    "Infrastructure that belongs to everyone who maintains it.",
-    "A record of what worked — and what didn't — that doesn't disappear.",
-    "Tools that make the invisible visible: who's tending what.",
-    "The kind of place I could actually send someone and trust they'd be held.",
-    "Regenerative movement knowledge, finally findable.",
-    "A home for things that don't fit inside one organization.",
-    "Exit to commons — not exit to acquisition.",
-    "Shared memory across the movement.",
-    "What if good governance templates were public goods?",
-    "The coordination layer we actually needed.",
-    "Belonging without permission.",
-    "A commons that's alive — not just archived.",
-    "The ground beneath the work.",
-    "Weaving without centralizing.",
-    "Trust infrastructure at scale.",
-    "Knowledge that breathes.",
-    "A place where small orgs can stand on each other's shoulders.",
-    "Not just another database. A living thing.",
-    "Something that persists when the grant ends.",
-    "Recognition for the invisible labor.",
-    "Protocol that serves the practitioner, not the platform.",
-    "Bioregional knowledge held in common.",
-    "The connective tissue between experiments.",
-    "Reciprocity made legible.",
-    "An answer to the question: where does this work live?",
-    "Commons for the commons-builders.",
-    "Regenerative by structure, not just by intention.",
-    "A field that gets richer with every person who tends it.",
-    "Memory that survives organizational collapse.",
-    "Governance as care, not as control.",
-    // Second wave — field practitioners, direct voices
-    "No more losing the thread when the project ends.",
-    "What the regenerative movement needs most is to talk to itself.",
-    "A library that knows it's alive.",
-    "The wisdom is already here. Help it find itself.",
-    "Coordination that scales without losing accountability.",
-    "A commons that outlasts every org that builds it.",
-    "Making the movement legible — to itself.",
-    "Soil knowledge. Watershed knowledge. Commons knowledge.",
-    "The right knowledge, at the right time, without the middleman.",
-    "A place where 'who knows about this' is finally answered.",
-    "Grant cycles end. The commons doesn't.",
-    "What if the movement knew what it knew?",
-    "A network that rewards contribution over extraction.",
-    "Federated. Distributed. Alive.",
-    "A place to bring the practices that still have no home.",
-    "Governance that holds the tension between care and accountability.",
-    "Not owned. Tended.",
-    "The experiments worth naming, finally named.",
-    "A commons where the cost of entry is an offering.",
-    "Knowledge that flows without leaking.",
-    "The long arc of regeneration, held somewhere.",
-    "What happens after the workshop ends.",
-    "The connective layer. The one we've always needed.",
-    "A place where failure is held, not hidden.",
-    "Interoperability without centralization.",
-    "What would it look like if the movement trusted itself?",
-    "Commons that make more commons.",
-    "A field that remembers.",
-    "What the seed holds before it opens.",
-    "Roots before branches.",
-    "Mutual aid with memory.",
-    "The infrastructure of trust.",
-    "A living archive of what actually worked.",
-    "Something we can return to when everything else changes.",
-    "Connection without permission. Depth without gatekeeping.",
-    "A commons that breathes back.",
-    "Not a monument. A metabolism.",
-    "Letting the movement hold its own history.",
-    "Knowledge as commons, not commodity.",
-    "A place where showing up means something.",
-  ];
+  // Visions are loaded from /api/seeds; this array is filled at runtime.
+  var SEEDED = [];
 
   // ─── Organic blob SVG path (Symphony of Vines technique) ─────────────────
   // Irregular hand-drawn ellipse — used as button border
@@ -117,12 +36,11 @@
       .then(function (r) { if (!r.ok) throw new Error("seeds_fetch_failed"); return r.json(); })
       .then(function (data) {
         var items = ((data && data.seeds) || []).map(function (s) { return s.text; }).filter(Boolean);
-        if (!items.length) return;
         SEEDED.length = 0;
         items.forEach(function (t) { SEEDED.push(t); });
       })
       .catch(function (err) {
-        console.warn("seeds using inline fallback:", err && err.message);
+        console.warn("seeds: empty (API error)", err && err.message);
       });
   }
 
@@ -351,47 +269,33 @@
       localStorage.setItem("regen_map_last_visit", Date.now().toString());
     } catch (_) {}
 
-    // Sample visions for the echo (subset of SEEDED array)
-    var echoSampleVisions = [
-      "Knowledge that outlasts the organizations that made it.",
-      "A commons that's alive — not just archived.",
-      "The ground beneath the work.",
-      "Belonging without permission.",
-      "A field that gets richer with every person who tends it."
-    ];
-
     if (!hasVisitedMap && savedVision && arrivalEcho && echoVision) {
-      // First arrival after planting a vision
+      // First arrival after planting a vision — show user's vision plus a few
+      // others fetched from the live Seeds DB (best-effort).
       echoVision.textContent = '"' + savedVision + '"';
       if (echoOthers) {
-        // Show 3 random other visions
-        var shuffled = echoSampleVisions.sort(function () { return 0.5 - Math.random(); });
-        for (var i = 0; i < 3; i++) {
-          var v = document.createElement("p");
-          v.className = "arrival-echo-other";
-          v.textContent = '"' + shuffled[i] + '"';
-          echoOthers.appendChild(v);
-        }
+        fetch("/api/seeds")
+          .then(function (r) { return r.ok ? r.json() : { seeds: [] }; })
+          .then(function (data) {
+            var pool = ((data && data.seeds) || [])
+              .map(function (s) { return s.text; })
+              .filter(function (t) { return t && t !== savedVision; });
+            var shuffled = pool.sort(function () { return 0.5 - Math.random(); });
+            for (var i = 0; i < Math.min(3, shuffled.length); i++) {
+              var v = document.createElement("p");
+              v.className = "arrival-echo-other";
+              v.textContent = '"' + shuffled[i] + '"';
+              echoOthers.appendChild(v);
+            }
+          })
+          .catch(function () { /* leave echoOthers empty if offline */ });
       }
       arrivalEcho.style.display = "block";
       arrivalEcho.style.opacity = "0";
       arrivalEcho.style.transition = "opacity 1.5s ease";
       requestAnimationFrame(function () { arrivalEcho.style.opacity = "1"; });
     } else if (hasVisitedMap && welcomeBack) {
-      // Returning visitor
-      if (welcomePulse) {
-        var items = [
-          "2 new resources added to the Knowledge Commons",
-          "The Federated Knowledge experiment completed its first integration test",
-          "Next commons gathering: April 8, 2026"
-        ];
-        items.forEach(function (item) {
-          var p = document.createElement("p");
-          p.className = "welcome-back-item";
-          p.textContent = item;
-          welcomePulse.appendChild(p);
-        });
-      }
+      // Returning visitor — pulse content not wired to a live data source yet.
       welcomeBack.style.display = "block";
       welcomeBack.style.opacity = "0";
       welcomeBack.style.transition = "opacity 1.2s ease";

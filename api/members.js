@@ -24,10 +24,8 @@ export default async function handler(req, res) {
       const response = await notion.databases.query({
         database_id: MEMBERS_DB,
         filter: {
-          or: [
-            { property: "Status", select: { equals: "Active" } },
-            { property: "Status", select: { equals: "Steward" } },
-          ],
+          property: "Status",
+          select: { equals: "Active" },
         },
         start_cursor: cursor,
         page_size: 100,

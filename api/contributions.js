@@ -32,7 +32,7 @@ export default async function handler(req, res) {
         database_id: CONTRIBUTIONS_DB,
         filter: {
           property: "Status",
-          select: { does_not_equal: "Archived" },
+          select: { equals: "Active" },
         },
         start_cursor: cursor,
         page_size: 100,

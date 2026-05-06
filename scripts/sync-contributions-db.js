@@ -4,6 +4,7 @@
 //   • "Capital form": rich_text → multi_select with 8 forms-of-capital options
 //   • "Tier":         rich_text → select with the 4 tier labels
 //   • "Terms":        new rich_text property (was missing)
+//   • "Status":       add "Active" option (the public publish gate)
 //
 // Type changes require deleting and recreating the property, so any existing
 // values in "Capital form" or "Tier" will be lost. Run this when the DB is
@@ -53,6 +54,7 @@ async function main() {
   const cap = present["Capital form"];
   const tier = present["Tier"];
   const terms = present["Terms"];
+  const status = present["Status"];
 
   const plan = [];
 
@@ -84,6 +86,22 @@ async function main() {
     plan.push(`! TYPE    Terms          current=${terms.type}, expected=rich_text (manual fix)`);
   } else {
     plan.push("✓ OK      Terms");
+  }
+
+  // Status — make sure "Active" exists (the publish gate)
+  let needStatusActive = false;
+  if (status && status.type === "select") {
+    const have = new Set((status.select.options || []).map((o) => o.name.toLowerCase()));
+    if (!have.has("active")) {
+      plan.push('~ OPTIONS Status         add: Active');
+      needStatusActive = true;
+    } else {
+      plan.push("✓ OK      Status (Active option present)");
+    }
+  } else if (!status) {
+    plan.push("! TYPE    Status         missing entirely (manual fix)");
+  } else {
+    plan.push(`! TYPE    Status         current=${status.type}, expected=select (manual fix)`);
   }
 
   plan.forEach((p) => console.log("  " + p));
@@ -130,6 +148,12 @@ async function main() {
       ...TIER_OPTIONS.filter((n) => !existingLower.has(n.toLowerCase())).map((n) => ({ name: n })),
     ];
     addUpdate["Tier"] = { select: { options: merged } };
+  }
+  if (needStatusActive && status && status.type === "select") {
+    const existing = (status.select.options || []).map((o) => ({ name: o.name }));
+    addUpdate["Status"] = {
+      select: { options: [...existing, { name: "Active" }] },
+    };
   }
 
   console.log("Applying updates…");
