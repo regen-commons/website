@@ -12,7 +12,7 @@ import { notifyTelegram } from "./_lib/notify.js";
 
 const rateLimitBuckets = new Map();
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
-const RATE_LIMIT_MAX = 3;
+const RATE_LIMIT_MAX = 6;
 const MIN_LENGTH = 3;
 const MAX_LENGTH = 240;
 
