@@ -2217,14 +2217,6 @@ p:last-child { margin-bottom: 0; }
     background: rgba(20, 16, 8, 0.92);
   }
 
-  /* Stage-of-growth filters (Seed / Sprout / Flowering / Tree) get one
-     full-row each on mobile so they don't get crowded inline. */
-  .filter-btn[data-filter="seed"],
-  .filter-btn[data-filter="sprout"],
-  .filter-btn[data-filter="flowering"],
-  .filter-btn[data-filter="tree"] {
-    flex: 0 0 100%;
-  }
 }
 
 
