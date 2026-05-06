@@ -1440,6 +1440,7 @@ p:last-child { margin-bottom: 0; }
   color: var(--ink-mid);
   line-height: 1.6;
   display: block;
+  font-style: normal;
 }
 
 .card-contributor {
@@ -1501,6 +1502,7 @@ p:last-child { margin-bottom: 0; }
   line-height: 1.72;
   color: var(--ink-dim);
   margin-top: 0.8rem;
+  font-style: italic;
 }
 .card-terms strong {
   font-weight: 500;

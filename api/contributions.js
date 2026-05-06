@@ -12,7 +12,7 @@ import {
 async function nameForMember(id) {
   try {
     const page = await notion.pages.retrieve({ page_id: id });
-    return readTitle(page.properties?.["Name"]);
+    return readTitle(page.properties?.["Org/Individual Name"]);
   } catch {
     return "";
   }
