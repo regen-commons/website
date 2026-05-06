@@ -498,15 +498,7 @@
           <span class="eyebrow">Already in the ground</span>
           <h2>Explore what's been planted.</h2>
           <p>Hover over the seeds to see what's growing.</p>
-          <div class="seed-dots" id="learn-seed-dots">
-            <div class="seed-dot" data-vision="Knowledge that outlasts the organizations that made it."></div>
-            <div class="seed-dot" data-vision="Coordination without burning out the coordinator."></div>
-            <div class="seed-dot" data-vision="A place to return to — not a platform that extracts and moves on."></div>
-            <div class="seed-dot" data-vision="Governance that doesn't require a lawyer to understand."></div>
-            <div class="seed-dot" data-vision="Belonging without permission."></div>
-            <div class="seed-dot" data-vision="The ground beneath the work."></div>
-            <div class="seed-dot" data-vision="A commons that's alive — not just archived."></div>
-          </div>
+          <div class="seed-dots" id="learn-seed-dots"></div>
           <div class="seed-tooltip" id="seed-tooltip" style="display:none;">
             <span class="seed-tooltip-vision"></span>
           </div>
@@ -632,50 +624,90 @@
   </script>
 
   <script>
-  // ── Seed dot randomization + hover interaction ──
+  // ── Seed dots: pulled from /api/seeds (Notion), random selection ──
   (function() {
-    var dots = document.querySelectorAll('.seed-dot');
+    var container = document.getElementById('learn-seed-dots');
     var tooltip = document.getElementById('seed-tooltip');
-    if (!dots.length) return;
+    if (!container) return;
 
-    // Randomize position (within an inset of the container) and color on each load.
+    var FALLBACK = [
+      "Knowledge that outlasts the organizations that made it.",
+      "Coordination without burning out the coordinator.",
+      "A place to return to — not a platform that extracts and moves on.",
+      "Governance that doesn't require a lawyer to understand.",
+      "Belonging without permission.",
+      "The ground beneath the work.",
+      "A commons that's alive — not just archived."
+    ];
+    var COUNT = 7;
     var palette = ['var(--copper)', 'var(--forest)', 'var(--teal)', 'var(--gold)'];
-    var placed = [];
-    var minDist = 12; // % distance to keep dots from overlapping
-    function pickPos() {
-      for (var attempt = 0; attempt < 40; attempt++) {
-        var x = 6 + Math.random() * 88;
-        var y = 8 + Math.random() * 80;
-        var ok = placed.every(function (p) {
-          var dx = p.x - x, dy = p.y - y;
-          return Math.sqrt(dx * dx + dy * dy) >= minDist;
-        });
-        if (ok) { placed.push({ x: x, y: y }); return { x: x, y: y }; }
+
+    function shufflePick(arr, n) {
+      var copy = arr.slice();
+      for (var i = copy.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = copy[i]; copy[i] = copy[j]; copy[j] = tmp;
       }
-      // Fallback if we can't find a spot
-      var fx = 6 + Math.random() * 88, fy = 8 + Math.random() * 80;
-      placed.push({ x: fx, y: fy });
-      return { x: fx, y: fy };
+      return copy.slice(0, n);
     }
-    dots.forEach(function (dot) {
-      var pos = pickPos();
-      dot.style.left = pos.x + '%';
-      dot.style.top  = pos.y + '%';
-      dot.style.background = palette[Math.floor(Math.random() * palette.length)];
-    });
 
-    if (!tooltip) return;
-    var visionEl = tooltip.querySelector('.seed-tooltip-vision');
+    function render(visions) {
+      container.innerHTML = '';
+      var placed = [];
+      var minDist = 12;
+      function pickPos() {
+        for (var attempt = 0; attempt < 40; attempt++) {
+          var x = 6 + Math.random() * 88;
+          var y = 8 + Math.random() * 80;
+          var ok = placed.every(function (p) {
+            var dx = p.x - x, dy = p.y - y;
+            return Math.sqrt(dx * dx + dy * dy) >= minDist;
+          });
+          if (ok) { placed.push({ x: x, y: y }); return { x: x, y: y }; }
+        }
+        var fx = 6 + Math.random() * 88, fy = 8 + Math.random() * 80;
+        placed.push({ x: fx, y: fy });
+        return { x: fx, y: fy };
+      }
+      visions.forEach(function (vision) {
+        var dot = document.createElement('div');
+        dot.className = 'seed-dot';
+        dot.setAttribute('data-vision', vision);
+        var pos = pickPos();
+        dot.style.left = pos.x + '%';
+        dot.style.top  = pos.y + '%';
+        dot.style.background = palette[Math.floor(Math.random() * palette.length)];
+        container.appendChild(dot);
+      });
+      bindHover();
+    }
 
-    dots.forEach(function(dot) {
-      dot.addEventListener('mouseenter', function() {
-        if (visionEl) visionEl.textContent = '"' + (dot.dataset.vision || '') + '"';
-        tooltip.style.display = 'block';
+    function bindHover() {
+      if (!tooltip) return;
+      var visionEl = tooltip.querySelector('.seed-tooltip-vision');
+      container.querySelectorAll('.seed-dot').forEach(function (dot) {
+        dot.addEventListener('mouseenter', function () {
+          if (visionEl) visionEl.textContent = '"' + (dot.getAttribute('data-vision') || '') + '"';
+          tooltip.style.display = 'block';
+        });
+        dot.addEventListener('mouseleave', function () {
+          tooltip.style.display = 'none';
+        });
       });
-      dot.addEventListener('mouseleave', function() {
-        tooltip.style.display = 'none';
+    }
+
+    fetch('/api/seeds')
+      .then(function (r) { return r.ok ? r.json() : { seeds: [] }; })
+      .then(function (data) {
+        var pool = ((data && data.seeds) || [])
+          .map(function (s) { return s && s.text; })
+          .filter(Boolean);
+        var source = pool.length ? pool : FALLBACK;
+        render(shufflePick(source, Math.min(COUNT, source.length)));
+      })
+      .catch(function () {
+        render(shufflePick(FALLBACK, COUNT));
       });
-    });
   })();
   </script>
 
