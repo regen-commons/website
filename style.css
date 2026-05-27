@@ -87,6 +87,19 @@ body[data-page="map"]         { --accent: var(--teal);   --accent-rgb: 72, 184, 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 18px; scroll-behavior: smooth; }
 
+/* ── HIDE SCROLLBARS (site-wide) ─────────────────────────────────────────── */
+html, body, * {
+  scrollbar-width: none;        /* Firefox */
+  -ms-overflow-style: none;     /* IE/Edge legacy */
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;                /* WebKit */
+}
+
 body {
   font-family: var(--font-serif);
   color: var(--ink);
@@ -312,18 +325,35 @@ p:last-child { margin-bottom: 0; }
   color: var(--ink-mid);
 }
 
-/* Scroll indicator — animated chevrons */
+/* Scroll indicator — animated chevrons in a circle */
 .hero-scroll-indicator {
-  display: flex;
-  flex-direction: column;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   margin-top: 3rem;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(var(--copper-rgb), 0.32);
+  background: var(--paper);
   text-decoration: none;
   color: var(--ink-dim);
-  transition: color 0.3s;
+  transition: color 0.3s, border-color 0.3s, background 0.3s, transform 0.3s;
 }
-.hero-scroll-indicator:hover { color: var(--accent, var(--forest)); }
-.scroll-chevrons { overflow: visible; }
+.hero-scroll-indicator:hover {
+  color: var(--accent, var(--forest));
+  border-color: var(--accent, var(--forest));
+  transform: translateY(2px);
+}
+[data-theme="light"] .hero-scroll-indicator {
+  border-color: rgba(var(--copper-rgb), 0.4);
+  background: var(--parchment);
+}
+.scroll-chevrons {
+  overflow: visible;
+  width: 20px;
+  height: 30px;
+}
 .chevron {
   opacity: 0;
   animation: chevron-pulse 2s ease-in-out infinite;
@@ -499,7 +529,7 @@ p:last-child { margin-bottom: 0; }
 .bridge {
   position: relative; z-index: 2;
   padding: 5rem var(--pad);
-  max-width: 680px;
+  max-width: 1100px;
   text-align: center;
   margin: 0 auto;
 }
@@ -515,16 +545,16 @@ p:last-child { margin-bottom: 0; }
 .bridge-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.6rem;
+  gap: 0.75rem;
   justify-content: center;
   margin-bottom: 2.5rem;
 }
 .bridge-tag {
   font-family: var(--font-sans);
-  font-size: 0.68rem;
+  font-size: 0.88rem;
   font-weight: 400;
   letter-spacing: 0.08em;
-  padding: 0.6rem 1.2rem;
+  padding: 0.9rem 1.7rem;
   border: 1px solid rgba(var(--accent-rgb, var(--forest-rgb)), 0.2);
   background: none;
   color: var(--ink-mid);
