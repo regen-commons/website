@@ -620,14 +620,23 @@
           submitBtn.querySelector(".btn-label").textContent = "Sending…";
         }
 
+        var res;
         try {
-          var res = await fetch("/api/apply", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(serializeForm()),
-          });
+          try {
+            res = await fetch("/api/apply", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(serializeForm()),
+            });
+          } catch (networkErr) {
+            // fetch() rejects only on network failure (offline, DNS, blocked,
+            // connection reset) — distinct from a server-side error response.
+            console.error("join: network error reaching /api/apply", networkErr);
+            throw new Error("network_error");
+          }
           if (!res.ok) {
             var data = await res.json().catch(function () { return {}; });
+            console.error("join: /api/apply failed", res.status, data && data.error);
             throw new Error(data.error || "request_failed");
           }
           form.style.display = "none";
@@ -635,9 +644,12 @@
           confirm.classList.add("active");
           window.scrollTo({ top: 0, behavior: "smooth" });
         } catch (err) {
+          var code = err && err.message;
           showError(
-            err && err.message === "rate_limited"
+            code === "rate_limited"
               ? "Too many submissions from this connection. Please try again later."
+              : code === "network_error"
+              ? "We couldn't reach the server — please check your connection and try again, or email a steward directly."
               : "Something went wrong sending your application. Please try again, or email a steward directly."
           );
           if (submitBtn) {

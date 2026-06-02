@@ -181,6 +181,76 @@ function escapeAttr(s) {
   return escapeHtml(s);
 }
 
+// Every submitted field as plain text — used to capture an application
+// out-of-band when Notion is unavailable, so nothing is lost.
+function rawApplicationLines(body) {
+  return Object.keys(body)
+    .filter((k) => k !== "website_confirm")
+    .map((k) => {
+      const v = body[k];
+      return `${k}: ${Array.isArray(v) ? v.join(", ") : v}`;
+    })
+    .join("\n");
+}
+
+// Notion's API occasionally returns transient 429 / 5xx responses. Retry those
+// once; surface validation errors (4xx other than 429) immediately.
+async function notionCreateWithRetry(properties, attempts = 2) {
+  let lastErr;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await notion.pages.create({
+        parent: { database_id: MEMBERS_DB },
+        properties,
+      });
+    } catch (err) {
+      lastErr = err;
+      const status = err && err.status;
+      const transient = status === 429 || (status >= 500 && status < 600);
+      if (!transient) throw err;
+    }
+  }
+  throw lastErr;
+}
+
+// When the Notion write fails, still get the application in front of a steward
+// (email + Telegram) with the raw answers so it can be added by hand.
+async function captureFailedApplication(body, err) {
+  const detail = [err && err.status, err && err.code, err && err.message]
+    .filter(Boolean)
+    .join(" ") || String(err);
+  const text =
+    `⚠️ Application could NOT be saved to Notion — please add it manually.\n` +
+    `Error: ${detail}\n\n` +
+    rawApplicationLines(body);
+
+  const tasks = [];
+  const resend = getResend();
+  const fromEmail = process.env.RESEND_FROM_EMAIL;
+  const stewardEmails = (process.env.STEWARD_NOTIFY_EMAILS || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  if (resend && fromEmail && stewardEmails.length) {
+    tasks.push(
+      resend.emails.send({
+        from: `Regen Commons <${fromEmail}>`,
+        to: stewardEmails,
+        subject: `⚠️ Application NOT saved: ${body["full-name"] || "(no name)"}`,
+        html: `<pre style="font-family:ui-monospace,monospace;white-space:pre-wrap">${escapeHtml(text)}</pre>`,
+      })
+    );
+  }
+  // Reuse type "application" — the notify receiver only accepts that or "seed".
+  tasks.push(notifyTelegram({ type: "application", text }));
+
+  const results = await Promise.allSettled(tasks);
+  results.forEach((r, i) => {
+    if (r.status === "rejected") console.error(`capture_failed_task_${i}`, r.reason);
+  });
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
@@ -206,12 +276,13 @@ export default async function handler(req, res) {
 
   let notionPage;
   try {
-    notionPage = await notion.pages.create({
-      parent: { database_id: MEMBERS_DB },
-      properties: buildProperties(body),
-    });
+    notionPage = await notionCreateWithRetry(buildProperties(body));
   } catch (err) {
-    console.error("notion_create_failed", err);
+    console.error("notion_create_failed", err && err.status, err && err.code, err && err.message);
+    // Don't drop the application — capture it out-of-band before erroring.
+    await captureFailedApplication(body, err).catch((e) =>
+      console.error("capture_failed_application_failed", e)
+    );
     return res.status(500).json({ error: "notion_failed" });
   }
 
