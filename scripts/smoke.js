@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { once } from "node:events";
 import { createLocalServer } from "./lib/local-server.js";
-import { publicFiles } from "./lib/site-files.js";
+import { publicFiles, pages } from "./lib/site-files.js";
 
 const server = createLocalServer();
 server.listen(0, "127.0.0.1");
@@ -33,7 +33,14 @@ try {
   assert.equal(application.status, 200);
   const members = await (await fetch(`${base}/api/members`)).json();
   assert.ok(!members.members.some((item) => item.name === "Smoke Applicant"));
-  console.log("Smoke passed: five pages, assets, all API reads, seed write/readback, pending application excluded from public members.");
+  assert.equal((await fetch(`${base}/api/admin?resource=applications`)).status, 401);
+  const authPost = (body) => fetch(`${base}/api/admin`, { method: "POST", headers: { Origin: base, "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  assert.equal((await authPost({ action: "request-code", email: "steward@example.test" })).status, 200);
+  const login = await authPost({ action: "verify-code", email: "steward@example.test", code: "123456" });
+  assert.equal(login.status, 200);
+  const reviewed = await fetch(`${base}/api/admin?resource=applications`, { headers: { Cookie: login.headers.get("set-cookie").split(";")[0] } });
+  assert.equal((await reviewed.json()).applications.length, 3);
+  console.log(`Smoke passed: ${pages.length} pages, assets, public API reads/writes, publication gate, steward login and authorized queue.`);
   console.log("Evidence: local HTTP + actual handlers with fixture transport; external services and rendered UI are not covered.");
 } finally {
   server.closeAllConnections();

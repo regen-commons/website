@@ -3,6 +3,8 @@ import { readFile } from "node:fs/promises";
 import { handlers } from "./fixtures.js";
 import { publicFiles } from "./site-files.js";
 import { createScenarios } from "./scenarios.js";
+import { createAdminHandler } from "../../api/admin.js";
+import { createStewardFixtures } from "./steward-fixtures.js";
 
 const root = new URL("../../", import.meta.url);
 const banner = '<aside aria-label="Local development" style="position:fixed;bottom:0;left:0;right:0;z-index:2147483647;background:#173c2c;color:white;padding:6px 12px;font:13px system-ui;text-align:center">Local demo · synthetic data · submissions stay in memory · restart to reset</aside>';
@@ -37,8 +39,9 @@ async function readBody(req, limit) {
   }
 }
 
-export function createLocalServer() {
+export function createLocalServer({ stewardProvider = createStewardFixtures() } = {}) {
   const scenarios = createScenarios();
+  const admin = createAdminHandler({ provider: () => stewardProvider, secureCookies: false, origin: (req) => `http://${req.headers.host}` });
   return createServer(async (req, res) => {
     res.setHeader("Cache-Control", "no-store");
     res.setHeader("X-Regen-Data", "fixture");
@@ -57,7 +60,7 @@ export function createLocalServer() {
       if (path === "/__dev/health" && req.method === "GET") {
         return json(res, 200, { ok: true, mode: "fixture", persistence: "memory", externalWrites: false });
       }
-      const handler = handlers[path];
+      const handler = path === "/api/admin" ? admin : handlers[path];
       if (handler) {
         if (req.method === "POST") req.body = await readBody(req, path === "/api/apply" ? 32768 : 8192);
         if (await scenarios.respond(req, res, path)) return;
@@ -80,7 +83,8 @@ export function createLocalServer() {
       if (!publicFiles.includes(file)) return json(res, 404, { error: "not_found" });
       const type = file.split(".").at(-1);
       let content = await readFile(new URL(file, root), "utf8");
-      if (type === "html") content = content.replace("</body>", `${banner}</body>`);
+      if (file === "admin.html") content = content.replace('id="demo-help" hidden', 'id="demo-help"');
+      if (type === "html") content = content.replace("</body>", `${file === "admin.html" ? '<aside class="dev-banner">Local demo · synthetic data · no email is sent · restart to reset</aside>' : banner}</body>`);
       res.writeHead(200, { "Content-Type": types[type] });
       res.end(req.method === "HEAD" ? undefined : content);
     } catch (error) {

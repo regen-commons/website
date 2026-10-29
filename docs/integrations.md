@@ -1,8 +1,11 @@
 # Architecture and integration contracts
 
-The browser calls four Vercel handlers. Only the handlers talk to Notion,
-Resend, and the separate Telegram agent. There is no frontend framework or
-bundler. Keep this small architecture until an actual requirement justifies more.
+The public browser calls four Vercel handlers. Only those handlers talk to
+Notion, Resend, and the separate Telegram agent. The separate `/admin` browser
+calls `/api/admin`, whose Supabase client carries the authenticated user's token
+and remains subject to row policies. There is no frontend framework or bundler.
+The [steward contract](steward-dashboard.md) owns dashboard schema, access,
+configuration, and verification. Public intake/read providers are unchanged.
 
 | Route | Current behavior | Owning implementation |
 |---|---|---|

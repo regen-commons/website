@@ -36,6 +36,19 @@ for seed and application writes remains follow-up work in item 3.
 
 ## 2. Establish a verified integration environment — parallel ownership work
 
+**Updated direction:** Supabase and `/admin` email-code access are confirmed;
+Directus is not part of the plan. The [read-only dashboard slice](steward-dashboard.md)
+is implemented on `codex/steward-dashboard`. Its schema and PostgreSQL access
+tests ran against Regen Commons / Website. Local auth and review flows use
+synthetic fixtures. Live Auth SMTP/code templates, named steward provisioning,
+and delivery remain unverified; no public provider cutover has occurred.
+
+**Next boundary:** establish real steward login in an authorized test environment,
+then agree acceptance/publication authority and migration scope. The remaining
+Notion work below is source inventory/export and reconciliation, not investment
+in a lasting replacement development database. Preserve separate acceptance and
+publication until council policy is agreed.
+
 **Scope:** account inventory and development configuration, followed by an
 explicitly authorized live smoke. No production migration is implied.
 

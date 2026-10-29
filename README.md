@@ -1,8 +1,9 @@
 # Regen Commons website
 
-Five static HTML pages with Vercel functions for membership applications, the
-commons library, and shared visions. Production data lives in Notion; optional
-notifications use Resend and the separate Regen Commons Telegram agent.
+Five public HTML pages and a separate `/admin` steward dashboard, with Vercel
+functions for data access. Public intake, the commons library, and shared visions
+still use Notion. The read-only steward pilot uses Supabase PostgreSQL and Auth.
+Optional public-intake notifications use Resend and the separate Telegram agent.
 
 ## Start locally
 
@@ -47,6 +48,7 @@ checks; provider delivery needs a separately configured integration environment.
 | Member graph and contributions library | `map.html` |
 | Seed planting experience | `seeds.html` |
 | Six-step membership application | `join.html` |
+| Steward login, applications, and member review | `admin.html`, `admin/`, `api/admin.js` |
 | Shared interactions and styling | `script.js`, `style.css` |
 | Canvas animations | `canvas.js`, `logo-canvas.js` |
 | Server handlers and provider helpers | `api/`, `api/_lib/` |
@@ -65,6 +67,7 @@ change, and report check/test/smoke results plus any browser or live-service gap
 - [Architecture and integration contracts](docs/integrations.md)
 - [Initial assessment](docs/assessment-2026-10-29.md)
 - [Prioritized initial work](docs/work-plan.md)
+- [Steward dashboard setup and verified Supabase state](docs/steward-dashboard.md)
 
 ## Deployment and stewardship
 
