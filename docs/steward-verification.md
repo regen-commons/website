@@ -7,13 +7,19 @@ results below distinguish local checks from hosted PostgreSQL verification.
 
 ## Local HTTP and automated behavior
 
-`npm run check`, all 24 tests in `npm test`, and `npm run smoke` pass using
+`npm run check`, all 28 tests in `npm test`, and `npm run smoke` pass using
 Node 22.22.1. The tests cover the original 14 foundation behaviors plus steward access,
 code expiry/reuse, unknown and non-steward users, revoked roles, expired sessions,
 private caching, input validation, origin checks, public/private projections,
 relationships, Supabase SDK request contracts, provider failure, and sign-out
 retry. Smoke covers six pages and their assets, public read/write behavior,
 the publication gate, and local steward sign-in plus an authorized queue read.
+
+PR review reproduced and fixed Auth outages being reported as invalid codes,
+Auth throttling invalidating the session, database throttling losing its 429
+status, and logout rejecting already-expired/deleted sessions. Regression tests
+use the pinned Supabase SDK with synthetic HTTP responses. Service failures
+remain retryable and do not masquerade as invalid credentials or successful logout.
 
 The default server and these tests use synthetic providers. No test mail is
 delivered by them, and the public join fixture is not wired into the new queue.

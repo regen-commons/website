@@ -12,13 +12,26 @@ const summaryColumns =
 const memberColumns =
   "id,name,member_type,publication_state,location,summary,website,focus_areas,contribution_areas";
 
-function result({ data, error, count }) {
-  if (error)
+function result({ data, error, count, status }) {
+  if (error) {
+    const limited = (error.status ?? status) === 429;
     throw new AdminError(
-      error.status === 429 ? 429 : 503,
-      error.status === 429 ? "rate_limited" : "provider_unavailable",
+      limited ? 429 : 503,
+      limited ? "rate_limited" : "provider_unavailable",
     );
+  }
   return { data, count };
+}
+
+function checkAuthService(error) {
+  if (!error) return;
+  if (error.status === 429) throw new AdminError(429, "rate_limited");
+  if (
+    !error.status ||
+    error.status >= 500 ||
+    error.name === "AuthRetryableFetchError"
+  )
+    throw new AdminError(503, "provider_unavailable");
 }
 
 // Every database call carries the user's token. No service-role key is used.
@@ -58,11 +71,8 @@ export function createSupabaseProvider({ url, key, request = fetch }) {
         token,
         type: "email",
       });
-      if (error || !data.session)
-        throw new AdminError(
-          error?.status === 429 ? 429 : 401,
-          error?.status === 429 ? "rate_limited" : "invalid_code",
-        );
+      checkAuthService(error);
+      if (error || !data.session) throw new AdminError(401, "invalid_code");
       return {
         token: data.session.access_token,
         expiresIn: Math.min(data.session.expires_in, 3600),
@@ -71,13 +81,7 @@ export function createSupabaseProvider({ url, key, request = fetch }) {
     async authorize(token) {
       const db = client(token);
       const { data, error } = await db.auth.getUser(token);
-      if (
-        error &&
-        (!error.status ||
-          error.status >= 500 ||
-          error.name === "AuthRetryableFetchError")
-      )
-        throw new AdminError(503, "provider_unavailable");
+      checkAuthService(error);
       if (error || !data.user) throw new AdminError(401, "sign_in_required");
       const access = result(await db.rpc("steward_access")).data;
       if (access !== true) throw new AdminError(403, "steward_required");
@@ -89,7 +93,8 @@ export function createSupabaseProvider({ url, key, request = fetch }) {
         headers: { apikey: key, Authorization: `Bearer ${token}` },
         signal: AbortSignal.timeout(10000),
       });
-      if (!response.ok && response.status !== 401)
+      // Match Supabase Auth's sign-out semantics for expired/deleted sessions.
+      if (!response.ok && ![401, 403, 404].includes(response.status))
         throw new AdminError(503, "sign_out_failed");
     },
     async applications(token, { search, state, type, offset }) {

@@ -318,6 +318,122 @@ test("provider failure is unavailable, not empty data or a successful login", as
   );
 });
 
+test("Auth outages and throttling remain retryable instead of invalidating credentials", async () => {
+  for (const [status, expectedStatus, code] of [
+    [503, 503, "provider_unavailable"],
+    [429, 429, "rate_limited"],
+  ]) {
+    const db = createSupabaseProvider({
+      url: "https://synthetic.supabase.co",
+      key: "sb_publishable_synthetic",
+      request: async () =>
+        new Response('{"message":"synthetic failure"}', {
+          status,
+          headers: { "content-type": "application/json" },
+        }),
+    });
+    for (const operation of [
+      () => db.verifyCode("steward@example.test", "123456"),
+      () => db.authorize("synthetic-user-token"),
+    ]) {
+      await assert.rejects(
+        operation,
+        (error) => error.status === expectedStatus && error.message === code,
+      );
+    }
+  }
+});
+
+test("database throttling preserves the provider's HTTP status", async () => {
+  const db = createSupabaseProvider({
+    url: "https://synthetic.supabase.co",
+    key: "sb_publishable_synthetic",
+    request: async () =>
+      new Response('{"message":"synthetic throttle","code":"429"}', {
+        status: 429,
+        headers: { "content-type": "application/json" },
+      }),
+  });
+  await assert.rejects(
+    db.applications("token", { search: "", state: "", type: "", offset: 0 }),
+    (error) => error.status === 429 && error.message === "rate_limited",
+  );
+});
+
+test("sign-out clears already invalid sessions while preserving real provider failures", async () => {
+  for (const status of [204, 401, 403, 404, 503]) {
+    const db = createSupabaseProvider({
+      url: "https://synthetic.supabase.co",
+      key: "sb_publishable_synthetic",
+      request: async () => new Response(null, { status }),
+    });
+    if (status === 503) {
+      await assert.rejects(
+        db.signOut("expired-token"),
+        (error) => error.status === 503,
+      );
+    } else {
+      await db.signOut("expired-token");
+    }
+  }
+});
+
+test("transient Auth responses do not clear the browser session cookie", async () => {
+  for (const status of [503, 429]) {
+    const db = createSupabaseProvider({
+      url: "https://synthetic.supabase.co",
+      key: "sb_publishable_synthetic",
+      request: async () =>
+        new Response('{"message":"synthetic failure"}', {
+          status,
+          headers: { "content-type": "application/json" },
+        }),
+    });
+    const handler = createAdminHandler({
+      origin: "https://commons.example",
+      provider: () => db,
+    });
+    for (const method of ["GET", "POST"]) {
+      const response = {
+        headers: {},
+        setHeader(key, value) {
+          this.headers[key] = value;
+        },
+        status(code) {
+          this.code = code;
+          return this;
+        },
+        json(body) {
+          this.body = body;
+        },
+      };
+      await handler(
+        {
+          method,
+          url: "/api/admin",
+          headers: {
+            cookie: "__Host-regen_steward=synthetic-token",
+            origin: "https://commons.example",
+            "content-type": "application/json",
+          },
+          body: {
+            action: "verify-code",
+            email: "steward@example.test",
+            code: "123456",
+          },
+        },
+        response,
+      );
+      assert.equal(response.code, status);
+      assert.equal(response.headers["Set-Cookie"], undefined);
+      assert.doesNotMatch(
+        JSON.stringify(response.body),
+        /invalid_code|sign_in_required|access_token/,
+      );
+    }
+  }
+});
+
 test("expired codes and sessions fail through the handler", async () => {
   await post({ action: "request-code", email: "steward@example.test" });
   fixtureTime += 600000;
