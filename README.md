@@ -1,104 +1,80 @@
-# Regen Commons — Site
+# Regen Commons website
 
-Static HTML/CSS/JS site backed by three Notion databases (Members, Contributions, Seeds) and Resend for transactional email. Hosted on Vercel.
+Five static HTML pages with Vercel functions for membership applications, the
+commons library, and shared visions. Production data lives in Notion; optional
+notifications use Resend and the separate Regen Commons Telegram agent.
 
-## What this site does
+## Start locally
 
-- **`/`** — landing page (static)
-- **`/learn.html`** — narrative onboarding (static, with a horizontal scroll flow)
-- **`/seeds.html`** — vision-planting threshold; pulls vision quotes from the **Seeds** Notion DB
-- **`/map.html`** — ecosystem graph + commons library; pulls from **Members** and **Contributions** Notion DBs
-- **`/join.html`** — membership application form; submissions create rows in the **Members** DB and trigger confirmation emails via Resend
+Use Node 22 and npm, from this directory:
 
-## Architecture
-
-```
-[Browser] ──▶ /api/apply        ──▶ Notion (Members DB, Status=Pending) + Resend (2 emails)
-[Browser] ──▶ /api/members      ──▶ Notion (Members DB, Status=Active|Steward)
-[Browser] ──▶ /api/contributions ─▶ Notion (Contributions DB, Status≠Archived)
-[Browser] ──▶ /api/seeds        ──▶ Notion (Seeds DB, Status=Active)
+```sh
+npm ci
+npm run dev
 ```
 
-All Notion / Resend secrets live in Vercel env vars — never in the repo.
+Open **http://127.0.0.1:3501**. No credentials, Vercel login, database, or Docker
+are needed. The pages use synthetic members, contributions, and seeds. Submitted
+seeds and applications stay in memory until you restart; they never send email
+or Telegram notifications. A banner identifies this local demo.
 
-## Local development
+`bun run dev` also runs the same entrypoint when Node 22 is on your PATH. Keep
+`package-lock.json` as the dependency authority and use npm for dependency changes.
+Refresh the browser after frontend edits; restart after API or tooling edits.
+Ctrl-C stops the server. See [local development](docs/development.md) for port
+conflicts, the machine-specific Node workaround, and the separate live workflow.
 
-```bash
-npm install
-npx vercel link        # first time only — links this directory to the Vercel project
-npx vercel env pull    # pulls env vars from Vercel into .env.local
-npm run dev            # starts vercel dev on http://localhost:3000
+## Verify a change
+
+```sh
+npm run check
+npm test
+npm run smoke
 ```
 
-Without env vars set, the API routes will return errors but the site still renders — pages fall back to their built-in static content (e.g. the hardcoded ecosystem graph and commons cards).
+These check JavaScript (including inline page scripts), local page links, and
+actual API handlers over local HTTP with a fixture Notion transport. Smoke
+starts and stops its own temporary server. There is no frontend compilation step.
+CI runs the same commands without secrets. Browser behavior still needs rendered
+checks; provider delivery needs a separately configured integration environment.
 
-## Environment variables
+## Find your way
 
-See [`.env.example`](.env.example). Set these in Vercel under **Settings → Environment Variables** for each environment (Production, Preview, Development):
-
-| Variable | Purpose |
+| Area | Source |
 |---|---|
-| `NOTION_TOKEN` | Internal-integration token from Notion → Integrations |
-| `NOTION_MEMBERS_DB_ID` | 32-char hex ID of the Members database |
-| `NOTION_CONTRIBUTIONS_DB_ID` | 32-char hex ID of the Contributions database |
-| `NOTION_SEEDS_DB_ID` | 32-char hex ID of the Seeds database |
-| `RESEND_API_KEY` | Resend API key (`re_…`) |
-| `RESEND_FROM_EMAIL` | Verified sender address on your domain |
-| `STEWARD_NOTIFY_EMAILS` | Comma-separated emails of stewards to notify on each new application |
-| `SITE_URL` | The site's primary URL (used in email copy) |
+| Landing page | `index.html` |
+| Narrative onboarding and seed entry | `learn.html` |
+| Member graph and contributions library | `map.html` |
+| Seed planting experience | `seeds.html` |
+| Six-step membership application | `join.html` |
+| Shared interactions and styling | `script.js`, `style.css` |
+| Canvas animations | `canvas.js`, `logo-canvas.js` |
+| Server handlers and provider helpers | `api/`, `api/_lib/` |
+| Local fixture transport and server | `scripts/lib/`, `scripts/dev.js` |
+| Notion administration scripts | `scripts/*db*.js` (live operations; see integration guide) |
 
-## Notion database schemas
+Start an AI coding session with:
 
-### Members
+```text
+Read AGENTS.md and docs/development.md. Inspect git status and the relevant
+implementation. Use the fixture environment for this task, make a bounded
+change, and report check/test/smoke results plus any browser or live-service gaps.
+```
 
-Public properties (returned by `/api/members`): **Name** (title), **Type** (select: Individual / Organization), **Status** (select: Pending / Active / Steward / Archived), **Location** (text), **Focus areas** (multi-select), **Contribution areas** (multi-select), **Vision** (text), **Website** (URL), **Avatar** (files), **Affiliation** (relation to self), **Date joined** (date).
+- [Agent guide](AGENTS.md) and [site-development skill](skills/site-development/SKILL.md)
+- [Architecture and integration contracts](docs/integrations.md)
+- [Initial assessment](docs/assessment-2026-10-29.md)
+- [Prioritized initial work](docs/work-plan.md)
 
-Private review properties (kept on the page; never returned by the API): **Email**, **Telegram**, **Org rep**, **Org description**, **Nominator**, **Regen relationship**, **Values resonance**, **Meaningful participation**, **Capital contribution**, **Contribution other**, **Commitment**, **Constraints**, **Authorized**, **Other colleagues**, **Agreement reviewed**, **Governance consent**, **Closing notes**.
+## Deployment and stewardship
 
-New applications land here with `Status = Pending`. To welcome someone in, change `Status` to `Active` (or `Steward`) — the change reflects on the public site within ~5 minutes.
+The intended workflow is a branch, pull request, Vercel preview, human review,
+then merge. Confirm branch protection, deployment linkage, account ownership,
+and environment separation in the actual services before relying on them. The
+handover describes these settings; they have not been verified in this bootstrap.
 
-### Contributions
-
-**Title**, **Type** (Knowledge / Infrastructure / Brand & IP / Governance & Legal / Coordination), **Stage** (Seed / Sprout / Flowering / Tree), **Status** (Indexed / In progress / Curated / Archived), **Description**, **Capital form**, **Tier**, **Contributor** (relation → Members), **License**, **Tags**, **Date contributed**.
-
-### Seeds
-
-Vision quotes that appear in the seed-field on `/seeds.html`.
-
-**Text** (title — the quote itself), **Author** (text — optional attribution), **Status** (Active / Archived), **Tags** (multi-select).
-
-## Maintainer workflow
-
-The repo uses PR-driven development so that no one merges directly to production:
-
-1. Branch from `main` (`git checkout -b fix/typo-on-learn-page`).
-2. Make changes (locally, or via GitHub's web editor).
-3. Open a PR. Vercel posts a preview URL in the PR conversation within ~30 seconds.
-4. Another steward reviews + approves.
-5. Merge. Vercel auto-deploys to production within ~1 minute.
-
-`main` is protected: pushes are blocked, PRs require 1 approval.
-
-For pure content edits (typos, copy tweaks), GitHub's web editor (press `.` in any file view) is sufficient — no local environment needed.
-
-## Adding members or contributions without an application
-
-Add the row directly in Notion (Members DB, set `Status = Active`). It appears on the map within ~5 minutes.
-
-## Removing a member
-
-Set `Status = Archived` in Notion. They drop off the public site within ~5 minutes.
-
-## Rotating credentials
-
-If a Notion token, Resend key, or Vercel secret needs to be rotated:
-
-1. Generate the new value in the source service.
-2. Update it in Vercel → Settings → Environment Variables.
-3. Trigger a redeploy (Deployments → … → Redeploy) so functions pick up the new value.
-
-## Troubleshooting
-
-- **Map shows the fallback ecosystem (the original hardcoded list):** `/api/members` errored or returned nothing. Check the function logs in Vercel → Deployments → … → Functions, then verify `NOTION_TOKEN` and that the Members DB is shared with the integration.
-- **Form submits but no email arrives:** check Resend → Emails for delivery status. Common issues: domain not verified, `RESEND_FROM_EMAIL` not on the verified domain.
-- **Application created in Notion but `/api/members` doesn't return it:** check `Status` on the row — it must be `Active` or `Steward` to appear publicly.
+Production readers publish only rows whose `Status` is exactly `Active`.
+Applications start `Pending`; new seeds start `Active`. Public members exclude
+contact and private review fields. The implementation owns exact Notion property
+names; [integration notes](docs/integrations.md) explain the known discrepancies
+in the inherited handover. Keep credentials and real application data out of Git.

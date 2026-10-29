@@ -9,18 +9,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,700;1,9..144,400&family=Source+Serif+4:ital,wght@0,380;0,400;0,500;0,600;1,400&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
   <script>(function(){var t=localStorage.getItem('rc-theme')||'dark';document.documentElement.setAttribute('data-theme',t)})()</script>
-  <style>
-    /* Hide form immediately when arriving from learn page (#planted) so
-       there's no flash of the form before the threshold sequence plays. */
-    html.planted #declaration-form-ui { opacity: 0 !important; }
-  </style>
-  <script>
-    (function () {
-      if (window.location.hash === '#planted') {
-        document.documentElement.classList.add('planted');
-      }
-    })();
-  </script>
 </head>
 <body data-page="seeds">
 
@@ -50,7 +38,7 @@
 
   <!-- STATE 1: The form, shown until submission -->
   <div class="declaration-ui" id="declaration-form-ui">
-    <div class="declaration-inner declaration-card declaration-card--pulse">
+    <form class="declaration-inner declaration-card declaration-card--pulse" id="seed-form" novalidate>
       <span class="declaration-eyebrow">Make an offering</span>
       <p class="declaration-prompt">I wish we would common&hellip;</p>
       <p class="declaration-sub">
@@ -62,17 +50,22 @@
         id="vision-input"
         class="declaration-textarea"
         rows="3"
+        required
+        minlength="3"
         maxlength="240"
         placeholder="Write here…"
         aria-label="Your vision for the commons"
+        aria-describedby="seed-hint seed-status"
       ></textarea>
+      <p class="seed-hint" id="seed-hint">3–240 characters. Your seed becomes public when saved.</p>
+      <p class="seed-status" id="seed-status" role="status" aria-live="polite" aria-atomic="true"></p>
       <div aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;height:0;width:0;overflow:hidden">
         <label>Confirm website (leave blank)
-          <input type="text" id="seed-website-confirm" tabindex="-1" autocomplete="off" />
+          <input type="text" id="seed-website-confirm" name="website_confirm" tabindex="-1" autocomplete="off" />
         </label>
       </div>
-      <button class="btn" id="offer-btn"><span class="btn-label">Plant this seed</span> &rarr;</button>
-    </div>
+      <button class="btn" type="submit" id="offer-btn"><span class="btn-label">Plant this seed</span> &rarr;</button>
+    </form>
   </div>
 
   <!-- STATE 2: The threshold moment — user's vision appears alone first -->
@@ -93,6 +86,8 @@
 
   <script src="logo-canvas.js"></script>
   <script src="canvas.js"></script>
+  <script src="data-state.js"></script>
+  <script src="seed-form.js"></script>
   <script src="script.js"></script>
   <script>initCanvas(3);</script>
 </body>

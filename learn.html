@@ -537,7 +537,7 @@
 
       <!-- Panel 7: DECLARATION CARD (mirrors declaration.html form state) -->
       <section class="panel panel--threshold" id="panel-6">
-        <div class="panel-inner declaration-card declaration-card--pulse">
+        <form class="panel-inner declaration-card declaration-card--pulse" id="learn-seed-form" novalidate>
           <span class="declaration-eyebrow">Make an offering</span>
           <p class="declaration-prompt">I wish we would common&hellip;</p>
           <p class="declaration-sub">
@@ -549,11 +549,19 @@
             id="learn-vision-input"
             class="declaration-textarea"
             rows="3"
+            required
+            minlength="3"
+            maxlength="240"
             placeholder="Write here…"
             aria-label="Your vision for the commons"
+            aria-describedby="learn-seed-hint learn-seed-status"
           ></textarea>
-          <button class="btn" id="learn-offer-btn"><span class="btn-label">Plant this seed</span> &rarr;</button>
-        </div>
+          <p class="seed-hint" id="learn-seed-hint">3–240 characters. Your seed becomes public when saved.</p>
+          <p class="seed-status" id="learn-seed-status" role="status" aria-live="polite" aria-atomic="true"></p>
+          <div hidden><label>Leave blank <input name="website_confirm" tabindex="-1" autocomplete="off" /></label></div>
+          <button class="btn" type="submit" id="learn-offer-btn"><span class="btn-label">Plant this seed</span> &rarr;</button>
+          <a href="map.html" class="seed-saved-link" hidden>Explore the commons</a>
+        </form>
       </section>
 
     </div>
@@ -561,6 +569,8 @@
 
   <script src="logo-canvas.js"></script>
   <script src="canvas.js"></script>
+  <script src="data-state.js"></script>
+  <script src="seed-form.js"></script>
   <script src="script.js"></script>
   <script>initCanvas(2);</script>
 
@@ -742,35 +752,19 @@
   </script>
 
   <script>
-  // ── Declaration form in panel 5 ──
-  (function() {
-    var btn   = document.getElementById('learn-offer-btn');
-    var input = document.getElementById('learn-vision-input');
-    if (!btn || !input) return;
-    btn.addEventListener('click', function() {
-      var text = (input.value || '').trim();
-      if (!text) {
-        input.classList.add('shake');
-        setTimeout(function() { input.classList.remove('shake'); }, 400);
+  // Both seed entry points wait for the same save acknowledgement.
+  (function () {
+    var form = document.getElementById('learn-seed-form');
+    RegenSeeds.bind(form, function (text) {
+      form.querySelector('.seed-saved-link').hidden = false;
+      try {
+        sessionStorage.setItem('regen_seed_receipt', text);
+      } catch (_) {
+        // The save succeeded even if browser storage is unavailable.
+        // Leave the confirmation and map link visible instead of submitting again.
         return;
       }
-      try {
-        localStorage.setItem('regen_vision', text);
-        localStorage.setItem('regen_vision_time', Date.now().toString());
-      } catch(_) {}
-      // Morph: fade the card and page before navigating so the handoff
-      // to seeds.html feels continuous (seeds page picks up on #planted).
-      var card = btn.closest('.declaration-card');
-      if (card) {
-        card.style.transition = 'opacity 0.9s ease, transform 0.9s ease';
-        card.style.opacity = '0';
-        card.style.transform = 'scale(0.96)';
-      }
-      document.body.style.transition = 'opacity 0.9s ease';
-      setTimeout(function() { document.body.style.opacity = '0'; }, 300);
-      setTimeout(function() {
-        window.location.href = 'seeds.html#planted';
-      }, 1000);
+      window.location.href = 'seeds.html#planted';
     });
   })();
   </script>

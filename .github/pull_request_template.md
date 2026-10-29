@@ -1,10 +1,9 @@
-## What changed
-<!-- One or two sentences. -->
+## Summary
+<!-- What changed and why; link the owning task. -->
 
-## Why
-<!-- The motivation or the issue this resolves. Link issue if applicable. -->
-
-## How to verify
-<!-- How a reviewer can confirm this works on the Vercel preview. -->
-
-## Screenshots (if visual)
+## Validation
+- [ ] `npm run check`
+- [ ] `npm test`
+- [ ] `npm run smoke`
+<!-- For UI: browser/session, routes, viewport sizes, screenshots, and failure paths checked. -->
+<!-- Distinguish fixture proof from Vercel/Notion/email/Telegram verification; list pending checks. -->
