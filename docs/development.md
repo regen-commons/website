@@ -29,6 +29,12 @@ member is excluded. A new application succeeds locally but stays off the public
 map. A new seed appears in `/api/seeds`. All submitted data disappears on restart.
 Use `example.test` addresses and invented content.
 
+The `/admin` dashboard has a separate synthetic steward provider. Request a code
+for `steward@example.test`, then enter `123456`; no mail is sent. Its applications
+and curated profiles are independent of the public Notion fixtures. See
+[steward setup](steward-dashboard.md) for access-denial examples, the actual
+Supabase migration status, and the unverified live-email prerequisites.
+
 Refresh for HTML/CSS/browser-JS edits. Restart for API or tooling changes. Ctrl-C
 stops the process. `bun run dev` is an equivalent launcher; npm remains the
 dependency manager so there is one lockfile.
@@ -39,7 +45,7 @@ dependency manager so there is one lockfile.
 |---|---|
 | `npm run check` | JS/inline-script syntax, local page link targets, JSON parsing |
 | `npm test` | HTTP behavior, credential isolation, public data filtering, validation, body limits, rate limiting, seed/save and list state transitions |
-| `npm run smoke` | Five pages/assets, API reads, seed write/readback, pending application exclusion |
+| `npm run smoke` | Six pages/assets, public API reads/writes, pending application exclusion, steward sign-in and authorized queue |
 
 The tests and smoke command create temporary loopback servers and close them.
 They do not need the dev server or credentials. CI uses these same commands on

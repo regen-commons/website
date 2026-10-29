@@ -6,7 +6,7 @@ process.env.NOTION_TOKEN = "local-fixture-token";
 process.env.NOTION_MEMBERS_DB_ID = "fixture-members";
 process.env.NOTION_CONTRIBUTIONS_DB_ID = "fixture-contributions";
 process.env.NOTION_SEEDS_DB_ID = "fixture-seeds";
-for (const key of ["RESEND_API_KEY", "RESEND_FROM_EMAIL", "STEWARD_NOTIFY_EMAILS", "NOTIFY_URL", "NOTIFY_WEBHOOK_SECRET"]) {
+for (const key of ["RESEND_API_KEY", "RESEND_FROM_EMAIL", "STEWARD_NOTIFY_EMAILS", "NOTIFY_URL", "NOTIFY_WEBHOOK_SECRET", "SUPABASE_URL", "SUPABASE_PUBLISHABLE_KEY", "SUPABASE_SERVICE_ROLE_KEY", "ADMIN_ORIGIN"]) {
   delete process.env[key];
 }
 

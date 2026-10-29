@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="referrer" content="no-referrer" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self'; base-uri 'none'; form-action 'self'; object-src 'none'"
+    />
+    <title>Steward desk · Regen Commons</title>
+    <link rel="stylesheet" href="/admin/style.css" />
+    <script src="/admin/app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="masthead">
+      <a class="wordmark" href="/index.html"
+        ><span class="mark" aria-hidden="true">✳</span> REGEN COMMONS</a
+      ><span class="desk-label">Steward desk</span>
+    </header>
+    <main id="main" tabindex="-1">
+      <section id="login" class="login panel">
+        <p class="eyebrow">Care for the commons</p>
+        <h1>A place for stewardship.</h1>
+        <p class="muted">
+          Review applications and the profiles taking shape in our network.
+        </p>
+        <form id="email-form" method="post" action="/api/admin">
+          <label for="email">Steward email</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            autocomplete="email"
+            autocapitalize="off"
+            spellcheck="false"
+            required
+            maxlength="254"
+            aria-describedby="access-help"
+          />
+          <p id="access-help" class="help">
+            Access is granted by a project administrator. Signing in does not
+            create a steward account.
+          </p>
+          <button type="submit">
+            Send sign-in code <span aria-hidden="true">→</span>
+          </button>
+        </form>
+        <form id="code-form" method="post" action="/api/admin" hidden>
+          <p id="code-help">
+            If this email has an account, check its inbox for a sign-in code.
+          </p>
+          <label for="code">Email code</label>
+          <input
+            id="code"
+            name="code"
+            type="text"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            pattern="[0-9]{6,10}"
+            minlength="6"
+            maxlength="10"
+            required
+            aria-describedby="code-help"
+          />
+          <button type="submit">
+            Open steward desk <span aria-hidden="true">→</span>
+          </button>
+          <button id="change-email" class="text-button" type="button">
+            Use another email or request a new code
+          </button>
+        </form>
+        <p id="login-message" role="status" aria-live="polite"></p>
+        <button id="retry-sign-out" class="secondary" type="button" hidden>
+          Retry sign out
+        </button>
+        <aside id="demo-help" hidden class="notice">
+          <strong>Local demo — no email is sent.</strong><br />Use
+          <code>steward@example.test</code>, then code <code>123456</code>.
+          <code>visitor@example.test</code> demonstrates denied access.
+        </aside>
+        <noscript
+          >JavaScript is required to sign in and review applications.</noscript
+        >
+      </section>
+      <div id="workspace" class="workspace" hidden>
+        <aside class="sidebar">
+          <p class="eyebrow">Workspace</p>
+          <nav aria-label="Steward workspace">
+            <a id="nav-applications" href="#applications"
+              >Applications <span aria-hidden="true">↗</span></a
+            ><a id="nav-members" href="#members"
+              >Members <span aria-hidden="true">↗</span></a
+            >
+          </nav>
+          <div class="sidebar-note">
+            <span class="small-label">Review access</span>
+            <p>
+              Private answers stay here. Public profiles are curated separately.
+            </p>
+          </div>
+          <p id="signed-in" class="help"></p>
+          <button id="sign-out" class="secondary" type="button">
+            Sign out
+          </button>
+        </aside>
+        <div class="content">
+          <div id="page-heading" class="page-heading">
+            <div>
+              <p class="eyebrow">Regen Commons / Stewardship</p>
+              <h1 id="view-title" tabindex="-1">Applications</h1>
+              <p id="view-description" class="muted">
+                Get to know the people and organizations joining the commons.
+              </p>
+            </div>
+            <span class="badge">Read-only pilot</span>
+          </div>
+          <p class="notice governance-note">
+            Acceptance and publication are separate decisions. Decision actions
+            will be added once council authority is agreed.
+          </p>
+          <section id="queue">
+            <form
+              id="filters"
+              class="filters"
+              role="search"
+              method="get"
+              action="/admin"
+            >
+              <div class="search-field">
+                <label for="search">Search applications</label
+                ><input
+                  type="search"
+                  id="search"
+                  name="search"
+                  placeholder="Person or organization name"
+                  maxlength="100"
+                />
+              </div>
+              <div>
+                <label for="type">Applicant type</label
+                ><select id="type" name="type">
+                  <option value="">All types</option>
+                  <option value="individual">Individual</option>
+                  <option value="organization">Organization</option>
+                </select>
+              </div>
+              <div>
+                <label for="state">Review state</label
+                ><select id="state" name="state">
+                  <option value="">All states</option>
+                  <option value="pending">Pending</option>
+                </select>
+              </div>
+              <button type="submit" class="secondary">Apply filters</button>
+            </form>
+            <div class="list-caption">
+              <p id="queue-count"></p>
+              <span class="help">Newest first</span>
+            </div>
+            <div id="application-list"></div>
+            <div id="pagination" class="pagination">
+              <button id="previous" class="secondary" type="button">
+                Previous</button
+              ><button id="next" class="secondary" type="button">Next</button>
+            </div>
+          </section>
+          <section id="detail" hidden aria-label="Application detail"></section>
+          <section id="members" hidden aria-label="Member profiles">
+            <div id="member-list" class="member-grid"></div>
+          </section>
+          <p id="load-message" role="status" aria-live="polite"></p>
+          <button id="retry" type="button" class="secondary" hidden>
+            Try again
+          </button>
+        </div>
+      </div>
+    </main>
+    <footer>
+      Regen Commons <span aria-hidden="true">·</span> A living network, tended
+      together.
+    </footer>
+  </body>
+</html>
