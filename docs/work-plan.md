@@ -4,17 +4,20 @@ Ordered after the 29 October 2026 [assessment](assessment-2026-10-29.md).
 These are repository-local work items, not tickets created in an external system.
 Each item can become a bounded PR; product/account decisions are explicit.
 
-## 0. Development foundation — implemented locally
+## 0. Development foundation — implemented
 
 Credential-free local server, Node selection, agent guidance, one focused skill,
 current setup/integration documentation, tests, smoke, and GitHub CI configuration
-are in this working tree. The default local server is independent of Vercel and
-the shared workbench. CI configuration has not yet run on GitHub.
+are implemented. The default local server is independent of Vercel and the shared
+workbench. The GitHub Actions Check workflow passed on the foundation commit
+([run](https://github.com/regen-commons/website/actions/runs/40947030458)).
+This establishes fixture checks, not a deployed preview or live-provider proof.
 
-## 1. Make seed and map feedback truthful — implemented locally
+## 1. Make seed and map feedback truthful — implemented
 
 **Scope:** shared request/save helpers, both seed forms, map states, and local
-failure scenarios. Implementation and verification are in this working tree.
+failure scenarios. See the verification record below for repeatable checks and
+their limits.
 
 **Verified:** seed submission waits for HTTP success and `{ ok: true }` before
 confirmation; 3–240 character validation matches the API. Network/429/5xx failures
