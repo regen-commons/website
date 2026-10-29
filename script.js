@@ -163,36 +163,14 @@
     var thresholdMoment = document.getElementById("threshold-moment");
     var thresholdText   = document.getElementById("threshold-vision-text");
 
-    offerBtn.addEventListener("click", function () {
-      var text = (input.value || "").trim();
-      if (!text) {
-        input.classList.add("shake");
-        setTimeout(function () { input.classList.remove("shake"); }, 400);
+    function showPlanted(text) {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        formUI.style.display = "none";
+        createField(text);
+        bubbleUI.classList.add("visible");
+        enterBtn.focus();
         return;
       }
-      if (text.length > 240) {
-        input.classList.add("shake");
-        setTimeout(function () { input.classList.remove("shake"); }, 400);
-        return;
-      }
-
-      // Save for map page
-      try {
-        localStorage.setItem("regen_vision", text);
-        localStorage.setItem("regen_vision_time", Date.now().toString());
-      } catch (_) {}
-
-      // Plant the seed in Notion (fire-and-forget; UX never blocks)
-      var honeypot = document.getElementById("seed-website-confirm");
-      fetch("/api/seeds", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          text: text,
-          website_confirm: honeypot ? honeypot.value : "",
-        }),
-      }).catch(function () { /* silent — local experience already works */ });
-
       // ── Phase 1: Form fades slowly (1.5s) ──
       formUI.style.transition = "opacity 1.5s ease";
       formUI.style.opacity = "0";
@@ -221,6 +199,7 @@
               // Fade in the counter and CTA after the field has had time to populate
               setTimeout(function () {
                 bubbleUI.classList.add("visible");
+                enterBtn.focus();
               }, 1200);
             }, 1200);
           }, 3000);
@@ -229,22 +208,33 @@
           createField(text);
           fieldActive = true;
           bubbleUI.classList.add("visible");
+          enterBtn.focus();
         }
       }, 1500);
-    });
+    }
 
     if (enterBtn) {
       enterBtn.addEventListener("click", function () { navigateTo("map.html"); });
     }
 
-    // ── Auto-proceed when arriving from learn page (#planted) ──────────────
+    // Learn already saved the seed. Consume a one-use receipt, never POST again.
+    var plantedText = null;
     if (window.location.hash === "#planted") {
-      var preVision = null;
-      try { preVision = localStorage.getItem("regen_vision"); } catch (_) {}
-      if (preVision && input && offerBtn) {
-        input.value = preVision;
-        setTimeout(function () { offerBtn.click(); }, 350);
-      }
+      try {
+        plantedText = sessionStorage.getItem("regen_seed_receipt");
+        sessionStorage.removeItem("regen_seed_receipt");
+      } catch (_) {}
+      history.replaceState(null, "", window.location.pathname + window.location.search);
+    }
+    if (plantedText) {
+      offerBtn.disabled = true;
+      offerBtn.querySelector(".btn-label").textContent = "Saved";
+      input.value = plantedText;
+      input.readOnly = true;
+      document.getElementById("seed-status").textContent = "Your seed has been saved to the commons.";
+      showPlanted(plantedText);
+    } else {
+      RegenSeeds.bind(document.getElementById("seed-form"), showPlanted);
     }
   }
 
@@ -358,17 +348,22 @@
 
     function applyFilter() {
       var isStageFilter = stageFilters.indexOf(activeType) !== -1;
-      getCards().forEach(function (c) {
+      var cards = getCards();
+      var visibleCount = 0;
+      cards.forEach(function (c) {
         var match =
           activeType === "all" ||
           (isStageFilter ? c.dataset.stage === activeType : c.dataset.type === activeType);
         if (match) {
+          visibleCount++;
           c.classList.remove("hidden");
         } else {
           c.classList.remove("open");
           c.classList.add("hidden");
         }
       });
+      var noMatches = document.getElementById("commons-no-matches");
+      if (noMatches) noMatches.hidden = !cards.length || visibleCount > 0;
     }
     window.applyCommonsFilter = applyFilter;
 

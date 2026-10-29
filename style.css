@@ -2549,3 +2549,39 @@ p:last-child { margin-bottom: 0; }
     letter-spacing: 0.18em;
   }
 }
+/* Save and data feedback remains legible in both themes and at mobile widths. */
+.seed-hint, .seed-status {
+  font: 0.875rem/1.5 'Space Grotesk', sans-serif;
+  color: inherit;
+  margin: 0.6rem 0;
+  overflow-wrap: anywhere;
+}
+.seed-status:empty { display: none; }
+.declaration-textarea[aria-invalid="true"] { border: 2px solid var(--copper); }
+.declaration-card button[type="submit"],
+[data-theme="light"] .declaration-card button[type="submit"] {
+  color: inherit;
+  border-color: currentColor;
+}
+.declaration-card button[type="submit"] .btn-label { color: inherit; }
+.declaration-card button:disabled { opacity: 0.65; cursor: wait; }
+.seed-saved-link { display: block; margin-top: 1rem; color: inherit; }
+.data-feedback {
+  color: var(--ink);
+  font: 0.95rem/1.6 'Space Grotesk', sans-serif;
+  margin: 1rem 0;
+}
+.data-retry {
+  background: transparent;
+  border: 1px solid var(--copper);
+  color: var(--ink);
+  font: inherit;
+  min-height: 44px;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+}
+.data-retry:focus-visible, .seed-saved-link:focus-visible {
+  outline: 2px solid var(--copper);
+  outline-offset: 4px;
+}
+.data-retry[hidden], .data-feedback[hidden], .ecosystem-map-wrap[hidden], .seed-saved-link[hidden] { display: none; }

@@ -803,7 +803,11 @@ body.rc-modal-locked { overflow: hidden; }
         <h2>The Regen Commons Ecosystem</h2>
         <p>Organizations, practitioners, and the connections between them. Hover to explore.</p>
       </div>
-      <div class="ecosystem-map-wrap">
+      <div class="data-feedback">
+        <p id="ecosystem-status" role="status" aria-live="polite" aria-atomic="true" tabindex="-1">Loading the ecosystem…</p>
+        <button type="button" class="data-retry" id="ecosystem-retry" hidden>Retry ecosystem</button>
+      </div>
+      <div class="ecosystem-map-wrap" hidden>
         <canvas id="ecosystem-canvas" width="900" height="500"></canvas>
         <div class="ecosystem-tooltip" id="eco-tooltip" style="display:none;">
           <span class="eco-tooltip-name" id="eco-tooltip-name"></span>
@@ -965,7 +969,12 @@ body.rc-modal-locked { overflow: hidden; }
         <button class="filter-btn" data-filter="tree">Tree</button>
       </div>
 
-      <div class="commons-grid" id="commons-grid">
+      <div class="data-feedback">
+        <p id="commons-status" role="status" aria-live="polite" aria-atomic="true" tabindex="-1">Loading the commons library…</p>
+        <button type="button" class="data-retry" id="commons-retry" hidden>Retry library</button>
+      </div>
+      <p class="data-feedback" id="commons-no-matches" role="status" hidden>No contributions match this filter. Choose All to see the library.</p>
+      <div class="commons-grid" id="commons-grid" aria-busy="true">
       </div><!-- /commons-grid -->
     </section>
 
@@ -979,13 +988,13 @@ body.rc-modal-locked { overflow: hidden; }
 
   <script src="logo-canvas.js"></script>
   <script src="canvas.js"></script>
+  <script src="data-state.js"></script>
   <script src="script.js"></script>
 
   <script>
     // ══════════════════════════════════════════════════════════════════════
     //  COMMONS LIBRARY — fetch contributions from Notion via /api/contributions
-    //  Falls back silently to the static cards already in the DOM if the API
-    //  is unreachable (e.g. local dev without env vars).
+    //  Loading, empty, and failed reads are distinct; failures can be retried.
     // ══════════════════════════════════════════════════════════════════════
     (function () {
       var grid = document.getElementById("commons-grid");
@@ -1063,17 +1072,24 @@ body.rc-modal-locked { overflow: hidden; }
         );
       }
 
-      fetch("/api/contributions")
-        .then(function (r) { if (!r.ok) throw new Error("contributions_fetch_failed"); return r.json(); })
-        .then(function (data) {
-          var items = (data && data.contributions) || [];
-          grid.innerHTML = items.map(renderCard).join("");
-          if (typeof window.applyCommonsFilter === "function") window.applyCommonsFilter();
-        })
-        .catch(function (err) {
-          console.warn("commons library: empty (API error)", err && err.message);
-          grid.innerHTML = "";
-        });
+      var status = document.getElementById("commons-status");
+      var retry = document.getElementById("commons-retry");
+      var loadLibrary = RegenData.createListLoader("/api/contributions", "contributions", function (state) {
+        grid.setAttribute("aria-busy", String(state.status === "loading"));
+        retry.hidden = state.status !== "error";
+        status.textContent = state.status === "loading" ? "Loading the commons library…"
+          : state.status === "empty" ? "No contributions are published yet. Check back soon."
+          : state.status === "error" ? "We couldn't load the commons library. Please try again."
+          : state.items.length + (state.items.length === 1 ? " contribution in the library." : " contributions in the library.");
+        grid.innerHTML = state.items.map(renderCard).join("");
+        document.getElementById("commons-no-matches").hidden = true;
+        if (typeof window.applyCommonsFilter === "function") window.applyCommonsFilter();
+      });
+      retry.addEventListener("click", function () {
+        loadLibrary();
+        status.focus();
+      });
+      loadLibrary();
     })();
   </script>
 
@@ -1233,21 +1249,25 @@ body.rc-modal-locked { overflow: hidden; }
       }
     }
 
-    function loadGraph() {
-      fetch("/api/members")
-        .then(function (r) { if (!r.ok) throw new Error("members_fetch_failed"); return r.json(); })
-        .then(function (data) {
-          var members = (data && data.members) || [];
-          var built = buildGraphFromMembers(members);
-          nodeData = built.nodes;
-          edgeData = built.edges;
-          initGraph();
-        })
-        .catch(function (err) {
-          console.warn("ecosystem graph: empty (API error)", err && err.message);
-          initGraph();
-        });
-    }
+    var graphStatus = document.getElementById("ecosystem-status");
+    var graphRetry = document.getElementById("ecosystem-retry");
+    var loadGraph = RegenData.createListLoader("/api/members", "members", function (state) {
+      wrap.hidden = state.status !== "ready";
+      graphRetry.hidden = state.status !== "error";
+      graphStatus.textContent = state.status === "loading" ? "Loading the ecosystem…"
+        : state.status === "empty" ? "No members are published yet. Check back soon."
+        : state.status === "error" ? "We couldn't load the ecosystem. Please try again."
+        : state.items.length + (state.items.length === 1 ? " member in the ecosystem." : " members in the ecosystem.");
+      var built = buildGraphFromMembers(state.items);
+      nodeData = built.nodes;
+      edgeData = built.edges;
+      if (!wrap.hidden) resize();
+      initGraph();
+    });
+    graphRetry.addEventListener("click", function () {
+      loadGraph();
+      graphStatus.focus();
+    });
     loadGraph();
 
     // ─── Force simulation ─────────────────────────────────────────────────
