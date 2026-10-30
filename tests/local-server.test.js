@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { once } from "node:events";
 import { get } from "node:http";
+import { readFile } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { after, test } from "node:test";
@@ -63,6 +64,14 @@ test("public pages and clean routes work; private files and foreign origins do n
   });
   assert.equal(foreignHostStatus, 403);
   assert.equal((await request("/api/seeds", { headers: { Origin: "https://example.test" } })).status, 403);
+});
+
+test("self-hosted font files retain their binary content and font MIME type", async () => {
+  const path = "/assets/fonts/fraunces-latin.woff2";
+  const response = await request(path);
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("content-type"), "font/woff2");
+  assert.deepEqual(Buffer.from(await response.arrayBuffer()), await readFile(new URL(`..${path}`, import.meta.url)));
 });
 
 test("actual read handlers exclude pending members and private fields, and resolve contributors", async () => {

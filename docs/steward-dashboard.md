@@ -98,10 +98,40 @@ failure keeps the operation retryable and does not report success.
 
 ## Configure real steward sign-in
 
-The connector cannot inspect Auth SMTP or email templates. The attempted browser
-inspection reached Supabase's sign-in page. **SMTP, the code template, sender
-domain, redirect configuration, signup settings, and real delivery remain
-unverified.** The site's Resend SDK configuration does not establish any of them.
+The connector has no Auth-settings operation; the authenticated Supabase browser
+is used for SMTP and templates. On 29 October 2026, Namecheap's authoritative DNS
+returned the expected DKIM TXT and two sending CNAME records for
+`auth.regencommons.com`. Resend reports the domain and all three records verified.
+The intended sender is `Regen Commons <signin@auth.regencommons.com>`.
+
+Custom SMTP is saved with `smtp.resend.com`, port `465`, and username `resend`.
+The user created a sending key restricted to the authentication domain and
+entered it directly into Supabase's Password field. No credential was entered
+into chat or committed. No secret or service-role key is needed by the dashboard.
+
+The Magic Link or OTP template now uses `{{ .Token }}` and subject
+`Your Regen Commons sign-in code`; its [versioned body](../supabase/templates/magic-link.html)
+uses the website's warm vellum palette. One approved account has been created
+through Supabase's user interface and granted an active steward role. A real
+code request from the actual dashboard handler succeeded, and Resend reports
+delivery to the approved recipient. The recipient completed code entry, and
+the browser loaded the authorized Applications and Members views. Reloading
+preserved the hosted session. Both datasets are currently empty; no live
+applications or profiles were imported for the test.
+
+Gmail desktop displayed the original template without its intended padding.
+The template now uses presentation tables, inline cell padding, and a fixed-width
+Outlook fallback. A fresh code email was delivered after that update; final
+Gmail rendering confirmation is pending. The dashboard also reuses the public
+website's `logo-canvas.js` artwork in still mode, with the same circle and wordmark.
+
+The email provider currently uses eight-digit OTPs with a 3,600-second expiry.
+Public signup is enabled at the project level; the dashboard's own requests use
+`shouldCreateUser: false`, and database access independently requires an active
+steward role and session. Project-wide signup-policy changes require a separate
+decision. The published website currently returns 404 for `/admin`; a disposable,
+loopback-only Auth probe can exercise the actual handler and hosted Supabase
+without changing the default fixture server or deploying the site.
 
 Before a separately authorized hosted pilot:
 
@@ -113,13 +143,15 @@ Before a separately authorized hosted pilot:
 2. Set the Magic Link email template to display `{{ .Token }}` for email codes.
    Confirm the expiry, code length, and rate limits. The UI accepts 6–10 digits.
    See [passwordless email](https://supabase.com/docs/guides/auth/auth-email-passwordless).
-3. Configure the exact HTTPS site/redirect URLs. Disable public signup for this
-   steward-only project. The application additionally sends `shouldCreateUser:
-   false`, but that client option alone is not a project-wide signup restriction.
+3. Configure the exact HTTPS site/redirect URLs. Decide whether public signup
+   should be disabled for this steward-only project. The application sends
+   `shouldCreateUser: false`, but that client option alone is not a project-wide
+   signup restriction.
 4. Provision only the named, approved steward accounts and activate their rows
    in `private.steward_roles` through an administrator-controlled process. No
-   users or roles have been provisioned by this implementation. Establish the
-   initial steward list before granting access; do not send invitations as a test.
+   additional users or roles are implied by this pilot. The single named test
+   steward is provisioned. Establish the steward list before granting further
+   access; do not send invitations as a test.
 5. Set `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, and `ADMIN_ORIGIN` in the
    authorized deployment environment. The expected URL is
    `https://ztygpuzldujfsqrubxic.supabase.co`. `ADMIN_ORIGIN` is the exact HTTPS

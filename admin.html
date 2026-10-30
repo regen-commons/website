@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark light" />
     <meta name="robots" content="noindex, nofollow" />
     <meta name="referrer" content="no-referrer" />
     <meta
@@ -10,15 +11,29 @@
       content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self'; base-uri 'none'; form-action 'self'; object-src 'none'"
     />
     <title>Steward desk · Regen Commons</title>
+    <script src="/admin/theme.js"></script>
     <link rel="stylesheet" href="/admin/style.css" />
+    <script src="/logo-canvas.js" defer></script>
     <script src="/admin/app.js" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
     <header class="masthead">
-      <a class="wordmark" href="/index.html"
-        ><span class="mark" aria-hidden="true">✳</span> REGEN COMMONS</a
-      ><span class="desk-label">Steward desk</span>
+      <a class="wordmark logo-mark" href="/index.html">
+        <canvas id="logo-canvas" width="76" height="76" data-static aria-hidden="true"></canvas>
+        <span class="logo-mark-label">Regen Commons</span>
+      </a>
+      <div class="header-actions">
+        <span class="desk-label">Steward desk</span>
+        <button
+          id="theme-toggle"
+          class="theme-toggle"
+          type="button"
+          aria-label="Switch to light theme"
+        >
+          Light theme
+        </button>
+      </div>
     </header>
     <main id="main" tabindex="-1">
       <section id="login" class="login panel">

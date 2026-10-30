@@ -1,22 +1,22 @@
+@import url("../design-tokens.css");
+@import url("./fonts.css");
+
 :root {
-  color-scheme: light;
-  --paper: #f6f5ef;
-  --panel: #fffefa;
-  --ink: #243b2f;
-  --muted: #5e6e62;
-  --line: #d8ded4;
-  --green: #2b573e;
-  --wash: #e9eee5;
-  font-family:
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
+  color-scheme: dark;
+  --panel: var(--parchment);
+  --muted: var(--ink-mid);
+  --line: color-mix(in srgb, var(--ink) 22%, var(--paper));
+  --green: var(--forest);
+  --wash: var(--vellum);
+  font-family: var(--font-sans);
   color: var(--ink);
   background: var(--paper);
   font-size: 16px;
 }
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -40,7 +40,7 @@ select {
   touch-action: manipulation;
 }
 :focus-visible {
-  outline: 3px solid #b26a28;
+  outline: 3px solid var(--gold);
   outline-offset: 4px;
 }
 [hidden] {
@@ -53,16 +53,12 @@ p {
   margin-top: 0;
 }
 h1 {
-  font:
-    400 clamp(2rem, 4vw, 3rem)/1.14 Georgia,
-    serif;
+  font: 300 clamp(2rem, 4vw, 3rem)/1.14 var(--font-display);
   letter-spacing: -0.035em;
   margin-bottom: 1rem;
 }
 h2 {
-  font:
-    400 1.55rem/1.2 Georgia,
-    serif;
+  font: 400 1.55rem/1.2 var(--font-display);
 }
 h3 {
   font-size: 1.1rem;
@@ -96,14 +92,25 @@ h3 {
 .wordmark {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
+  gap: 0.7rem;
   text-decoration: none;
-  font-size: 0.8rem;
-  font-weight: 650;
-  letter-spacing: 0.12em;
 }
-.mark {
-  font-size: 2rem;
+.wordmark canvas {
+  width: 38px;
+  height: 38px;
+  display: block;
+  border-radius: 50%;
+  border: 1.5px solid rgba(var(--copper-rgb), 0.25);
+  background: var(--paper);
+}
+.logo-mark-label {
+  font-family: var(--font-sans);
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink);
+  white-space: nowrap;
 }
 .desk-label {
   color: var(--muted);
@@ -133,20 +140,20 @@ select {
   min-height: 48px;
   width: 100%;
   padding: 0.65rem 0.8rem;
-  border: 1px solid #849681;
-  border-radius: 4px;
+  border: 1px solid var(--ink-mid);
+  border-radius: var(--card-radius);
   background: var(--panel);
   color: var(--ink);
 }
 input:user-invalid {
-  border-color: #a6412a;
+  border-color: var(--copper);
 }
 button {
   border: 1px solid var(--green);
-  border-radius: 4px;
+  border-radius: var(--card-radius);
   min-height: 48px;
   background: var(--green);
-  color: white;
+  color: var(--paper);
   padding: 0.6rem 1rem;
   cursor: pointer;
   font-size: 0.9rem;
@@ -180,10 +187,10 @@ button:disabled {
 }
 .notice {
   font-size: 0.85rem;
-  border-left: 3px solid #80996d;
+  border-left: 3px solid var(--forest);
   background: var(--wash);
   padding: 1rem 1.2rem;
-  color: #3d523d;
+  color: var(--ink-mid);
 }
 .login .notice {
   margin-top: 2rem;
@@ -224,7 +231,7 @@ code {
   margin-inline: -0.8rem;
   text-decoration: none;
   font-size: 0.9rem;
-  border-radius: 4px;
+  border-radius: var(--card-radius);
 }
 .sidebar nav a[aria-current="page"] {
   background: var(--wash);
@@ -259,13 +266,13 @@ code {
 }
 .badge {
   display: inline-block;
-  border: 1px solid #c8d3c0;
+  border: 1px solid var(--line);
   border-radius: 30px;
   padding: 0.3rem 0.7rem;
   font-size: 0.72rem;
   white-space: nowrap;
-  color: #3e5e3e;
-  background: #f0f4ea;
+  color: var(--forest);
+  background: var(--wash);
 }
 .page-heading > .badge {
   margin-top: 0.15rem;
@@ -362,9 +369,7 @@ code {
   font-size: 0.9rem;
 }
 .profile-card .profile-summary {
-  font:
-    400 1.15rem/1.5 Georgia,
-    serif;
+  font: 400 1.15rem/1.5 var(--font-serif);
   border-top: 1px solid var(--line);
   padding-top: 1.2rem;
   margin-top: 1.2rem;
@@ -391,7 +396,7 @@ code {
 }
 .empty {
   padding: 2rem;
-  border: 1px dashed #9aac94;
+  border: 1px dashed var(--ink-dim);
   color: var(--muted);
 }
 footer {
@@ -406,7 +411,7 @@ footer {
   top: -80px;
   left: 1rem;
   z-index: 10;
-  background: white;
+  background: var(--panel);
   padding: 1rem;
 }
 .skip-link:focus {
@@ -470,9 +475,11 @@ footer {
     height: 72px;
   }
   .wordmark {
-    font-size: 0.67rem;
-    letter-spacing: 0.08em;
     gap: 0.5rem;
+  }
+  .logo-mark-label {
+    font-size: 0.52rem;
+    letter-spacing: 0.18em;
   }
   .desk-label {
     font-size: 0.75rem;
@@ -516,9 +523,44 @@ footer {
   left: 0;
   right: 0;
   z-index: 20;
-  background: #173c2c;
-  color: white;
+  background: var(--forest);
+  color: var(--paper);
   padding: 6px 12px;
-  font: 13px system-ui;
+  font: 13px var(--font-sans);
   text-align: center;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.theme-toggle {
+  background: transparent;
+  color: var(--forest);
+  border: 1px solid var(--line);
+  font-size: 0.75rem;
+  min-height: 44px;
+}
+.eyebrow {
+  color: var(--forest);
+  letter-spacing: 0.2em;
+}
+#view-description,
+.login > .muted {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  line-height: 1.7;
+}
+.detail-card dd {
+  font-family: var(--font-serif);
+  font-size: 1.08rem;
+}
+@media (max-width: 600px) {
+  .header-actions {
+    gap: 0.5rem;
+  }
+  .desk-label {
+    display: none;
+  }
 }

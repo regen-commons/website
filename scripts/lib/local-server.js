@@ -8,7 +8,7 @@ import { createStewardFixtures } from "./steward-fixtures.js";
 
 const root = new URL("../../", import.meta.url);
 const banner = '<aside aria-label="Local development" style="position:fixed;bottom:0;left:0;right:0;z-index:2147483647;background:#173c2c;color:white;padding:6px 12px;font:13px system-ui;text-align:center">Local demo · synthetic data · submissions stay in memory · restart to reset</aside>';
-const types = { html: "text/html; charset=utf-8", css: "text/css; charset=utf-8", js: "text/javascript; charset=utf-8" };
+const types = { html: "text/html; charset=utf-8", css: "text/css; charset=utf-8", js: "text/javascript; charset=utf-8", woff2: "font/woff2" };
 
 function json(res, status, body) {
   res.writeHead(status, { "Content-Type": "application/json; charset=utf-8" });
@@ -82,7 +82,8 @@ export function createLocalServer({ stewardProvider = createStewardFixtures() } 
       if (!file.includes(".")) file += ".html";
       if (!publicFiles.includes(file)) return json(res, 404, { error: "not_found" });
       const type = file.split(".").at(-1);
-      let content = await readFile(new URL(file, root), "utf8");
+      let content = await readFile(new URL(file, root));
+      if (type === "html") content = content.toString("utf8");
       if (file === "admin.html") content = content.replace('id="demo-help" hidden', 'id="demo-help"');
       if (type === "html") content = content.replace("</body>", `${file === "admin.html" ? '<aside class="dev-banner">Local demo · synthetic data · no email is sent · restart to reset</aside>' : banner}</body>`);
       res.writeHead(200, { "Content-Type": types[type] });
