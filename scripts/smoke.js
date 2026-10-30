@@ -39,7 +39,7 @@ try {
   const login = await authPost({ action: "verify-code", email: "steward@example.test", code: "123456" });
   assert.equal(login.status, 200);
   const reviewed = await fetch(`${base}/api/admin?resource=applications`, { headers: { Cookie: login.headers.get("set-cookie").split(";")[0] } });
-  assert.equal((await reviewed.json()).applications.length, 3);
+  assert.ok((await reviewed.json()).applications.some(row=>row.display_name === "Smoke Applicant"));
   console.log(`Smoke passed: ${pages.length} pages, assets, public API reads/writes, publication gate, steward login and authorized queue.`);
   console.log("Evidence: local HTTP + actual handlers with fixture transport; external services and rendered UI are not covered.");
 } finally {

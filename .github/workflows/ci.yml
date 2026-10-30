@@ -18,3 +18,41 @@ jobs:
       - run: npm run check
       - run: npm test
       - run: npm run smoke
+  database:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: synthetic-local-test
+          POSTGRES_DB: regen_test
+        ports: [5432:5432]
+        options: >-
+          --health-cmd "pg_isready -U postgres -d regen_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      PGHOST: 127.0.0.1
+      PGPORT: 5432
+      PGUSER: postgres
+      PGDATABASE: regen_test
+      PGPASSWORD: synthetic-local-test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply migrations to disposable Postgres
+        run: |
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/local-auth.sql
+          for migration in supabase/migrations/*.sql; do
+            psql -v ON_ERROR_STOP=1 -1 -f "$migration"
+          done
+      - name: Verify steward and public data boundaries
+        run: |
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/steward-access.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/content-access.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/feedback-access.sql
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify synthetic Notion import and replay
+        env:
+          REGEN_IMPORT_SQL_TEST: synthetic-local-only
+        run: node scripts/verify-notion-import-replay.js

@@ -5,6 +5,16 @@ import "../seed-form.js";
 
 const response = (body, status = 200) => new Response(JSON.stringify(body), { status });
 
+test("seed retries retain a request identity; changed text receives a new identity", async () => {
+  const keys=[];
+  const save=RegenSeeds.createSaver(()=>{}, {fetch:async(_,options)=>{
+    keys.push(options.headers["Idempotency-Key"]);return response({error:"unavailable"},503);
+  }});
+  await save("An uncertain seed");await save("An uncertain seed");await save("Different seed text");
+  assert.match(keys[0],/^[a-f0-9-]{36}$/);
+  assert.equal(keys[0],keys[1]);assert.notEqual(keys[1],keys[2]);
+});
+
 test("seed length boundaries match the API, and no invalid seed is sent", async () => {
   const states = [];
   let requests = 0;

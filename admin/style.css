@@ -1,5 +1,6 @@
 @import url("../design-tokens.css");
 @import url("./fonts.css");
+@import url("../theme-toggle.css");
 
 :root {
   color-scheme: dark;
@@ -53,7 +54,7 @@ p {
   margin-top: 0;
 }
 h1 {
-  font: 300 clamp(2rem, 4vw, 3rem)/1.14 var(--font-display);
+  font: 300 clamp(2rem, 4vw, 3rem) / 1.14 var(--font-display);
   letter-spacing: -0.035em;
   margin-bottom: 1rem;
 }
@@ -121,12 +122,52 @@ h3 {
   border: 1px solid var(--line);
 }
 .login {
-  max-width: 32rem;
-  margin: 4rem auto;
-  padding: 2.5rem;
+  width: min(100%, 32rem);
+  margin: 0;
+  padding: clamp(1.25rem, 3svh, 2rem);
 }
-.login > p.muted {
-  margin-bottom: 2rem;
+body:has(.login:not([hidden])) {
+  min-height: 100svh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+body:has(.login:not([hidden])) .masthead {
+  height: clamp(60px, 10svh, 90px);
+}
+body:has(.login:not([hidden])) main {
+  display: grid;
+  place-items: center;
+  padding: clamp(0.5rem, 1.5svh, 1.25rem) 1rem;
+}
+body:has(.login:not([hidden])) footer {
+  padding: 0.5rem 1rem;
+}
+body:has(.login:not([hidden])) .dev-banner {
+  position: static;
+}
+.login .eyebrow {
+  margin-bottom: 0.5rem;
+}
+.login h1 {
+  font-size: clamp(1.75rem, 4svh, 2.25rem);
+  margin-bottom: 0.75rem;
+}
+.login p.login-description {
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 1.25rem;
+}
+.login .help {
+  margin: 0.5rem 0 0;
+}
+.login #code-help {
+  margin-bottom: 1rem;
+}
+.login .text-button {
+  min-height: 44px;
+  margin-top: 0.25rem;
+  line-height: 1.4;
 }
 label {
   display: block;
@@ -181,7 +222,7 @@ button:disabled {
 }
 .login button[type="submit"] {
   width: 100%;
-  margin-top: 1.25rem;
+  margin-top: 1rem;
   display: flex;
   justify-content: space-between;
 }
@@ -193,8 +234,17 @@ button:disabled {
   color: var(--ink-mid);
 }
 .login .notice {
-  margin-top: 2rem;
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
   font-size: 0.8rem;
+}
+.login .notice summary {
+  cursor: pointer;
+  font-weight: 600;
+  min-height: 24px;
+}
+.login .notice p {
+  margin: 0.75rem 0 0;
 }
 code {
   overflow-wrap: anywhere;
@@ -205,6 +255,11 @@ code {
 }
 #login-message {
   margin-top: 1rem;
+}
+.login #login-message {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
 }
 .workspace {
   display: grid;
@@ -273,12 +328,6 @@ code {
   white-space: nowrap;
   color: var(--forest);
   background: var(--wash);
-}
-.page-heading > .badge {
-  margin-top: 0.15rem;
-}
-.governance-note {
-  margin: 1.5rem 0 2rem;
 }
 .filters {
   display: flex;
@@ -422,41 +471,13 @@ footer {
 }
 @media (max-width: 850px) {
   .workspace {
-    grid-template-columns: 1fr;
-  }
-  .sidebar {
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
-    padding: 1rem 1.4rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-  .sidebar > .eyebrow,
-  .sidebar-note,
-  #signed-in {
-    display: none;
-  }
-  .sidebar nav {
-    flex-direction: row;
-    gap: 1.5rem;
-    margin-right: auto;
-  }
-  .sidebar nav a {
-    gap: 1rem;
-  }
-  .sidebar button {
-    min-height: 44px;
+    grid-template-columns: minmax(0, 1fr);
   }
   .content {
     padding: 1.7rem 1.2rem 3rem;
   }
   .detail-grid {
     grid-template-columns: 1fr;
-  }
-  .page-heading > .badge {
-    margin-top: 0.4rem;
   }
   .application-row {
     grid-template-columns: minmax(0, 1fr) 90px;
@@ -484,15 +505,8 @@ footer {
   .desk-label {
     font-size: 0.75rem;
   }
-  .login {
-    margin: 2rem 1rem;
-    padding: 1.5rem;
-  }
   .page-heading {
     display: block;
-  }
-  .page-heading > .badge {
-    margin-bottom: 0.6rem;
   }
   .filters > div {
     flex: 1;
@@ -535,19 +549,11 @@ footer {
   align-items: center;
   gap: 1.5rem;
 }
-.theme-toggle {
-  background: transparent;
-  color: var(--forest);
-  border: 1px solid var(--line);
-  font-size: 0.75rem;
-  min-height: 44px;
-}
 .eyebrow {
   color: var(--forest);
   letter-spacing: 0.2em;
 }
-#view-description,
-.login > .muted {
+#view-description {
   font-family: var(--font-serif);
   font-size: 1.1rem;
   line-height: 1.7;
@@ -562,5 +568,168 @@ footer {
   }
   .desk-label {
     display: none;
+  }
+}
+
+#content-management .detail-card {
+  margin-top: 1.5rem;
+}
+.editor-field {
+  display: grid;
+  gap: 0;
+  margin-bottom: 1.1rem;
+  min-width: 0;
+}
+.filters .editor-field {
+  margin-bottom: 0;
+}
+textarea {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  resize: vertical;
+}
+textarea:focus-visible {
+  outline: 2px solid var(--forest);
+  outline-offset: 3px;
+}
+.contribution-editor fieldset {
+  border: 1px solid var(--line);
+  padding: 1rem;
+  margin: 1rem 0;
+  min-width: 0;
+}
+.contributor-option {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin: 0.7rem 0;
+}
+.contributor-option input {
+  width: auto;
+  flex: 0 0 auto;
+}
+.application-row a,
+.detail-card h2,
+.detail-card p {
+  overflow-wrap: anywhere;
+}
+
+/* Shared site theme control, placed within the steward header. */
+.masthead .theme-toggle {
+  position: relative;
+  inset: auto;
+  z-index: auto;
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  flex-shrink: 0;
+}
+.workspace-menu-toggle,
+.workspace-menu-close {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 1.5px solid rgba(var(--copper-rgb), 0.25);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink);
+  flex-shrink: 0;
+}
+.workspace-menu-toggle svg,
+.workspace-menu-close svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+}
+.workspace-menu-heading .eyebrow {
+  margin: 0 0 1.25rem;
+  font-family: var(--font-sans);
+  line-height: 1.55;
+}
+@media (max-width: 850px) {
+  .masthead {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: var(--paper);
+  }
+  .header-actions {
+    gap: 0.65rem;
+  }
+  .desk-label {
+    display: none;
+  }
+  .workspace-menu-toggle,
+  .workspace-menu-close {
+    display: inline-flex;
+  }
+  .sidebar {
+    position: fixed;
+    inset: 98px 1rem auto auto;
+    z-index: 40;
+    width: min(22rem, calc(100vw - 2rem));
+    max-width: none;
+    max-height: calc(100dvh - 114px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    margin: 0;
+    padding: 1.25rem;
+    border: 1px solid var(--line);
+    border-radius: var(--card-radius);
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow: 0 16px 48px rgb(0 0 0 / 0.2);
+  }
+  .sidebar::backdrop {
+    background: rgb(0 0 0 / 0.22);
+  }
+  .workspace-menu-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+  }
+  .workspace-menu-heading .eyebrow {
+    margin: 0;
+  }
+  .sidebar nav {
+    gap: 0.35rem;
+  }
+  .sidebar nav a {
+    min-height: 52px;
+    padding: 0.75rem;
+    font-size: 0.95rem;
+  }
+  .sidebar-note {
+    display: none;
+  }
+  .sidebar #signed-in {
+    margin: 0.75rem 0;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--line);
+  }
+  .sidebar #sign-out {
+    width: 100%;
+  }
+}
+@media (max-width: 480px) {
+  .sidebar {
+    inset-block-start: 80px;
+    max-height: calc(100dvh - 96px);
   }
 }

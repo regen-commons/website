@@ -20,29 +20,62 @@
     <a class="skip-link" href="#main">Skip to content</a>
     <header class="masthead">
       <a class="wordmark logo-mark" href="/index.html">
-        <canvas id="logo-canvas" width="76" height="76" data-static aria-hidden="true"></canvas>
+        <canvas
+          id="logo-canvas"
+          width="76"
+          height="76"
+          data-static
+          aria-hidden="true"
+        ></canvas>
         <span class="logo-mark-label">Regen Commons</span>
       </a>
       <div class="header-actions">
         <span class="desk-label">Steward desk</span>
+        <button
+          id="workspace-menu-toggle"
+          class="workspace-menu-toggle"
+          type="button"
+          aria-label="Workspace menu"
+          aria-controls="workspace-navigation"
+          aria-expanded="false"
+          popovertarget="workspace-navigation"
+          hidden
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 7h16M4 12h16M4 17h16" />
+          </svg>
+        </button>
         <button
           id="theme-toggle"
           class="theme-toggle"
           type="button"
           aria-label="Switch to light theme"
         >
-          Light theme
+          <svg aria-hidden="true" class="icon-sun" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="5" />
+            <line x1="12" y1="1" x2="12" y2="3" />
+            <line x1="12" y1="21" x2="12" y2="23" />
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+            <line x1="1" y1="12" x2="3" y2="12" />
+            <line x1="21" y1="12" x2="23" y2="12" />
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+          </svg>
+          <svg aria-hidden="true" class="icon-moon" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          </svg>
         </button>
       </div>
     </header>
     <main id="main" tabindex="-1">
       <section id="login" class="login panel">
         <p class="eyebrow">Care for the commons</p>
-        <h1>A place for stewardship.</h1>
-        <p class="muted">
-          Review applications and the profiles taking shape in our network.
-        </p>
+        <h1>Steward sign-in</h1>
         <form id="email-form" method="post" action="/api/admin">
+          <p class="muted login-description">
+            Manage membership requests, Seeds, and Contributions.
+          </p>
           <label for="email">Steward email</label>
           <input
             id="email"
@@ -64,9 +97,7 @@
           </button>
         </form>
         <form id="code-form" method="post" action="/api/admin" hidden>
-          <p id="code-help">
-            If this email has an account, check its inbox for a sign-in code.
-          </p>
+          <p id="code-help">Enter the code from your email.</p>
           <label for="code">Email code</label>
           <input
             id="code"
@@ -84,34 +115,59 @@
             Open steward desk <span aria-hidden="true">→</span>
           </button>
           <button id="change-email" class="text-button" type="button">
-            Use another email or request a new code
+            Change email or request a new code
           </button>
         </form>
         <p id="login-message" role="status" aria-live="polite"></p>
         <button id="retry-sign-out" class="secondary" type="button" hidden>
           Retry sign out
         </button>
-        <aside id="demo-help" hidden class="notice">
-          <strong>Local demo — no email is sent.</strong><br />Use
-          <code>steward@example.test</code>, then code <code>123456</code>.
-          <code>visitor@example.test</code> demonstrates denied access.
-        </aside>
+        <details id="demo-help" hidden class="notice">
+          <summary>Local demo — no email is sent</summary>
+          <p>
+            Use <code>steward@example.test</code>, then code
+            <code>123456</code>. <code>visitor@example.test</code> demonstrates
+            denied access.
+          </p>
+        </details>
         <noscript
           >JavaScript is required to sign in and review applications.</noscript
         >
       </section>
       <div id="workspace" class="workspace" hidden>
-        <aside class="sidebar">
-          <p class="eyebrow">Workspace</p>
+        <aside
+          id="workspace-navigation"
+          class="sidebar"
+          aria-label="Workspace navigation"
+        >
+          <div class="workspace-menu-heading">
+            <h2 class="eyebrow">Workspace</h2>
+            <button
+              id="close-workspace-menu"
+              class="workspace-menu-close"
+              type="button"
+              aria-label="Close workspace menu"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m6 6 12 12M18 6 6 18" />
+              </svg>
+            </button>
+          </div>
           <nav aria-label="Steward workspace">
             <a id="nav-applications" href="#applications"
-              >Applications <span aria-hidden="true">↗</span></a
+              >Membership requests <span aria-hidden="true">→</span></a
             ><a id="nav-members" href="#members"
-              >Members <span aria-hidden="true">↗</span></a
+              >Members <span aria-hidden="true">→</span></a
+            >
+            <a id="nav-seeds" href="#seeds"
+              >Seeds <span aria-hidden="true">→</span></a
+            >
+            <a id="nav-contributions" href="#contributions"
+              >Contributions <span aria-hidden="true">→</span></a
             >
           </nav>
           <div class="sidebar-note">
-            <span class="small-label">Review access</span>
+            <span class="small-label">Steward access</span>
             <p>
               Private answers stay here. Public profiles are curated separately.
             </p>
@@ -125,17 +181,12 @@
           <div id="page-heading" class="page-heading">
             <div>
               <p class="eyebrow">Regen Commons / Stewardship</p>
-              <h1 id="view-title" tabindex="-1">Applications</h1>
+              <h1 id="view-title" tabindex="-1">Membership requests</h1>
               <p id="view-description" class="muted">
                 Get to know the people and organizations joining the commons.
               </p>
             </div>
-            <span class="badge">Read-only pilot</span>
           </div>
-          <p class="notice governance-note">
-            Acceptance and publication are separate decisions. Decision actions
-            will be added once council authority is agreed.
-          </p>
           <section id="queue">
             <form
               id="filters"
@@ -145,7 +196,7 @@
               action="/admin"
             >
               <div class="search-field">
-                <label for="search">Search applications</label
+                <label for="search">Search membership requests</label
                 ><input
                   type="search"
                   id="search"
@@ -186,6 +237,11 @@
           <section id="members" hidden aria-label="Member profiles">
             <div id="member-list" class="member-grid"></div>
           </section>
+          <section
+            id="content-management"
+            hidden
+            aria-label="Content management"
+          ></section>
           <p id="load-message" role="status" aria-live="polite"></p>
           <button id="retry" type="button" class="secondary" hidden>
             Try again

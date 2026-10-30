@@ -5,6 +5,7 @@
 */
 
 @import url("./design-tokens.css");
+@import url("./theme-toggle.css");
 
 /* ── PER-PAGE ACCENT — one dominant color per page ─────────────────────── */
 body[data-page="landing"]     { --accent: var(--forest); --accent-rgb: var(--forest-rgb); }
@@ -2357,58 +2358,6 @@ p:last-child { margin-bottom: 0; }
    THEME TOGGLE
    ══════════════════════════════════════════════════════════════════════════ */
 
-.theme-toggle {
-  position: fixed;
-  top: 1.2rem; right: 1.4rem;
-  z-index: 9999;
-  width: 38px; height: 38px;
-  border: 1.5px solid rgba(var(--copper-rgb), 0.25);
-  border-radius: 50%;
-  background: var(--paper);
-  color: var(--ink-dim);
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: border-color 0.3s, color 0.3s, background 0.3s;
-  padding: 0;
-}
-.theme-toggle:hover {
-  border-color: var(--gold);
-  color: var(--gold);
-}
-.theme-toggle svg {
-  width: 18px; height: 18px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-/* Show sun icon in dark mode, moon icon in light mode */
-.theme-toggle .icon-sun  { display: block; }
-.theme-toggle .icon-moon { display: none; }
-[data-theme="light"] .theme-toggle .icon-sun  { display: none; }
-[data-theme="light"] .theme-toggle .icon-moon { display: block; }
-/* Label below theme toggle */
-.theme-toggle::after {
-  content: 'Dark';
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: var(--font-sans);
-  font-size: 0.45rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ink-mid);
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s;
-}
-[data-theme="light"] .theme-toggle::after { content: 'Light'; }
-.theme-toggle:hover::after { opacity: 1; }
-.theme-toggle { position: fixed; /* add relative for ::after */ }
-
 /* ── Light-mode section contrast — cards/sections need to stand out from background ── */
 [data-theme="light"] .context,
 [data-theme="light"] .cta {
@@ -2481,6 +2430,29 @@ p:last-child { margin-bottom: 0; }
     letter-spacing: 0.18em;
   }
 }
+.feedback-page {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 8rem 1.5rem 4rem;
+  color: var(--ink);
+}
+.feedback-page h1 { font: 500 clamp(2rem, 6vw, 3.5rem)/1.15 var(--font-display); margin: 1rem 0 1.5rem; }
+.feedback-page > p { line-height: 1.65; }
+.feedback-back { display: inline-block; padding-block: .75rem; margin-bottom: 1.5rem; color: inherit; }
+.feedback-page form { margin-top: 2rem; }
+.feedback-page fieldset { border: 1px solid var(--ink-mid); padding: 1rem; margin: 0 0 1.5rem; }
+.feedback-page legend, .feedback-message > label { font: 500 1rem/1.5 var(--font-sans); }
+#feedback-categories { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); }
+#feedback-categories label { display: flex; align-items: center; gap: .75rem; min-height: 48px; font: 1rem/1.4 var(--font-sans); cursor: pointer; }
+#feedback-categories input { width: 1.15rem; height: 1.15rem; accent-color: var(--copper); }
+.feedback-message > label { display: block; margin-bottom: .5rem; }
+.feedback-message textarea { box-sizing: border-box; width: 100%; padding: 1rem; border: 1px solid var(--ink-mid); background: var(--paper); color: inherit; font: 1rem/1.6 var(--font-sans); resize: vertical; }
+.feedback-help { margin: .5rem 0 1rem; color: inherit; font: .875rem/1.5 var(--font-sans); overflow-wrap: anywhere; }
+.feedback-page button[type="submit"] { min-height: 48px; padding: .8rem 1.25rem; border: 1px solid currentColor; background: var(--copper); color: var(--paper); font: 500 1rem/1.4 var(--font-sans); cursor: pointer; }
+.feedback-page button:disabled { opacity: .65; cursor: default; }
+.feedback-page :focus-visible { outline: 3px solid var(--gold); outline-offset: 4px; }
+#feedback-status { min-height: 1.5em; margin-block: 1rem; font: 1rem/1.5 var(--font-sans); }
+
 /* Save and data feedback remains legible in both themes and at mobile widths. */
 .seed-hint, .seed-status {
   font: 0.875rem/1.5 'Space Grotesk', sans-serif;

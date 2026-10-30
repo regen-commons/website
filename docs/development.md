@@ -86,7 +86,7 @@ own rate limits still apply after a synthetic failure is cleared.
 - **Port occupied:** the server refuses to replace the occupant. Reuse the
   existing instance or run `PORT=3503 npm run dev`. Stop only your own process.
 - **HTTP 429:** the actual handlers limit applications to three attempts/hour
-  and seeds to six; invalid attempts also consume quota. Restart local dev to reset.
+  and seeds to six valid saves per clock hour; invalid inputs and acknowledged retries do not consume additional quota. Restart local dev to reset.
 - **Dependency import fails:** run `npm ci` from the repository root. Preserve
   the lockfile. The inherited v1 lockfile may make npm fetch supplemental metadata.
 - **`listen EPERM` inside an agent sandbox:** allow the bounded command to bind
@@ -106,6 +106,10 @@ own rate limits still apply after a synthetic failure is cleared.
   runtime or Codex configuration changes are needed.
 
 ## Live integration workflow
+
+The [content management guide](content-management.md) owns the new Supabase
+runtime configuration and migration gates. The older Notion setup below is a
+historical reference while production cutover is pending.
 
 `npm run dev:live` reserves port 3502 for Vercel's emulator. It requires a
 separately installed Vercel CLI, an authorized project link, and development

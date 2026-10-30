@@ -1,9 +1,12 @@
 # Regen Commons website
 
 Five public HTML pages and a separate `/admin` steward dashboard, with Vercel
-functions for data access. Public intake, the commons library, and shared visions
-still use Notion. The read-only steward pilot uses Supabase PostgreSQL and Auth.
-Optional public-intake notifications use Resend and the separate Telegram agent.
+functions for data access. This branch uses Supabase PostgreSQL and Auth for
+public reads/intake and the steward desk, including Seeds and Contributions
+management. Optional intake notices use Resend and the separate Telegram agent.
+The hosted schema and historical import are complete; runtime configuration and
+production cutover are pending. See
+[content management and migration gates](docs/content-management.md).
 
 ## Start locally
 
@@ -76,8 +79,9 @@ then merge. Confirm branch protection, deployment linkage, account ownership,
 and environment separation in the actual services before relying on them. The
 handover describes these settings; they have not been verified in this bootstrap.
 
-Production readers publish only rows whose `Status` is exactly `Active`.
-Applications start `Pending`; new seeds start `Active`. Public members exclude
-contact and private review fields. The implementation owns exact Notion property
+Supabase readers publish only records whose publication state is `published`;
+the public API retains the compatible `Active` status label. Membership requests
+start private and pending. New Seeds and Contributions publish immediately.
+Public members exclude contact and private review fields. The implementation owns exact Notion property
 names; [integration notes](docs/integrations.md) explain the known discrepancies
 in the inherited handover. Keep credentials and real application data out of Git.

@@ -633,6 +633,7 @@
         if (errorEl) errorEl.style.display = "none";
       }
 
+      var lastSubmission = null, submissionId = null;
       form.addEventListener("submit", async function (e) {
         e.preventDefault();
         if (currentStep < 6) {
@@ -648,13 +649,15 @@
           submitBtn.querySelector(".btn-label").textContent = "Sending…";
         }
 
+        var serialized = JSON.stringify(serializeForm());
+        if (serialized !== lastSubmission) { submissionId = crypto.randomUUID(); lastSubmission = serialized; }
         var res;
         try {
           try {
             res = await fetch("/api/apply", {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(serializeForm()),
+              headers: { "Content-Type": "application/json", "Idempotency-Key": submissionId },
+              body: serialized,
             });
           } catch (networkErr) {
             // fetch() rejects only on network failure (offline, DNS, blocked,
@@ -746,12 +749,10 @@
 
   // ─── Floating feedback indicator (every page) ────────────────────────────
   (function () {
-    if (document.querySelector(".feedback-indicator")) return;
+    if (document.querySelector(".feedback-indicator") || /^\/feedback(?:\.html)?\/?$/.test(location.pathname)) return;
     var a = document.createElement("a");
     a.className = "feedback-indicator";
-    a.href = "https://opencivics.notion.site/35206d2570f28065a7dcf559894ec554?pvs=105";
-    a.target = "_blank";
-    a.rel = "noopener";
+    a.href = "/feedback?from=" + encodeURIComponent(location.pathname);
     a.textContent = "Feedback";
     document.body.appendChild(a);
   })();

@@ -76,6 +76,36 @@ plus email/Telegram delivery if enabled. Record cleanup and rollback steps.
 authorize any data move. Review the database-creation script's legacy default ID
 before use. Live test writes/messages require authorization for the targets.
 
+## 2a. Seeds and Contributions management and Supabase cutover — in progress
+
+**Implemented on the feature branch:** Seeds list/search/filter and hide/restore;
+Contribution creation/editing, attribution, immediate publishing, and hide/restore;
+recorded actors/reasons/revisions; Supabase public projections and private intake;
+durable request identities, shared quotas, and notification jobs. Membership
+requests are private applications; Members has Individual and Organization types.
+See [implementation and migration gates](content-management.md) and the
+[research roadmap](steward-roadmap-and-migration.md).
+
+**Verified locally:** check, regression tests, HTTP smoke, native Postgres 17
+migrations and both permission suites. Rendered desktop/mobile proof uses
+synthetic fixtures. This work stays separate from public-site polish.
+
+**Historical import complete:** after explicit user approval, the supplied
+exports and four recovered application messages were imported into hosted
+Supabase and reconciled. The
+[import guide](notion-import.md) records counts, private source preservation,
+confirmed member typing/merge, repeat-run behavior, and verification.
+
+**Cutover in progress:** the user confirmed the exports are final and source edits
+are paused; a fresh inventory matches the hosted receipt. Production runtime and
+the bounded intake credential are configured. Review fixed queue ordering for
+unknown dates and, at the user's request, replaced the public Notion feedback
+form. See the [cutover record](production-cutover.md).
+
+**Pending:** feedback migration, current-head CI, merge/deployment, live flow
+verification, cache checks, and Notion runtime retirement. Public production
+remains on its deployed provider until release verification completes.
+
 ## 3. Make application and notification failures observable
 
 **Scope:** `api/apply.js`, `api/seeds.js`, `api/_lib/notify.js`, provider-boundary tests.
