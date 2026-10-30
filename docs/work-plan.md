@@ -108,6 +108,22 @@ remains on its deployed provider until release verification completes.
 
 ## 3. Make application and notification failures observable
 
+**Membership confirmation email:** add `regencommons.com` as a separate Resend
+sender, then enable application receipts from `membership@regencommons.com` after
+DNS verification. Receipt wording confirms a saved request and pending steward
+review. Use the website's light palette and wordmark, table-cell padding, system
+font fallbacks, a plain-text alternative, and the public contact inbox for replies.
+Retain durable notification jobs and stable provider retry identities. Verify one
+named test recipient in Gmail before enabling the production sender. Do not send
+historical applicants a backfill or enable additional steward recipients.
+
+**Current proof:** the template and delivery adapter pass 55 tests, check, and
+smoke. Synthetic browser previews verify desktop and 320px padding without
+horizontal overflow. The root domain is added in Resend, and production sender
+and reply-address settings are prepared. DNS verification, a domain-scoped API
+key, release, and actual Gmail delivery/formatting remain pending. No new real
+membership email has been sent.
+
 **Scope:** `api/apply.js`, `api/seeds.js`, `api/_lib/notify.js`, provider-boundary tests.
 
 **Done when:** handle Resend's fulfilled `{ error }` results; bound notification
