@@ -108,6 +108,25 @@ remains on its deployed provider until release verification completes.
 
 ## 3. Make application and notification failures observable
 
+**Membership confirmation email:** add `regencommons.com` as a separate Resend
+sender, then enable application receipts from `membership@regencommons.com` after
+DNS verification. Receipt wording confirms a saved request and pending steward
+review. Use the website's light palette and wordmark, table-cell padding, system
+font fallbacks, a plain-text alternative, and the public contact inbox for replies.
+Retain durable notification jobs and stable provider retry identities. Verify one
+named test recipient in Gmail before enabling the production sender. Do not send
+historical applicants a backfill or enable additional steward recipients.
+
+**Current proof:** the template and delivery adapter pass 55 tests, check, and
+smoke. Synthetic browser previews verify desktop and 320px padding without
+horizontal overflow. On 30 October, the three authoritative DNS records matched
+Resend's values, the root domain became Verified, and the operator saved a
+domain-scoped sending key as a production Vercel Secret. A single QA-copy email
+to the approved test recipient was delivered to Gmail's inbox with the intended
+padding, colors, and typography. Gmail shows the root-domain signature and reply
+inbox. Release and automatic form-to-receipt verification remain pending. The QA
+template is a test copy; the application module remains the runtime authority.
+
 **Scope:** `api/apply.js`, `api/seeds.js`, `api/_lib/notify.js`, provider-boundary tests.
 
 **Done when:** handle Resend's fulfilled `{ error }` results; bound notification

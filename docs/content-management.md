@@ -81,6 +81,26 @@ This command can send real mail/messages. Do not run it as a fixture smoke.
 Use the intended recipients and verified sender configuration. Supabase SMTP
 still handles sign-in mail separately; it does not configure receipt senders.
 
+### Membership request receipts
+
+Set production `RESEND_API_KEY` to a sending-only key scoped to the verified
+`regencommons.com` domain and `RESEND_FROM_EMAIL=membership@regencommons.com`.
+Store the key as a Vercel Secret. `RESEND_REPLY_TO_EMAIL` selects a monitored
+reply inbox; it defaults to the website's public `regencommons@gmail.com` address.
+These settings do not alter Supabase Auth SMTP or its existing auth subdomain.
+
+The receipt uses the website's light palette and wordmark with inline styles,
+table-cell padding, system font fallbacks, and a plain-text alternative. It
+confirms that the request was saved and remains subject to steward review. It
+does not grant membership, publish a profile, or include private application
+answers or a dashboard link. Each receipt goes only to its applicant. Optional
+steward recipients remain independently configured by `STEWARD_NOTIFY_EMAILS`.
+
+The existing notification job controls retries and the provider identity. Do not
+reset historical skipped/sent jobs to backfill email as part of setup. Real
+Gmail delivery and formatting require the verified sender, an approved test
+recipient, and live-provider proof; a browser preview is only a layout check.
+
 ## Export inventory and migration gates
 
 The supplied Members, Seeds, Contributions, and Participant Feedback exports and

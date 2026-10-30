@@ -1,3 +1,5 @@
+import { membershipReceipt } from "./membership-email.js";
+
 const escapeHtml = (value) =>
   String(value || "").replace(
     /[&<>"']/g,
@@ -58,6 +60,16 @@ export async function drainNotifications({
                   .filter(Boolean);
           if (recipients.length) {
             const receipt = job.channel === "receipt";
+            const message = receipt
+              ? membershipReceipt(job.name)
+              : {
+                  subject: "New Regen Commons membership request",
+                  html: mailBody(
+                    "New membership request",
+                    `${job.name} has submitted a membership request.`,
+                    url,
+                  ),
+                };
             const response = await request("https://api.resend.com/emails", {
               method: "POST",
               headers: {
@@ -68,16 +80,10 @@ export async function drainNotifications({
               body: JSON.stringify({
                 from: `Regen Commons <${env.RESEND_FROM_EMAIL}>`,
                 to: recipients,
-                subject: receipt
-                  ? "We received your membership request — Regen Commons"
-                  : "New Regen Commons membership request",
-                html: mailBody(
-                  receipt ? `Thank you, ${job.name}` : "New membership request",
-                  receipt
-                    ? "Your membership request has been saved. A steward can now review what you shared. This receipt does not confirm membership."
-                    : `${job.name} has submitted a membership request.`,
-                  receipt ? null : url,
-                ),
+                ...message,
+                ...(receipt
+                  ? { reply_to: env.RESEND_REPLY_TO_EMAIL || "regencommons@gmail.com" }
+                  : {}),
               }),
               signal: AbortSignal.timeout(8000),
             });
