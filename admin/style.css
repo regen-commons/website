@@ -1,5 +1,6 @@
 @import url("../design-tokens.css");
 @import url("./fonts.css");
+@import url("../theme-toggle.css");
 
 :root {
   color-scheme: dark;
@@ -328,12 +329,6 @@ code {
   color: var(--forest);
   background: var(--wash);
 }
-.page-heading > .badge {
-  margin-top: 0.15rem;
-}
-.governance-note {
-  margin: 1.5rem 0 2rem;
-}
 .filters {
   display: flex;
   gap: 1rem;
@@ -478,44 +473,11 @@ footer {
   .workspace {
     grid-template-columns: minmax(0, 1fr);
   }
-  .sidebar {
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
-    padding: 1rem 1.4rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-  .sidebar > .eyebrow,
-  .sidebar-note,
-  #signed-in {
-    display: none;
-  }
-  .sidebar nav {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-right: auto;
-    min-width: 0;
-    width: 100%;
-  }
-  .sidebar nav a {
-    gap: 0.6rem;
-    flex: 1 1 40%;
-    min-width: 0;
-  }
-  .sidebar button {
-    min-height: 44px;
-  }
   .content {
     padding: 1.7rem 1.2rem 3rem;
   }
   .detail-grid {
     grid-template-columns: 1fr;
-  }
-  .page-heading > .badge {
-    margin-top: 0.4rem;
   }
   .application-row {
     grid-template-columns: minmax(0, 1fr) 90px;
@@ -545,9 +507,6 @@ footer {
   }
   .page-heading {
     display: block;
-  }
-  .page-heading > .badge {
-    margin-bottom: 0.6rem;
   }
   .filters > div {
     flex: 1;
@@ -590,13 +549,6 @@ footer {
   align-items: center;
   gap: 1.5rem;
 }
-.theme-toggle {
-  background: transparent;
-  color: var(--forest);
-  border: 1px solid var(--line);
-  font-size: 0.75rem;
-  min-height: 44px;
-}
 .eyebrow {
   color: var(--forest);
   letter-spacing: 0.2em;
@@ -624,9 +576,12 @@ footer {
 }
 .editor-field {
   display: grid;
-  gap: 0.5rem;
+  gap: 0;
   margin-bottom: 1.1rem;
   min-width: 0;
+}
+.filters .editor-field {
+  margin-bottom: 0;
 }
 textarea {
   width: 100%;
@@ -664,4 +619,117 @@ textarea:focus-visible {
 .detail-card h2,
 .detail-card p {
   overflow-wrap: anywhere;
+}
+
+/* Shared site theme control, placed within the steward header. */
+.masthead .theme-toggle {
+  position: relative;
+  inset: auto;
+  z-index: auto;
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  flex-shrink: 0;
+}
+.workspace-menu-toggle,
+.workspace-menu-close {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 1.5px solid rgba(var(--copper-rgb), 0.25);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink);
+  flex-shrink: 0;
+}
+.workspace-menu-toggle svg,
+.workspace-menu-close svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+}
+.workspace-menu-heading .eyebrow {
+  margin: 0 0 1.25rem;
+  font-family: var(--font-sans);
+  line-height: 1.55;
+}
+@media (max-width: 850px) {
+  .masthead {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: var(--paper);
+  }
+  .header-actions {
+    gap: 0.65rem;
+  }
+  .desk-label {
+    display: none;
+  }
+  .workspace-menu-toggle,
+  .workspace-menu-close {
+    display: inline-flex;
+  }
+  .sidebar {
+    position: fixed;
+    inset: 98px 1rem auto auto;
+    z-index: 40;
+    width: min(22rem, calc(100vw - 2rem));
+    max-width: none;
+    max-height: calc(100dvh - 114px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    margin: 0;
+    padding: 1.25rem;
+    border: 1px solid var(--line);
+    border-radius: var(--card-radius);
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow: 0 16px 48px rgb(0 0 0 / 0.2);
+  }
+  .sidebar::backdrop {
+    background: rgb(0 0 0 / 0.22);
+  }
+  .workspace-menu-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+  }
+  .workspace-menu-heading .eyebrow {
+    margin: 0;
+  }
+  .sidebar nav {
+    gap: 0.35rem;
+  }
+  .sidebar nav a {
+    min-height: 52px;
+    padding: 0.75rem;
+    font-size: 0.95rem;
+  }
+  .sidebar-note {
+    display: none;
+  }
+  .sidebar #signed-in {
+    margin: 0.75rem 0;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--line);
+  }
+  .sidebar #sign-out {
+    width: 100%;
+  }
+}
+@media (max-width: 480px) {
+  .sidebar {
+    inset-block-start: 80px;
+    max-height: calc(100dvh - 96px);
+  }
 }

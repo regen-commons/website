@@ -24,6 +24,94 @@
     offset = 0,
     generation = 0;
   const filters = { search: "", state: "", type: "" };
+  const menuButton = $("workspace-menu-toggle");
+  const navigation = $("workspace-navigation");
+  const mobileNavigation = window.matchMedia("(max-width: 850px)");
+  const nativePopover = "popover" in HTMLElement.prototype;
+  function menuIsOpen() {
+    return nativePopover && navigation.hasAttribute("popover")
+      ? navigation.matches(":popover-open")
+      : navigation.hasAttribute("data-menu-open");
+  }
+  function focusCurrentDestination() {
+    (
+      navigation.querySelector('[aria-current="page"]') ||
+      navigation.querySelector("nav a")
+    ).focus();
+  }
+  function closeMenu() {
+    if (!menuIsOpen()) return;
+    if (nativePopover) navigation.hidePopover();
+    else {
+      const hadFocus = navigation.contains(document.activeElement);
+      navigation.removeAttribute("data-menu-open");
+      navigation.hidden = mobileNavigation.matches;
+      if (hadFocus && signedIn) menuButton.focus();
+    }
+    menuButton.setAttribute("aria-expanded", "false");
+  }
+  function layoutNavigation() {
+    const hadFocus = navigation.contains(document.activeElement);
+    closeMenu();
+    if (nativePopover) {
+      if (mobileNavigation.matches) navigation.setAttribute("popover", "auto");
+      else navigation.removeAttribute("popover");
+    } else navigation.hidden = mobileNavigation.matches;
+    if (hadFocus && signedIn) {
+      if (mobileNavigation.matches) menuButton.focus();
+      else focusCurrentDestination();
+    }
+  }
+  menuButton.addEventListener("click", (event) => {
+    if (!signedIn || !mobileNavigation.matches) {
+      event.preventDefault();
+      return;
+    }
+    if (!nativePopover) {
+      if (menuIsOpen()) closeMenu();
+      else {
+        navigation.hidden = false;
+        navigation.setAttribute("data-menu-open", "");
+        menuButton.setAttribute("aria-expanded", "true");
+        focusCurrentDestination();
+      }
+    }
+  });
+  navigation.addEventListener("toggle", () => {
+    const open = menuIsOpen();
+    menuButton.setAttribute("aria-expanded", String(open));
+    if (open) focusCurrentDestination();
+  });
+  $("close-workspace-menu").addEventListener("click", closeMenu);
+  navigation.addEventListener("click", (event) => {
+    const destination = event.target.closest("nav a");
+    if (!destination) return;
+    closeMenu();
+    if (destination.hash === location.hash) $("view-title").focus();
+  });
+  document.addEventListener("focusin", (event) => {
+    if (
+      menuIsOpen() &&
+      !navigation.contains(event.target) &&
+      event.target !== menuButton
+    )
+      closeMenu();
+  });
+  // The fallback retains the same disclosure behavior on browsers without Popover.
+  if (!nativePopover) {
+    document.addEventListener("pointerdown", (event) => {
+      if (
+        !navigation.contains(event.target) &&
+        !menuButton.contains(event.target)
+      )
+        closeMenu();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeMenu();
+    });
+  }
+  mobileNavigation.addEventListener("change", layoutNavigation);
+  layoutNavigation();
   function node(tag, text, className) {
     const element = document.createElement(tag);
     if (text != null) element.textContent = text;
@@ -88,6 +176,8 @@
   }
   function showLogin(message = "") {
     signedIn = false;
+    closeMenu();
+    menuButton.hidden = true;
     clearPrivateData();
     $("signed-in").textContent = "";
     $("view-title").textContent = "Membership requests";
@@ -107,6 +197,7 @@
   }
   function showWorkspace(user) {
     signedIn = true;
+    menuButton.hidden = false;
     $("login").hidden = true;
     $("workspace").hidden = false;
     $("signed-in").textContent = user.email;
@@ -714,6 +805,7 @@
   }
   async function loadView() {
     if (!signedIn) return;
+    closeMenu();
     clearPrivateData();
     const current = generation;
     const route = location.hash.slice(1),
@@ -734,10 +826,10 @@
           ? "Membership request"
           : "Membership requests";
     $("view-description").textContent = managing
-      ? "Published immediately, tended through hide and restore moderation."
+      ? "New items publish immediately. Hide or restore them as needed."
       : members
-        ? "Curated profiles, affiliations, and contributions. Publication is tracked separately."
-        : "Get to know the people and organizations joining the commons.";
+        ? "Individuals and organizations in the commons."
+        : "Private membership requests from individuals and organizations.";
     for (const section of ["applications", "members", "seeds", "contributions"])
       $("nav-" + section).removeAttribute("aria-current");
     (managing
@@ -764,7 +856,7 @@
           renderContentList(resource, data);
         }
         $("load-message").textContent = "";
-        $("view-title").focus();
+        if (!menuIsOpen()) $("view-title").focus();
         return;
       }
       const params = members
@@ -778,7 +870,7 @@
       else if (detailId) renderDetail(data);
       else renderQueue(data);
       $("load-message").textContent = "";
-      $("view-title").focus();
+      if (!menuIsOpen()) $("view-title").focus();
     } catch (error) {
       if (current !== generation) return;
       if ([401, 403].includes(error.status)) {

@@ -15,9 +15,10 @@
     function render(value) {
       theme = value;
       root.setAttribute("data-theme", theme);
-      window.dispatchEvent(new CustomEvent("theme-change", { detail: { theme } }));
+      window.dispatchEvent(
+        new CustomEvent("theme-change", { detail: { theme } }),
+      );
       const next = theme === "dark" ? "light" : "dark";
-      toggle.textContent = `${next === "light" ? "Light" : "Dark"} theme`;
       toggle.setAttribute("aria-label", `Switch to ${next} theme`);
     }
     render(theme);

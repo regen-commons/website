@@ -157,5 +157,23 @@ height or nested scrolling. Demo instructions use a native, keyboard-accessible
 disclosure. The fixture banner stays in document flow during sign-in so it cannot
 cover the form. These layout changes preserve the existing sign-in behavior.
 
+The dashboard and public pages share [theme control styles](../theme-toggle.css)
+and the same sun/moon artwork and `rc-theme` preference. The steward header uses
+44px controls. On screens up to 850px wide, a header button opens the workspace
+navigation as a native popover, with an ordinary disclosure fallback for browsers
+without Popover support. Desktop keeps the sidebar. Only one navigation element
+exists, and sign-out or lost authorization closes the menu and hides its trigger.
+Repeated workspace labels and the global governance notice were removed from
+the content header; private request descriptions and publication guidance remain
+in the views where they help the steward.
+
+Rendered verification covers all four destinations, current-section state,
+keyboard opening and Escape dismissal with focus return, outside dismissal,
+mobile/desktop resizing, menu access after scrolling, and sign-out. The menu fits
+320×568 and 390×667 without horizontal overflow; at 844×390 it scrolls within its
+available height. The website-to-admin theme update and reload persistence were
+checked with synthetic local data. The legacy disclosure fallback was reviewed
+in code, not exercised in an older browser.
+
 The [work plan](work-plan.md) owns remaining migration work; the
 [roadmap](steward-roadmap-and-migration.md) records the research baseline.
