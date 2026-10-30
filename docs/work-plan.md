@@ -90,17 +90,17 @@ See [implementation and migration gates](content-management.md) and the
 migrations and both permission suites. Rendered desktop/mobile proof uses
 synthetic fixtures. This work stays separate from public-site polish.
 
-**Import prepared:** the supplied exports and four recovered application messages
-are reconciled and rehearsed against disposable PostgreSQL 17. The
+**Historical import complete:** after explicit user approval, the supplied
+exports and four recovered application messages were imported into hosted
+Supabase and reconciled. The
 [import guide](notion-import.md) records counts, private source preservation,
 confirmed member typing/merge, repeat-run behavior, and verification.
 
-**Pending:** hosted migration approval and post-change advisors; hosted import and
-reconciliation; intake credential and
+**Pending:** intake credential and
 production environment; deployment, final source delta, cache purge, and verified
 cutover. Public production remains on its currently deployed provider until those
-gates pass. Automatic review rejected hosted DDL rehearsal; no hosted schema or
-source content was changed by this implementation.
+gates pass. Hosted schema/import and post-change advisors are complete; no
+production deployment or Notion retirement was performed.
 
 ## 3. Make application and notification failures observable
 

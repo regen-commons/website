@@ -4,7 +4,8 @@ Five public HTML pages and a separate `/admin` steward dashboard, with Vercel
 functions for data access. This branch uses Supabase PostgreSQL and Auth for
 public reads/intake and the steward desk, including Seeds and Contributions
 management. Optional intake notices use Resend and the separate Telegram agent.
-Hosted schema/import/configuration and cutover are pending; see
+The hosted schema and historical import are complete; runtime configuration and
+production cutover are pending. See
 [content management and migration gates](docs/content-management.md).
 
 ## Start locally

@@ -1,11 +1,11 @@
 # Import the Notion exports
 
-The supplied exports and four recovered application messages were reconciled on
-29 October 2026. The import passed two disposable PostgreSQL 17 rehearsals. The
-hosted schema and import are **not applied**: automatic approval review requires
-explicit approval for the access-control changes in the
-[content-management migration](../supabase/migrations/20261030004638_content_management.sql).
-The production website has not switched providers.
+The supplied exports and four recovered application messages were imported into
+Regen Commons / Website Supabase on 29 October 2026, after local PostgreSQL 17
+rehearsals and explicit user approval of the schema and import. The applied
+[content-management migration](../supabase/migrations/20261030030022_content_management.sql)
+matches hosted migration version `20261030030022`. The production website has
+not switched providers; runtime configuration and production cutover remain open.
 
 ## Reconciled scope
 
@@ -131,3 +131,29 @@ verified all 68 source file digests and original application answers, exposed
 only the 19 published members/17 Seeds/10 Contributions to `anon`, and created
 no notification jobs or fabricated authorship events. Those private rehearsals
 are separate from the synthetic tests committed to Git.
+
+## Hosted reconciliation
+
+The hosted import receipt records plan checksum
+`24e1f132b9a28df3b0517b8c42da08e324a073cbc8c2df183640b88598b7d68b`
+and source snapshot checksum
+`2c4b970c984ae46645fc86a9331de953c0fc9029476d4f40f81679c47c679db6`.
+One batch is recorded and no temporary staging rows remain. Hosted counts match
+the table above. All source file byte lengths and SHA-256 digests, original
+application answers, and recovered answers match the prepared import. There are
+no notification jobs or fabricated content-authorship events.
+
+Queries under the actual `anon` database role expose 19 members, 17 Seeds, and
+10 Contributions. Anonymous access to applications and the source archive is
+denied, and the archive is also denied to ordinary authenticated users. All
+exposed tables have RLS enabled. The website's real Supabase SDK adapter was
+also exercised against hosted PostgREST using the project's publishable key;
+public reads return those same counts without private fields, and private HTTP
+reads are rejected.
+
+Post-change advisors report intentionally closed private tables with RLS and no
+client policies, plus unused-index information for the new workload. The
+pre-existing [leaked-password protection setting](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection)
+is unchanged. No Auth users or steward roles were created, and no real mail or
+Telegram messages were sent. The intake capability remains unprovisioned until
+runtime configuration and cutover are authorized.

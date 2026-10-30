@@ -1,10 +1,11 @@
 # Seeds and Contributions management
 
-Implementation status on 29 October 2026: dashboard, Supabase data adapters,
-versioned schema, local fixtures, and regression checks are implemented on the
-feature branch. The hosted schema, historical import, environment configuration,
-and production cutover are pending. Do not deploy this branch against the old
-Notion environment or describe the migration as complete before reconciliation.
+Status on 29 October 2026: dashboard, Supabase data adapters, versioned schema,
+local fixtures, and regression checks are implemented on the feature branch.
+The hosted schema and historical import are applied and reconciled after explicit
+user approval. Runtime environment configuration and production cutover remain
+pending. Do not deploy this branch against the old Notion environment or describe
+the production cutover as complete.
 
 ## Steward behavior
 
@@ -85,8 +86,8 @@ still handles sign-in mail separately; it does not configure receipt senders.
 The supplied Members, Seeds, Contributions, and Participant Feedback exports and
 four recovered applications are reconciled in the
 [initial import guide](notion-import.md). The import passed direct and staged
-local PostgreSQL rehearsals; hosted application remains pending explicit schema
-approval. These exports contain no attachments. No Notion plugin is needed.
+local PostgreSQL rehearsals and is now applied and reconciled in hosted Supabase.
+These exports contain no attachments. No Notion plugin is needed.
 Keep those files private and preserve their folder structure. Run:
 
 ```sh
@@ -112,11 +113,10 @@ Before hosted cutover:
 3. Import entities before relations; verify counts, public projections, private
    fields, file bytes, repeat-run behavior, and rejects. The inventory is not an
    importer and does not establish data completeness. An export-specific import
-   is now prepared and rehearsed against the supplied files; it has not been
-   applied to hosted Supabase.
-4. Obtain hosted migration approval, apply the
-   [schema migration](../supabase/migrations/20261030004638_content_management.sql),
-   provision the intake credential, and configure the exact HTTPS origin and
+   is now applied and reconciled against the supplied files in hosted Supabase.
+4. The user-approved
+   [schema migration](../supabase/migrations/20261030030022_content_management.sql)
+   and import are complete. Provision the intake credential and configure the exact HTTPS origin and
    Supabase environment. Use separate test and production configuration.
 5. Reconcile a final source snapshot under a write pause, retain one writer per
    area, deploy and verify public reads/intake plus steward moderation, and purge
@@ -127,12 +127,11 @@ Before hosted cutover:
    retiring the source. Store file bytes in Supabase Storage and back them up
    separately from the database.
 
-Automatic approval review rejected a hosted DDL rehearsal because production
-schema/grant changes can acquire locks even inside a rolled-back transaction.
-No hosted migration was applied. A second attempt after the exports arrived was
-also rejected because the exact hosted schema and access-control changes need
-explicit approval. Local proof uses disposable Postgres 17 containers; hosted
-migration and post-change advisors remain pending approval.
+Hosted application proceeded only after explicit user approval of the exact
+schema and data import. Hosted SQL and PostgREST checks match the reconciled
+counts, private answers and all source file hashes. Post-change advisors were
+inspected; the [import guide](notion-import.md#hosted-reconciliation) records the
+receipt and remaining runtime/cutover boundaries.
 
 ## Verification
 
