@@ -90,9 +90,13 @@ See [implementation and migration gates](content-management.md) and the
 migrations and both permission suites. Rendered desktop/mobile proof uses
 synthetic fixtures. This work stays separate from public-site polish.
 
-**Pending:** the user's Members/Seeds/Contributions CSV/Markdown exports,
-attachments, and recovered failed-submission messages; actual-source mapping and
-reconciliation; hosted migration approval and advisors; intake credential and
+**Import prepared:** the supplied exports and four recovered application messages
+are reconciled and rehearsed against disposable PostgreSQL 17. The
+[import guide](notion-import.md) records counts, private source preservation,
+confirmed member typing/merge, repeat-run behavior, and verification.
+
+**Pending:** hosted migration approval and post-change advisors; hosted import and
+reconciliation; intake credential and
 production environment; deployment, final source delta, cache purge, and verified
 cutover. Public production remains on its currently deployed provider until those
 gates pass. Automatic review rejected hosted DDL rehearsal; no hosted schema or

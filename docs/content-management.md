@@ -82,8 +82,11 @@ still handles sign-in mail separately; it does not configure receipt senders.
 
 ## Export inventory and migration gates
 
-The user will provide Members, Seeds, and Contributions CSV/Markdown exports,
-attachments, and messages about failed submissions. No Notion plugin is needed.
+The supplied Members, Seeds, Contributions, and Participant Feedback exports and
+four recovered applications are reconciled in the
+[initial import guide](notion-import.md). The import passed direct and staged
+local PostgreSQL rehearsals; hosted application remains pending explicit schema
+approval. These exports contain no attachments. No Notion plugin is needed.
 Keep those files private and preserve their folder structure. Run:
 
 ```sh
@@ -109,7 +112,8 @@ Before hosted cutover:
 3. Import entities before relations; verify counts, public projections, private
    fields, file bytes, repeat-run behavior, and rejects. The inventory is not an
    importer and does not establish data completeness. An export-specific import
-   remains pending until the real files arrive.
+   is now prepared and rehearsed against the supplied files; it has not been
+   applied to hosted Supabase.
 4. Obtain hosted migration approval, apply the
    [schema migration](../supabase/migrations/20261030004638_content_management.sql),
    provision the intake credential, and configure the exact HTTPS origin and
@@ -125,8 +129,10 @@ Before hosted cutover:
 
 Automatic approval review rejected a hosted DDL rehearsal because production
 schema/grant changes can acquire locks even inside a rolled-back transaction.
-No hosted migration was applied. Local proof uses a disposable Postgres 17
-container; hosted migration and post-change advisors remain pending approval.
+No hosted migration was applied. A second attempt after the exports arrived was
+also rejected because the exact hosted schema and access-control changes need
+explicit approval. Local proof uses disposable Postgres 17 containers; hosted
+migration and post-change advisors remain pending approval.
 
 ## Verification
 
