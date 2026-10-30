@@ -2,7 +2,7 @@ import { readdir, readFile, access } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import { Script } from "node:vm";
 import { fileURLToPath } from "node:url";
-import { pages } from "./lib/site-files.js";
+import { pages, resolvePublicFile } from "./lib/site-files.js";
 
 const root = new URL("../", import.meta.url);
 let count = 0;
@@ -32,7 +32,9 @@ for (const file of pages) {
   for (const match of html.matchAll(/\b(?:src|href)="([^"#?]+)[^"]*"/g)) {
     const target = match[1];
     if (/^(?:[a-z]+:|\/\/)/i.test(target)) continue;
-    await access(new URL(target.replace(/^\//, ""), root));
+    const filePath = resolvePublicFile(target);
+    if (!filePath) throw new Error(`${file}: public link is not served: ${target}`);
+    await access(new URL(filePath, root));
   }
 }
 for (const file of ["package.json", "package-lock.json", "vercel.json"]) {

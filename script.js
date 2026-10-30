@@ -517,36 +517,66 @@
         else if (stepNum < n) d.classList.add("done");
       });
 
-      // Scroll to top of form
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      var heading = target && target.querySelector(".join-heading");
+      if (heading) {
+        heading.focus({ preventScroll: true });
+        target.scrollIntoView({ block: "start", behavior: "instant" });
+      }
+    }
+
+    function clearFieldError(field) {
+      var wrapper = field.closest(".join-field");
+      if (!wrapper) return;
+      wrapper.classList.remove("has-error");
+      var error = wrapper.querySelector(".join-field-error");
+      if (error) {
+        wrapper.querySelectorAll("input, textarea, select").forEach(function (control) {
+          control.removeAttribute("aria-invalid");
+          var ids = (control.getAttribute("aria-describedby") || "").split(/\s+/).filter(function (id) {
+            return id && id !== error.id;
+          });
+          if (ids.length) control.setAttribute("aria-describedby", ids.join(" "));
+          else control.removeAttribute("aria-describedby");
+        });
+        error.remove();
+      }
     }
 
     function validateStep(n) {
       var step = form.querySelector('.join-step[data-step="' + n + '"]');
       if (!step) return true;
-      var valid = true;
-      // Track required radio groups (one validation per name)
-      var checkedGroups = {};
-      step.querySelectorAll("[required]").forEach(function (f) {
-        var wrapper = f.closest(".join-field");
-        if (f.type === "radio") {
-          if (checkedGroups[f.name]) return;
-          checkedGroups[f.name] = true;
-          var anyChecked = step.querySelector('input[name="' + f.name + '"]:checked');
-          if (!anyChecked) {
-            valid = false;
-            if (wrapper) wrapper.classList.add("has-error");
-          } else if (wrapper) {
-            wrapper.classList.remove("has-error");
-          }
-        } else if (!f.value.trim()) {
-          valid = false;
-          if (wrapper) wrapper.classList.add("has-error");
-        } else if (wrapper) {
-          wrapper.classList.remove("has-error");
+      var firstInvalid = null;
+      var checkedGroups = new Set();
+      step.querySelectorAll("input, textarea, select").forEach(function (field) {
+        if (!field.willValidate) return;
+        if (field.type === "radio") {
+          if (checkedGroups.has(field.name)) return;
+          checkedGroups.add(field.name);
         }
+        clearFieldError(field);
+        var blank = field.required && !field.value.trim();
+        if (field.validity.valid && !blank) return;
+        if (!firstInvalid) firstInvalid = field;
+        var wrapper = field.closest(".join-field");
+        if (!wrapper) return;
+        wrapper.classList.add("has-error");
+        var error = document.createElement("p");
+        error.className = "join-field-error";
+        error.id = "join-error-" + field.name;
+        error.textContent = field.validity.typeMismatch && field.type === "email"
+          ? "Enter a valid email address, such as name@example.com."
+          : field.validity.typeMismatch && field.type === "url"
+          ? "Enter a full web address, such as https://example.com, or leave this optional field blank."
+          : field.type === "radio" ? "Choose an option to continue." : "Complete this field to continue.";
+        wrapper.appendChild(error);
+        var controls = field.type === "radio" ? wrapper.querySelectorAll('input[type="radio"]') : [field];
+        controls.forEach(function (control) {
+          control.setAttribute("aria-invalid", "true");
+          control.setAttribute("aria-describedby", [control.getAttribute("aria-describedby"), error.id].filter(Boolean).join(" "));
+        });
       });
-      return valid;
+      if (firstInvalid) firstInvalid.focus();
+      return !firstInvalid;
     }
 
     // Next / back buttons
@@ -564,8 +594,7 @@
     // Clear error on input or selection change
     if (form) {
       function clearError(e) {
-        var wrapper = e.target.closest(".join-field");
-        if (wrapper) wrapper.classList.remove("has-error");
+        clearFieldError(e.target);
       }
       form.addEventListener("input", clearError);
       form.addEventListener("change", clearError);
@@ -606,6 +635,10 @@
 
       form.addEventListener("submit", async function (e) {
         e.preventDefault();
+        if (currentStep < 6) {
+          goToStep(currentStep + 1);
+          return;
+        }
         if (!validateStep(6)) return;
         clearSubmitError();
 
@@ -637,7 +670,8 @@
           form.style.display = "none";
           document.querySelector(".join-progress").style.display = "none";
           confirm.classList.add("active");
-          window.scrollTo({ top: 0, behavior: "smooth" });
+          confirm.focus({ preventScroll: true });
+          confirm.scrollIntoView({ block: "start", behavior: "instant" });
         } catch (err) {
           var code = err && err.message;
           showError(
@@ -650,6 +684,7 @@
           if (submitBtn) {
             submitBtn.disabled = false;
             submitBtn.querySelector(".btn-label").textContent = originalLabel || "Submit application";
+            submitBtn.focus();
           }
         }
       });
@@ -663,6 +698,11 @@
 
     var btn = document.createElement("button");
     btn.className = "mobile-nav-toggle";
+    btn.type = "button";
+    nav.id = "site-navigation";
+    btn.setAttribute("aria-controls", nav.id);
+    btn.setAttribute("aria-expanded", "false");
+    var mobile = window.matchMedia("(max-width: 640px)");
     btn.setAttribute("aria-label", "Open navigation");
     btn.innerHTML =
       '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" aria-hidden="true">' +
@@ -677,19 +717,30 @@
     document.body.appendChild(btn);
     document.body.appendChild(backdrop);
 
-    function setOpen(open) {
+    function setOpen(open, restoreFocus) {
       document.body.classList.toggle("mobile-nav-open", open);
       btn.setAttribute("aria-label", open ? "Close navigation" : "Open navigation");
+      btn.setAttribute("aria-expanded", String(open));
+      nav.inert = mobile.matches && !open;
+      if (open) nav.querySelector("a").focus();
+      else if (restoreFocus) btn.focus();
     }
-    btn.addEventListener("click", function () {
-      setOpen(!document.body.classList.contains("mobile-nav-open"));
+    mobile.addEventListener("change", function () { setOpen(false); });
+    setOpen(false);
+    document.addEventListener("focusin", function (event) {
+      if (document.body.classList.contains("mobile-nav-open") && !nav.contains(event.target) && event.target !== btn) {
+        setOpen(false);
+      }
     });
-    backdrop.addEventListener("click", function () { setOpen(false); });
+    btn.addEventListener("click", function () {
+      setOpen(!document.body.classList.contains("mobile-nav-open"), true);
+    });
+    backdrop.addEventListener("click", function () { setOpen(false, true); });
     nav.querySelectorAll("a").forEach(function (a) {
       a.addEventListener("click", function () { setOpen(false); });
     });
     document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape" && document.body.classList.contains("mobile-nav-open")) setOpen(false, true);
     });
   })();
 
@@ -712,7 +763,7 @@
       var current = document.documentElement.getAttribute("data-theme") || "dark";
       var next = current === "dark" ? "light" : "dark";
       document.documentElement.setAttribute("data-theme", next);
-      localStorage.setItem("rc-theme", next);
+      try { localStorage.setItem("rc-theme", next); } catch (_) { /* Theme still works without storage. */ }
       // Notify canvas.js so it can update palette
       window.dispatchEvent(new CustomEvent("theme-change", { detail: { theme: next } }));
     });

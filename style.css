@@ -2585,3 +2585,48 @@ p:last-child { margin-bottom: 0; }
   outline-offset: 4px;
 }
 .data-retry[hidden], .data-feedback[hidden], .ecosystem-map-wrap[hidden], .seed-saved-link[hidden] { display: none; }
+
+/* Public page navigation stays readable over scrolling content. */
+body:not([data-page="admin"])::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto;
+  height: 76px;
+  background: var(--paper);
+  border-bottom: 1px solid rgba(var(--copper-rgb), 0.15);
+  z-index: 9990;
+  pointer-events: none;
+}
+.skip-link {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 10010;
+  padding: 0.75rem 1rem;
+  background: var(--paper);
+  color: var(--ink);
+  transform: translateY(-200%);
+}
+.skip-link:focus { transform: none; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+.join-step, .join-heading, .join-confirmation, .join-input, .join-textarea { scroll-margin-top: 6rem; }
+.join-field-error { color: var(--ink); font-size: 1rem; margin: 0.5rem 0 0; }
+.join-field.has-error .join-input, .join-field.has-error .join-textarea { border-width: 2px; }
+.page-nav-dot:focus-visible::after { opacity: 1; }
+.hero .reveal { opacity: 1; transform: none; transition: none; }
+.declaration-card .declaration-eyebrow { color: #74431F; }
+[data-theme="light"] .declaration-card .declaration-eyebrow { color: #D59B63; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal, .reveal-scale { opacity: 1; transform: none; transition: none; }
+  .logo-mark:hover canvas { transform: none; }
+}
+
+/* Public overrides remain independent of the steward dashboard tokens. */
+body:not([data-page="admin"]) {
+  --font-serif: 'Source Serif 4', 'Source Serif 4 Fallback', Georgia, serif;
+  --font-display: 'Fraunces', 'Fraunces Fallback', Georgia, serif;
+  --font-sans: 'Space Grotesk', 'Space Grotesk Fallback', system-ui, sans-serif;
+  --ink-dim: #A49A87;
+}
+[data-theme="light"] body:not([data-page="admin"]) { --ink-dim: #5D503B; }

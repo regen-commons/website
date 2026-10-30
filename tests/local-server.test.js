@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { once } from "node:events";
 import { get } from "node:http";
+import { readFile } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { after, test } from "node:test";
@@ -129,4 +130,29 @@ test("local scenarios distinguish empty/error data and allow recovery without li
     await scenario("normal");
   }
   assert.equal((await request("/api/members")).status, 200);
+});
+
+test("self-hosted fonts are served as unchanged binary assets", async () => {
+  const path = "assets/fonts/fraunces-latin.woff2";
+  const response = await request("/" + path);
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("content-type"), "font/woff2");
+  const bytes = Buffer.from(await response.arrayBuffer());
+  assert.equal(bytes.subarray(0, 4).toString(), "wOF2");
+  assert.deepEqual(bytes, await readFile(new URL("../" + path, import.meta.url)));
+  assert.equal((await request("/favicon.svg")).headers.get("content-type"), "image/svg+xml");
+});
+
+test("static text supports gzip without changing the document or font bytes", async () => {
+  const plain = await request("/style.css", { headers: { "Accept-Encoding": "identity" } });
+  assert.equal(plain.headers.get("content-encoding"), null);
+  const compressed = await request("/style.css", { headers: { "Accept-Encoding": "gzip" } });
+  assert.equal(compressed.headers.get("content-encoding"), "gzip");
+  assert.equal(compressed.headers.get("vary"), "Accept-Encoding");
+  assert.equal(await compressed.text(), await plain.text());
+  const declined = await request("/style.css", { headers: { "Accept-Encoding": "gzip;q=0" } });
+  assert.equal(declined.headers.get("content-encoding"), null);
+  const weighted = await request("/style.css", { headers: { "Accept-Encoding": "br, gzip;q=0.5" } });
+  assert.equal(weighted.headers.get("content-encoding"), "gzip");
+  assert.equal((await request("/assets/fonts/fraunces-latin.woff2")).headers.get("content-encoding"), null);
 });
