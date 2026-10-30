@@ -711,30 +711,22 @@
 
     function render(visions) {
       container.innerHTML = '';
-      var placed = [];
-      var minDist = 12;
-      function pickPos() {
-        for (var attempt = 0; attempt < 40; attempt++) {
-          var x = 6 + Math.random() * 88;
-          var y = 8 + Math.random() * 80;
-          var ok = placed.every(function (p) {
-            var dx = p.x - x, dy = p.y - y;
-            return Math.sqrt(dx * dx + dy * dy) >= minDist;
-          });
-          if (ok) { placed.push({ x: x, y: y }); return { x: x, y: y }; }
-        }
-        var fx = 6 + Math.random() * 88, fy = 8 + Math.random() * 80;
-        placed.push({ x: fx, y: fy });
-        return { x: fx, y: fy };
-      }
-      visions.forEach(function (vision) {
+      // Keep the larger button targets apart, including after a resize.
+      var positions = [];
+      [8, 40, 72].forEach(function (y) {
+        [5, 40, 75].forEach(function (x) {
+          positions.push({ x: x + Math.random() * 6 - 3, y: y + Math.random() * 6 - 3 });
+        });
+      });
+      positions = shufflePick(positions, visions.length);
+      visions.forEach(function (vision, index) {
         var dot = document.createElement('button');
         dot.className = 'seed-dot';
         dot.type = 'button';
         dot.setAttribute('aria-label', vision);
         dot.setAttribute('aria-describedby', 'seed-tooltip');
         dot.setAttribute('data-vision', vision);
-        var pos = pickPos();
+        var pos = positions[index];
         dot.style.left = pos.x + '%';
         dot.style.top  = pos.y + '%';
         dot.style.setProperty('--seed-color', palette[Math.floor(Math.random() * palette.length)]);

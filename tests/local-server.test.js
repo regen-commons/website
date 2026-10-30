@@ -66,6 +66,14 @@ test("public pages and clean routes work; private files and foreign origins do n
   assert.equal((await request("/api/seeds", { headers: { Origin: "https://example.test" } })).status, 403);
 });
 
+test("self-hosted font files retain their binary content and font MIME type", async () => {
+  const path = "/assets/fonts/fraunces-latin.woff2";
+  const response = await request(path);
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("content-type"), "font/woff2");
+  assert.deepEqual(Buffer.from(await response.arrayBuffer()), await readFile(new URL(`..${path}`, import.meta.url)));
+});
+
 test("actual read handlers exclude pending members and private fields, and resolve contributors", async () => {
   const response = await request("/api/members");
   assert.equal(response.headers.get("cache-control"), "no-store");
@@ -130,17 +138,6 @@ test("local scenarios distinguish empty/error data and allow recovery without li
     await scenario("normal");
   }
   assert.equal((await request("/api/members")).status, 200);
-});
-
-test("self-hosted fonts are served as unchanged binary assets", async () => {
-  const path = "assets/fonts/fraunces-latin.woff2";
-  const response = await request("/" + path);
-  assert.equal(response.status, 200);
-  assert.equal(response.headers.get("content-type"), "font/woff2");
-  const bytes = Buffer.from(await response.arrayBuffer());
-  assert.equal(bytes.subarray(0, 4).toString(), "wOF2");
-  assert.deepEqual(bytes, await readFile(new URL("../" + path, import.meta.url)));
-  assert.equal((await request("/favicon.svg")).headers.get("content-type"), "image/svg+xml");
 });
 
 test("static text supports gzip without changing the document or font bytes", async () => {

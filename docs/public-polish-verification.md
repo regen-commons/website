@@ -1,7 +1,7 @@
 # Public website polish verification
 
 The public font and Join/navigation changes run independently of the steward
-dashboard on `codex/public-fonts-join-navigation`, based on main `ebd8aab`.
+dashboard on `codex/public-fonts-join-navigation`, initially based on main `ebd8aab` and integrated with `a1908e6` after dashboard PR #4 merged.
 The target is 100 for performance, accessibility, best practices, and SEO on
 Home, Learn, Map, Seeds, and Join, on both mobile and desktop. Admin remains
 private and intentionally excluded from the SEO target.
@@ -25,7 +25,9 @@ private and intentionally excluded from the SEO target.
   editing. Seed previews support keyboard focus and tapping.
 - Public pages include skip links, main landmarks, descriptions, a favicon, and
   improved muted-text contrast. Above-the-fold text no longer waits for entrance
-  fades. Local serving preserves font bytes and supports gzip text delivery.
+  fades. The home scroll prompt is visible immediately and pulses only on hover or
+  keyboard focus, respecting reduced motion. Local serving preserves font bytes
+  and supports gzip text delivery.
 
 ## Automated verification
 
@@ -59,24 +61,29 @@ All submissions used synthetic local data. No live applications were sent.
 
 | Page | Device | Performance | Accessibility | Best practices | SEO | LCP | CLS |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Home | mobile | 100 | 100 | 100 | 100 | 1.15 s | 0 |
-| Learn | mobile | 100 | 100 | 100 | 100 | 1.20 s | 0 |
-| Map | mobile | 100 | 100 | 100 | 100 | 1.13 s | 0 |
-| Seeds | mobile | 100 | 100 | 100 | 100 | 1.19 s | 0 |
-| Join | mobile | 100 | 100 | 100 | 100 | 1.17 s | 0 |
+| Home | mobile | 100 | 100 | 100 | 100 | 1.39 s | 0 |
+| Learn | mobile | 100 | 100 | 100 | 100 | 1.33 s | 0 |
+| Map | mobile | 100 | 100 | 100 | 100 | 1.17 s | 0 |
+| Seeds | mobile | 100 | 100 | 100 | 100 | 1.26 s | 0 |
+| Join | mobile | 100 | 100 | 100 | 100 | 1.21 s | 0 |
 | Home | desktop | 100 | 100 | 100 | 100 | 0.34 s | 0 |
-| Learn | desktop | 100 | 100 | 100 | 100 | 0.32 s | 0 |
-| Map | desktop | 99 | 100 | 100 | 100 | 0.36 s | 0 |
-| Seeds | desktop | 100 | 100 | 100 | 100 | 0.31 s | 0 |
-| Join | desktop | 100 | 100 | 100 | 100 | 0.29 s | 0 |
+| Learn | desktop | 100 | 100 | 100 | 100 | 0.33 s | 0 |
+| Map | desktop | 100 | 100 | 100 | 100 | 0.33 s | 0 |
+| Seeds | desktop | 100 | 100 | 100 | 100 | 0.34 s | 0 |
+| Join | desktop | 100 | 100 | 100 | 100 | 0.37 s | 0 |
 
-The first complete compressed pass reached 100 in every category on all ten
-page/device combinations. The repeat recorded above includes desktop Map at 99
-performance (Speed Index 1.4 s, LCP 0.36 s, TBT 0 ms, CLS 0). Its earlier score
-was 100. Keep this variation visible: stable 100 on repeated Map runs remains a
-follow-up target. All final matrix runs measured zero CLS and zero TBT.
+The final integrated matrix reaches 100 in every category on all ten page/device
+combinations. All ten measured zero CLS and zero TBT. After making the home
+scroll prompt immediately visible, three consecutive desktop Home audits scored
+100. Seven 36px seed-preview buttons were also verified without overlapping at
+390px and after resizing to desktop.
 
-Separate actual-throttling diagnostics for Home measured:
+Earlier repeated desktop Home and Map runs scored 99 performance; those reports
+remain in the artifacts. Keep that variation visible rather than treating a
+100 as a guarantee for every run, device, or dataset.
+
+Separate actual-throttling diagnostics for Home, captured before integrating
+dashboard PR #4's token extraction, measured:
 
 | Font scenario | Performance | Accessibility / best practices / SEO | LCP | CLS | TBT |
 | --- | ---: | --- | ---: | ---: | ---: |
@@ -95,8 +102,8 @@ brand face always appears on a slow cold visit.
 The raw HTML/JSON reports, font traces, filmstrips, source SHA-256 fingerprints,
 and test output are in local ignored `artifacts/public-polish/`. `index.html`
 there links the reports. Earlier passes are retained under `initial/`,
-`compressed-pass/`, and `prior-refinement/` rather than discarded.
-
+`compressed-pass/`, `prior-refinement/`, and `pre-main-integration/` rather
+than discarded.
 
 Lighthouse 13.6.0, Chromium 156, Node 22.22.1. Mobile uses Lighthouse's default
 simulated mobile throttling; desktop uses `--preset=desktop`. Audits run serially
@@ -141,8 +148,9 @@ This PR does not migrate or repair those providers. Rerun the same ten audits an
 key journeys against a deployed preview and `https://regencommons.com` after the
 Vercel deployment restriction is resolved and this branch is deployed.
 
-Dashboard PR #4 owns admin assets, shared-token extraction, its logo still mode,
-and SMTP/Auth work. Public font binaries shared with it are identical. Combine
-both PRs' additions to the local asset allowlist and font/SVG MIME map when
-merging; retain the binary-read behavior and this branch's gzip/route handling.
-Neither PR is merged or deployed by this verification.
+Dashboard PR #4 merged independently during verification. This branch integrates
+its admin assets, shared-token extraction, logo still mode, and SMTP/Auth work
+from main. Shared normal font binaries are identical. The local asset allowlist
+and MIME map now retain both sets of additions, binary reads, and this branch's
+gzip/route handling. The PR diff against main contains only the public polish
+work; it does not redeploy or change the dashboard.

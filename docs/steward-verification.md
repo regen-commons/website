@@ -61,19 +61,67 @@ on port 3501 was preserved.
 | Private DOM cleanup | Applicant names and private answers are absent after sign-out |
 | Keyboard | Email-code submit, application-link activation, retry, and search focus work; visible focus is retained |
 | Mobile | Queue, detail, and members reflow; document width equals the 390px viewport |
-| Motion | The admin shell loads no public animation scripts and defines no animation or transition effects |
+| Motion | The shared logo renderer uses still mode in the dashboard; it requests no animation frames and redraws on theme changes |
 | Browser console | No warnings or errors in the final rendered desktop session |
 
 Screenshots are local, ignored artifacts under `artifacts/steward-dashboard/`.
 They contain synthetic records only. Failure scenarios are reset to `normal`
 after verification. This is rendered fixture evidence, not hosted Auth evidence.
 
-## Remaining limits
+## Design alignment follow-up
 
-SMTP, the Magic Link code template, exact hosted origin/redirects, public-signup
-settings, steward provisioning, and real email delivery are not verified. No
-approved steward accounts or roles exist yet. The browser and HTTP flows have
-not been exercised with a real hosted Auth session through the Data API.
+On `codex/steward-smtp-design`, the public site and steward desk share their
+existing color and typography tokens in `design-tokens.css`. The dashboard uses
+self-hosted Latin subsets of Fraunces, Source Serif 4, and Space Grotesk under its
+existing same-origin content security policy. Public-page font loading is
+unchanged. Its theme toggle stores only the shared `rc-theme` preference.
+
+`npm run check`, all 29 tests, and `npm run smoke` pass on Node 22.22.1. The added
+HTTP regression compares the served WOFF2 bytes with the source font so the local
+server cannot silently corrupt binary assets through UTF-8 decoding.
+
+Brave rendered the light and dark login/queue views, original-answer detail,
+and the 390px queue/detail layout. Light-theme paper and display-font tokens
+match the public page. Document width equals the 390px viewport, and keyboard
+Space activates the theme toggle. Screenshots under `artifacts/steward-design/`
+contain synthetic records or the approved live account's empty dashboard.
+The logo uses the website's renderer and wordmark with a still-mode opt-in.
+A focused renderer check confirms that the public animated default is preserved
+and the dashboard requests no animation frames, including after a theme change.
+
+## Hosted Auth verification
+
+Resend has verified the authentication domain and its three sending records.
+Custom SMTP is saved, and the Magic Link or OTP template now sends only the
+one-time code with the subject `Your Regen Commons sign-in code`. It retains
+the project's existing eight-digit length and one-hour expiry. The user created
+the approved Auth account through the dashboard, and its active steward role
+was granted only after checking the exact account and confirmed-email status.
+
+A disposable probe at `http://localhost:3504/admin` serves the actual dashboard
+and `createAdminHandler` with the real hosted Supabase provider. It binds only
+loopback, restricts code requests to the approved recipient, retains Secure
+HttpOnly cookies, and does not import fixture transport. Its health route names
+the hosted project. Unauthorized reads return 401; other recipient requests
+return 403 before contacting Auth. The ordinary development server is unchanged.
+
+The real code request succeeded, and Resend's email list reports **Delivered**.
+Local evidence is in `artifacts/steward-design/email-delivered.jpg`. The user
+entered the code directly into the dashboard and completed sign-in. The real
+hosted provider returned authorized, empty Applications and Members views.
+Reloading preserved the session; a separate database read confirmed the account
+had signed in with one session and an active steward role. No token, code, or
+password was captured in the evidence.
+
+The user reported missing email padding in Gmail desktop. Padding originally
+depended on an HTML5 `main` element. The revised template uses presentation
+tables, inline cell padding with `cellpadding` fallbacks, and an Outlook width
+fallback. A synthetic 390px browser preview has 40px left content spacing and no
+horizontal overflow. Supabase saved the revision, and Resend confirms a second
+real email was delivered. The recipient confirmed that padding is now correct
+in Gmail desktop.
+
+Exact hosted origins/redirects remain a deployment prerequisite.
 
 Vercel routing/security headers remain unverified in deployment because this
 slice has not been deployed. The known Hobby/private-organization-repository
