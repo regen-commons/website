@@ -2,7 +2,10 @@ import { randomUUID } from "node:crypto";
 import { AdminError } from "../../api/_lib/steward-data.js";
 
 // Local-only provider. This module is never imported by production handlers.
-export function createStewardFixtures({ now = Date.now } = {}) {
+export function createStewardFixtures({
+  now = Date.now,
+  retryFailure = false,
+} = {}) {
   const ids = {
     application: "10000000-0000-4000-8000-000000000001",
     person: "20000000-0000-4000-8000-000000000001",
@@ -174,6 +177,52 @@ export function createStewardFixtures({ now = Date.now } = {}) {
   ]);
   const codes = new Map(),
     sessions = new Map();
+  const notifications = [
+    {
+      id: "50000000-0000-4000-8000-000000000001",
+      application_id: ids.application,
+      channel: "receipt",
+      status: "failed",
+      attempts: 1,
+      provider_message_id: null,
+      failure_code: "resend_authentication_failed",
+      created_at: new Date(now() - 3600000).toISOString(),
+      updated_at: new Date(now() - 1800000).toISOString(),
+    },
+    {
+      id: "50000000-0000-4000-8000-000000000002",
+      application_id: ids.application,
+      channel: "steward",
+      status: "sent",
+      attempts: 1,
+      provider_message_id: "60000000-0000-4000-8000-000000000001",
+      failure_code: null,
+      created_at: new Date(now() - 3600000).toISOString(),
+      updated_at: new Date(now() - 1800000).toISOString(),
+    },
+    {
+      id: "50000000-0000-4000-8000-000000000003",
+      application_id: applications[1].id,
+      channel: "receipt",
+      status: "failed",
+      attempts: 2,
+      provider_message_id: null,
+      failure_code: "notification_timeout",
+      created_at: new Date(now() - 25 * 3600000).toISOString(),
+      updated_at: new Date(now() - 24 * 3600000).toISOString(),
+    },
+  ];
+  function retryBlock(job) {
+    if (job.status === "sent" || job.provider_message_id) return "already_sent";
+    if (Date.parse(job.created_at) <= now() - 86400000)
+      return "retry_window_expired";
+    if (job.attempts >= 3) return "retry_limit_reached";
+    if (job.status === "sending" && Date.parse(job.updated_at) > now() - 300000)
+      return "notification_busy";
+    if (!["pending", "failed", "skipped", "sending"].includes(job.status))
+      return "manual_review_required";
+    return null;
+  }
   return {
     ids,
     setActive(email, active) {
@@ -245,6 +294,38 @@ export function createStewardFixtures({ now = Date.now } = {}) {
           },
         ],
       });
+    },
+    async notifications(token, applicationId) {
+      await this.authorize(token);
+      if (!applications.some((row) => row.id === applicationId))
+        throw new AdminError(404, "application_not_found");
+      return {
+        notifications: notifications
+          .filter((job) => job.application_id === applicationId)
+          .map(({ application_id, ...job }) => ({
+            ...structuredClone(job),
+            last_attempt_at: job.updated_at,
+            retry_block: retryBlock(job),
+          })),
+      };
+    },
+    async retryNotification(token, body) {
+      await this.authorize(token);
+      const job = notifications.find(
+        (row) =>
+          row.id === body.job_id && row.application_id === body.application_id,
+      );
+      if (!job) throw new AdminError(404, "notification_not_found");
+      if (job.attempts !== body.attempts)
+        throw new AdminError(409, "notification_changed");
+      const blocked = retryBlock(job);
+      if (blocked) throw new AdminError(409, blocked);
+      job.attempts++;
+      job.status = retryFailure ? "failed" : "sent";
+      job.provider_message_id = retryFailure ? null : randomUUID();
+      job.failure_code = retryFailure ? "resend_unavailable" : null;
+      job.updated_at = new Date(now()).toISOString();
+      return this.notifications(token, body.application_id);
     },
     async publicList(resource) {
       if (resource === "seeds")

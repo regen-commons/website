@@ -5,7 +5,13 @@ import { drainNotifications } from "./intake-notifications.js";
 import { uuid } from "./content-contract.js";
 import { feedbackPayload } from "../../feedback-contract.js";
 
-export function createPublicProvider({ url, key, secret, request = fetch }) {
+export function createPublicProvider({
+  url,
+  key,
+  secret,
+  request = fetch,
+  env = process.env,
+}) {
   if (!url || !key) throw new AdminError(503, "data_not_configured");
   const db = createClient(url, key, {
     auth: {
@@ -66,9 +72,19 @@ export function createPublicProvider({ url, key, secret, request = fetch }) {
       return drainNotifications({
         applicationId,
         request,
+        env,
         claim: (id) => work({ p_application_id: id }),
-        finish: (job, status) =>
-          work({ p_job_id: job.id, p_lease: job.lease_id, p_status: status }),
+        finish: (job, status, result) =>
+          db
+            .rpc("notification_result", {
+              p_secret: secret,
+              p_job_id: job.id,
+              p_lease: job.lease_id,
+              p_status: status,
+              p_provider_message_id: result.provider_message_id,
+              p_failure_code: result.failure_code,
+            })
+            .then(checked),
       });
     },
     async publicList(resource) {

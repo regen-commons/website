@@ -29,26 +29,47 @@ test("successful receipt uses the verified sender, reply inbox and one applicant
       STEWARD_NOTIFY_EMAILS: "steward@example.test",
       ADMIN_ORIGIN: "https://admin.example.test",
     },
-    claim: async () => [{
-      id: "receipt-job", lease_id: "lease", application_id: "application",
-      channel: "receipt", name: "Synthetic Applicant", email: "person@example.test",
-      original_answers: { private_notes: "Private test answer must stay private" },
-    }],
-    finish: async (job, status) => finished.push({ id: job.id, status }),
+    claim: async () => [
+      {
+        id: "receipt-job",
+        lease_id: "lease",
+        application_id: "application",
+        channel: "receipt",
+        name: "Synthetic Applicant",
+        email: "person@example.test",
+        original_answers: {
+          private_notes: "Private test answer must stay private",
+        },
+      },
+    ],
+    finish: async (job, status, result) =>
+      finished.push({ id: job.id, status, result }),
     request: async (url, options) => {
       assert.equal(url, "https://api.resend.com/emails");
       requestBody = JSON.parse(options.body);
       requestHeaders = options.headers;
-      return new Response('{"id":"synthetic-provider-id"}', { status: 200 });
+      return Response.json({ id: "60000000-0000-4000-8000-000000000001" });
     },
   });
-  assert.deepEqual(finished, [{ id: "receipt-job", status: "sent" }]);
+  assert.deepEqual(finished, [
+    {
+      id: "receipt-job",
+      status: "sent",
+      result: {
+        provider_message_id: "60000000-0000-4000-8000-000000000001",
+        failure_code: null,
+      },
+    },
+  ]);
   assert.equal(requestHeaders["Idempotency-Key"], "membership/receipt-job");
   assert.equal(requestBody.from, "Regen Commons <membership@example.test>");
   assert.equal(requestBody.reply_to, "replies@example.test");
   assert.deepEqual(requestBody.to, ["person@example.test"]);
   assert.match(requestBody.text, /Your request is in/);
-  assert.doesNotMatch(JSON.stringify(requestBody), /Private test answer|admin\.example|steward@example/);
+  assert.doesNotMatch(
+    JSON.stringify(requestBody),
+    /Private test answer|admin\.example|steward@example/,
+  );
 });
 
 test("notification errors stay separate from a confirmed application save", async () => {
@@ -143,4 +164,99 @@ test("uncertain Telegram delivery requests review instead of an automatic duplic
     },
   });
   assert.equal(state, "needs_review");
+});
+
+test("email failures retain only safe fixed reasons and stable retry identities", async () => {
+  const cases = [
+    [401, "resend_authentication_failed"],
+    [403, "resend_authentication_failed"],
+    [422, "resend_invalid_request"],
+    [429, "resend_rate_limited"],
+    [409, "resend_idempotency_conflict"],
+    [500, "resend_unavailable"],
+    [404, "resend_rejected"],
+    [200, "resend_invalid_response"],
+    ["timeout", "notification_timeout"],
+    ["network", "notification_connection_failed"],
+    ["bad-json", "resend_invalid_response"],
+  ];
+  for (const [response, failure_code] of cases) {
+    let outcome;
+    await drainNotifications({
+      env: {
+        RESEND_API_KEY: "synthetic-secret",
+        RESEND_FROM_EMAIL: "membership@example.test",
+      },
+      claim: async () => [
+        { id: "job", channel: "receipt", email: "person@example.test" },
+      ],
+      request: async (url, options) => {
+        assert.equal(options.headers["Idempotency-Key"], "membership/job");
+        if (response === "timeout")
+          throw new DOMException("Private timeout context", "TimeoutError");
+        if (response === "network")
+          throw new Error("synthetic-secret person@example.test");
+        return new Response(
+          response === "bad-json"
+            ? "bad json"
+            : JSON.stringify({
+                message: "synthetic-secret person@example.test",
+                id: "invalid-provider-id",
+              }),
+          { status: typeof response === "number" ? response : 200 },
+        );
+      },
+      finish: async (job, status, result) => {
+        outcome = { status, ...result };
+      },
+    });
+    assert.deepEqual(outcome, {
+      status: "failed",
+      provider_message_id: null,
+      failure_code,
+    });
+    assert.doesNotMatch(
+      JSON.stringify(outcome),
+      /synthetic-secret|person@example/,
+    );
+  }
+});
+
+test("missing email settings are visible without making a provider call", async () => {
+  let outcome;
+  await drainNotifications({
+    env: {},
+    claim: async () => [{ id: "job", channel: "receipt" }],
+    request: () => {
+      throw new Error("Unexpected network request");
+    },
+    finish: async (job, status, result) => {
+      outcome = { status, ...result };
+    },
+  });
+  assert.deepEqual(outcome, {
+    status: "skipped",
+    provider_message_id: null,
+    failure_code: "resend_not_configured",
+  });
+});
+
+test("a completion failure remains uncertain instead of reporting a recorded send", async () => {
+  await assert.rejects(
+    drainNotifications({
+      env: {
+        RESEND_API_KEY: "synthetic",
+        RESEND_FROM_EMAIL: "sender@example.test",
+      },
+      claim: async () => [
+        { id: "job", channel: "receipt", email: "person@example.test" },
+      ],
+      request: async () =>
+        Response.json({ id: "60000000-0000-4000-8000-000000000001" }),
+      finish: async () => {
+        throw new Error("Synthetic database outage");
+      },
+    }),
+    /notification_status_update_failed/,
+  );
 });

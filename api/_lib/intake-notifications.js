@@ -1,4 +1,9 @@
 import { membershipReceipt } from "./membership-email.js";
+import {
+  resendFailure,
+  transportFailure,
+  resendMessageId,
+} from "./notification-result.js";
 
 const escapeHtml = (value) =>
   String(value || "").replace(
@@ -18,21 +23,21 @@ export async function drainNotifications({
   env = process.env,
   applicationId = null,
 }) {
-  if (
-    !(env.RESEND_API_KEY && env.RESEND_FROM_EMAIL) &&
-    !(env.NOTIFY_URL && env.NOTIFY_WEBHOOK_SECRET)
-  )
-    return;
   const jobs = await claim(applicationId);
   const results = await Promise.allSettled(
     jobs.map(async (job) => {
       let status = "skipped";
+      const result = {
+        provider_message_id: null,
+        failure_code: "resend_not_configured",
+      };
       try {
         const origin = env.ADMIN_ORIGIN;
         const url = origin
           ? `${origin}/admin#applications/${job.application_id}`
           : null;
         if (job.channel === "telegram") {
+          result.failure_code = "notification_not_configured";
           if (env.NOTIFY_URL && env.NOTIFY_WEBHOOK_SECRET) {
             const response = await request(env.NOTIFY_URL, {
               method: "POST",
@@ -49,6 +54,7 @@ export async function drainNotifications({
               signal: AbortSignal.timeout(8000),
             });
             status = response.ok ? "sent" : "needs_review";
+            result.failure_code = response.ok ? null : "notification_rejected";
           }
         } else if (env.RESEND_API_KEY && env.RESEND_FROM_EMAIL) {
           const recipients =
@@ -58,6 +64,7 @@ export async function drainNotifications({
                   .split(",")
                   .map((s) => s.trim())
                   .filter(Boolean);
+          result.failure_code = "recipients_not_configured";
           if (recipients.length) {
             const receipt = job.channel === "receipt";
             const message = receipt
@@ -82,20 +89,34 @@ export async function drainNotifications({
                 to: recipients,
                 ...message,
                 ...(receipt
-                  ? { reply_to: env.RESEND_REPLY_TO_EMAIL || "regencommons@gmail.com" }
+                  ? {
+                      reply_to:
+                        env.RESEND_REPLY_TO_EMAIL || "regencommons@gmail.com",
+                    }
                   : {}),
               }),
               signal: AbortSignal.timeout(8000),
             });
-            const data = await response.json();
-            status =
-              response.ok && typeof data.id === "string" ? "sent" : "failed";
+            status = "failed";
+            result.failure_code = response.ok
+              ? "resend_invalid_response"
+              : resendFailure(response.status);
+            // An error response may echo private input. Do not persist or log it.
+            if (response.ok) {
+              const data = await response.json().catch(() => null);
+              if (resendMessageId(data?.id)) {
+                status = "sent";
+                result.provider_message_id = data.id;
+                result.failure_code = null;
+              }
+            }
           }
         }
-      } catch {
+      } catch (error) {
         status = job.channel === "telegram" ? "needs_review" : "failed";
+        result.failure_code = transportFailure(error);
       }
-      await finish(job, status);
+      await finish(job, status, result);
     }),
   );
   if (results.some((result) => result.status === "rejected"))

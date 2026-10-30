@@ -48,6 +48,20 @@ export function createAdminHandler({ provider, origin, secureCookies = true }) {
           res.setHeader("Set-Cookie", cookie());
           return res.status(200).json({ ok: true });
         }
+        if (body.action === "retry-email") {
+          if (!token) throw new AdminError(401, "sign_in_required");
+          const db = provider();
+          await db.authorize(token);
+          if (
+            !uuid.test(body.application_id || "") ||
+            !uuid.test(body.job_id || "") ||
+            !Number.isSafeInteger(body.attempts) ||
+            body.attempts < 0 ||
+            body.attempts > 3
+          )
+            throw new AdminError(400, "invalid_notification");
+          return res.status(200).json(await db.retryNotification(token, body));
+        }
         if (["moderate", "save-contribution"].includes(body.action)) {
           if (!token) throw new AdminError(401, "sign_in_required");
           const db = provider();
@@ -145,6 +159,11 @@ export function createAdminHandler({ provider, origin, secureCookies = true }) {
         const id = params.get("id");
         if (!uuid.test(id || "")) throw new AdminError(400, "invalid_id");
         return res.status(200).json(await db.application(token, id));
+      }
+      if (resource === "email-deliveries") {
+        const id = params.get("id");
+        if (!uuid.test(id || "")) throw new AdminError(400, "invalid_id");
+        return res.status(200).json(await db.notifications(token, id));
       }
       if (resource === "members")
         return res.status(200).json(await db.members(token));
