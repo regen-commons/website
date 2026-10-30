@@ -119,10 +119,13 @@ historical applicants a backfill or enable additional steward recipients.
 
 **Current proof:** the template and delivery adapter pass 55 tests, check, and
 smoke. Synthetic browser previews verify desktop and 320px padding without
-horizontal overflow. The root domain is added in Resend, and production sender
-and reply-address settings are prepared. DNS verification, a domain-scoped API
-key, release, and actual Gmail delivery/formatting remain pending. No new real
-membership email has been sent.
+horizontal overflow. On 30 October, the three authoritative DNS records matched
+Resend's values, the root domain became Verified, and the operator saved a
+domain-scoped sending key as a production Vercel Secret. A single QA-copy email
+to the approved test recipient was delivered to Gmail's inbox with the intended
+padding, colors, and typography. Gmail shows the root-domain signature and reply
+inbox. Release and automatic form-to-receipt verification remain pending. The QA
+template is a test copy; the application module remains the runtime authority.
 
 **Scope:** `api/apply.js`, `api/seeds.js`, `api/_lib/notify.js`, provider-boundary tests.
 
