@@ -749,12 +749,10 @@
 
   // ─── Floating feedback indicator (every page) ────────────────────────────
   (function () {
-    if (document.querySelector(".feedback-indicator")) return;
+    if (document.querySelector(".feedback-indicator") || /^\/feedback(?:\.html)?\/?$/.test(location.pathname)) return;
     var a = document.createElement("a");
     a.className = "feedback-indicator";
-    a.href = "https://opencivics.notion.site/35206d2570f28065a7dcf559894ec554?pvs=105";
-    a.target = "_blank";
-    a.rel = "noopener";
+    a.href = "/feedback?from=" + encodeURIComponent(location.pathname);
     a.textContent = "Feedback";
     document.body.appendChild(a);
   })();

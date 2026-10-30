@@ -112,7 +112,7 @@ export function createSupabaseProvider({ url, key, request = fetch }) {
       if (type) query = query.eq("applicant_type", type);
       const { data, count } = result(
         await query
-          .order("submitted_at", { ascending: false })
+          .order("submitted_at", { ascending: false, nullsFirst: false })
           .order("id")
           .range(offset, offset + 24),
       );

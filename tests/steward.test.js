@@ -378,6 +378,27 @@ test("sign-out clears already invalid sessions while preserving real provider fa
   }
 });
 
+test("the membership queue places dated requests ahead of imported unknown dates", async () => {
+  let order;
+  const db = createSupabaseProvider({
+    url: "https://synthetic.supabase.co",
+    key: "sb_publishable_synthetic",
+    request: async (url) => {
+      order = new URL(url).searchParams.get("order");
+      return new Response("[]", {
+        headers: { "content-type": "application/json", "content-range": "*/0" },
+      });
+    },
+  });
+  await db.applications("synthetic-token", {
+    search: "",
+    state: "",
+    type: "",
+    offset: 0,
+  });
+  assert.equal(order, "submitted_at.desc.nullslast,id.asc");
+});
+
 test("transient Auth responses do not clear the browser session cookie", async () => {
   for (const status of [503, 429]) {
     const db = createSupabaseProvider({

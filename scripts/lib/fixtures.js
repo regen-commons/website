@@ -10,7 +10,7 @@ for (const key of Object.keys(process.env)) {
 import { createWebsiteHandler } from "../../api/_lib/public-data.js";
 export function createFixtureHandlers(provider) {
   return Object.fromEntries(
-    ["members", "contributions", "seeds", "apply"].map((name) => [
+    ["members", "contributions", "seeds", "apply", "feedback"].map((name) => [
       `/api/${name}`,
       createWebsiteHandler(name, { provider: () => provider }),
     ]),

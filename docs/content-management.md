@@ -34,7 +34,7 @@ when switching tabs. They clear on sign-out or loss of authorization.
 
 ## Supabase data boundary
 
-The public `members`, `contributions`, `seeds`, and `apply` handlers use Supabase.
+The public `members`, `contributions`, `seeds`, `apply`, and `feedback` handlers use Supabase.
 There is no runtime Notion fallback. Public reads use explicit projections in
 security-invoker views; private application answers, contact details, and history
 are not exposed. Published/hidden state is checked by RLS and the projection.
@@ -182,3 +182,5 @@ in code, not exercised in an older browser.
 
 The [work plan](work-plan.md) owns remaining migration work; the
 [roadmap](steward-roadmap-and-migration.md) records the research baseline.
+The [production cutover record](production-cutover.md) records final-source
+confirmation, runtime setup, review fixes, and release verification.

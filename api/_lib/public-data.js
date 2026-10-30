@@ -3,6 +3,7 @@ import { createHmac, randomUUID } from "node:crypto";
 import { AdminError } from "./steward-data.js";
 import { drainNotifications } from "./intake-notifications.js";
 import { uuid } from "./content-contract.js";
+import { feedbackPayload } from "../../feedback-contract.js";
 
 export function createPublicProvider({ url, key, secret, request = fetch }) {
   if (!url || !key) throw new AdminError(503, "data_not_configured");
@@ -104,9 +105,13 @@ export function createWebsiteHandler(resource, { provider }) {
     res.setHeader("Cache-Control", "no-store");
     res.setHeader("Vercel-CDN-Cache-Control", "no-store");
     res.setHeader("X-Content-Type-Options", "nosniff");
-    const writes = resource === "seeds" || resource === "apply";
-    const methods =
-      resource === "apply" ? ["POST"] : writes ? ["GET", "POST"] : ["GET"];
+    const privateIntake = ["apply", "feedback"].includes(resource);
+    const writes = resource === "seeds" || privateIntake;
+    const methods = privateIntake
+      ? ["POST"]
+      : writes
+        ? ["GET", "POST"]
+        : ["GET"];
     try {
       if (!methods.includes(req.method)) {
         res.setHeader("Allow", methods.join(", "));
@@ -122,8 +127,7 @@ export function createWebsiteHandler(resource, { provider }) {
       if (!body || typeof body !== "object" || Array.isArray(body))
         throw new AdminError(400, "invalid_request");
       if (
-        Buffer.byteLength(JSON.stringify(body)) >
-        (resource === "apply" ? 32768 : 8192)
+        Buffer.byteLength(JSON.stringify(body)) > (privateIntake ? 32768 : 8192)
       )
         throw new AdminError(413, "body_too_large");
       if (body.website_confirm) return res.status(200).json({ ok: true });
@@ -144,6 +148,12 @@ export function createWebsiteHandler(resource, { provider }) {
           text: body.text.trim(),
           author: (body.author || "").trim(),
         };
+      } else if (resource === "feedback") {
+        try {
+          payload = feedbackPayload(body);
+        } catch {
+          throw new AdminError(400, "invalid_feedback");
+        }
       } else {
         if (
           typeof body["full-name"] !== "string" ||
@@ -188,7 +198,11 @@ export function createWebsiteHandler(resource, { provider }) {
           : req.socket?.remoteAddress || "unknown";
       const db = provider();
       const saved = await db.submit(
-        resource === "seeds" ? "seed" : "application",
+        resource === "seeds"
+          ? "seed"
+          : resource === "feedback"
+            ? "feedback"
+            : "application",
         requestId,
         payload,
         ip,

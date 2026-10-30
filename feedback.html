@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Feedback · Regen Commons</title>
+    <meta
+      name="description"
+      content="Share feedback with the Regen Commons stewards."
+    />
+    <link rel="canonical" href="https://regencommons.com/feedback" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/fonts.css" />
+    <link rel="stylesheet" href="/style.css" />
+    <script>
+      (function () {
+        try {
+          document.documentElement.setAttribute(
+            "data-theme",
+            localStorage.getItem("rc-theme") || "dark",
+          );
+        } catch (_) {}
+      })();
+    </script>
+    <script src="/script.js" defer></script>
+    <script src="/logo-canvas.js" defer></script>
+    <script type="module" src="/feedback-form.js"></script>
+  </head>
+  <body data-page="feedback">
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <a href="/" class="logo-mark">
+      <canvas
+        aria-hidden="true"
+        id="logo-canvas"
+        width="76"
+        height="76"
+        data-static
+      ></canvas>
+      <span class="logo-mark-label">Regen Commons</span>
+    </a>
+
+    <button
+      class="theme-toggle"
+      id="theme-toggle"
+      aria-label="Toggle light/dark mode"
+    >
+      <svg class="icon-sun" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="5" />
+        <line x1="12" y1="1" x2="12" y2="3" />
+        <line x1="12" y1="21" x2="12" y2="23" />
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+        <line x1="1" y1="12" x2="3" y2="12" />
+        <line x1="21" y1="12" x2="23" y2="12" />
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+      </svg>
+      <svg class="icon-moon" viewBox="0 0 24 24">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+      </svg>
+    </button>
+
+    <main id="main-content" class="feedback-page" tabindex="-1">
+      <a class="feedback-back" href="/">← Back to the commons</a>
+      <p class="section-label mono">Care for the commons</p>
+      <h1>Share your feedback.</h1>
+      <p>
+        Tell us what could work better, or share an idea. Your feedback stays
+        private to the stewards. Please leave out passwords and other sensitive
+        personal information.
+      </p>
+      <form id="feedback-form" method="post" action="/api/feedback">
+        <fieldset>
+          <legend>
+            What type of feedback is this?
+            <span class="join-label-hint">(optional; select any)</span>
+          </legend>
+          <div id="feedback-categories"></div>
+        </fieldset>
+        <div class="feedback-message">
+          <label for="feedback-message"
+            >What’s your feedback?
+            <span class="join-label-hint">(required)</span></label
+          >
+          <textarea
+            id="feedback-message"
+            name="message"
+            rows="6"
+            required
+            minlength="3"
+            maxlength="5000"
+            aria-describedby="feedback-help"
+          ></textarea>
+          <p id="feedback-help" class="feedback-help">
+            Between 3 and 5,000 characters.
+          </p>
+        </div>
+        <input type="hidden" name="page_path" value="/" />
+        <div hidden>
+          <label for="feedback-website-confirm">Leave this field empty</label
+          ><input
+            id="feedback-website-confirm"
+            name="website_confirm"
+            tabindex="-1"
+            autocomplete="off"
+          />
+        </div>
+        <p id="feedback-context" class="feedback-help"></p>
+        <button type="submit">
+          Send feedback <span aria-hidden="true">→</span>
+        </button>
+        <p id="feedback-status" role="status" aria-live="polite"></p>
+        <noscript
+          >JavaScript is required to save feedback from this form.</noscript
+        >
+      </form>
+    </main>
+  </body>
+</html>

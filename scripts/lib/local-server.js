@@ -64,7 +64,7 @@ export function createLocalServer({ stewardProvider = createStewardFixtures() } 
       }
       const handler = path === "/api/admin" ? admin : handlers[path];
       if (handler) {
-        if (req.method === "POST") req.body = await readBody(req, ["/api/apply","/api/admin"].includes(path) ? 32768 : 8192);
+        if (req.method === "POST") req.body = await readBody(req, ["/api/apply","/api/admin","/api/feedback"].includes(path) ? 32768 : 8192);
         if (await scenarios.respond(req, res, path)) return;
         // Do not let forwarded headers bypass the real handlers' local rate limits.
         delete req.headers["x-forwarded-for"];

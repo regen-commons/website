@@ -333,7 +333,9 @@ export function createStewardFixtures({ now = Date.now } = {}) {
           revision: 1,
           created_at: new Date(now()).toISOString(),
         });
-      else
+      else if (kind === "feedback") {
+        // Private fixture persistence is represented by the retained request payload.
+      } else
         applications.push({
           id,
           display_name: payload["full-name"],

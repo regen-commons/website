@@ -96,11 +96,15 @@ Supabase and reconciled. The
 [import guide](notion-import.md) records counts, private source preservation,
 confirmed member typing/merge, repeat-run behavior, and verification.
 
-**Pending:** intake credential and
-production environment; deployment, final source delta, cache purge, and verified
-cutover. Public production remains on its currently deployed provider until those
-gates pass. Hosted schema/import and post-change advisors are complete; no
-production deployment or Notion retirement was performed.
+**Cutover in progress:** the user confirmed the exports are final and source edits
+are paused; a fresh inventory matches the hosted receipt. Production runtime and
+the bounded intake credential are configured. Review fixed queue ordering for
+unknown dates and, at the user's request, replaced the public Notion feedback
+form. See the [cutover record](production-cutover.md).
+
+**Pending:** feedback migration, current-head CI, merge/deployment, live flow
+verification, cache checks, and Notion runtime retirement. Public production
+remains on its deployed provider until release verification completes.
 
 ## 3. Make application and notification failures observable
 
