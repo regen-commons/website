@@ -104,6 +104,15 @@ without a demonstrated need.
 
 ## 5. Make the five-page experience accessible and maintainable
 
+**Public polish slice:** font delivery, Join step focus/validation, named site
+navigation, and keyboard/touch Learn controls are implemented on the independent
+`codex/public-fonts-join-navigation` branch. The [verification record](public-polish-verification.md)
+records 100 in all four standard Lighthouse categories on the five public pages,
+mobile and desktop, with local UI evidence and earlier score variation retained.
+Dashboard changes landed independently in PR #4. Canvas alternatives, broader
+reduced-motion coverage, and a deployed-site rerun remain follow-up work; automated scores do
+not close those manual accessibility requirements.
+
 **Scope:** navigation, canvas alternatives, forms, modal behavior, shared styling.
 
 **Done when:** keyboard users can complete key journeys and access graph content;

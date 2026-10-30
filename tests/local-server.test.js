@@ -139,3 +139,17 @@ test("local scenarios distinguish empty/error data and allow recovery without li
   }
   assert.equal((await request("/api/members")).status, 200);
 });
+
+test("static text supports gzip without changing the document or font bytes", async () => {
+  const plain = await request("/style.css", { headers: { "Accept-Encoding": "identity" } });
+  assert.equal(plain.headers.get("content-encoding"), null);
+  const compressed = await request("/style.css", { headers: { "Accept-Encoding": "gzip" } });
+  assert.equal(compressed.headers.get("content-encoding"), "gzip");
+  assert.equal(compressed.headers.get("vary"), "Accept-Encoding");
+  assert.equal(await compressed.text(), await plain.text());
+  const declined = await request("/style.css", { headers: { "Accept-Encoding": "gzip;q=0" } });
+  assert.equal(declined.headers.get("content-encoding"), null);
+  const weighted = await request("/style.css", { headers: { "Accept-Encoding": "br, gzip;q=0.5" } });
+  assert.equal(weighted.headers.get("content-encoding"), "gzip");
+  assert.equal((await request("/assets/fonts/fraunces-latin.woff2")).headers.get("content-encoding"), null);
+});
