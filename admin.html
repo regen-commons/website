@@ -44,12 +44,11 @@
     <main id="main" tabindex="-1">
       <section id="login" class="login panel">
         <p class="eyebrow">Care for the commons</p>
-        <h1>A place for stewardship.</h1>
-        <p class="muted">
-          Tend Seeds, Contributions, and the people and organizations joining
-          the commons.
-        </p>
+        <h1>Steward sign-in</h1>
         <form id="email-form" method="post" action="/api/admin">
+          <p class="muted login-description">
+            Manage membership requests, Seeds, and Contributions.
+          </p>
           <label for="email">Steward email</label>
           <input
             id="email"
@@ -71,9 +70,7 @@
           </button>
         </form>
         <form id="code-form" method="post" action="/api/admin" hidden>
-          <p id="code-help">
-            If this email has an account, check its inbox for a sign-in code.
-          </p>
+          <p id="code-help">Enter the code from your email.</p>
           <label for="code">Email code</label>
           <input
             id="code"
@@ -91,18 +88,20 @@
             Open steward desk <span aria-hidden="true">→</span>
           </button>
           <button id="change-email" class="text-button" type="button">
-            Use another email or request a new code
+            Change email or request a new code
           </button>
         </form>
         <p id="login-message" role="status" aria-live="polite"></p>
         <button id="retry-sign-out" class="secondary" type="button" hidden>
           Retry sign out
         </button>
-        <aside id="demo-help" hidden class="notice">
-          <strong>Local demo — no email is sent.</strong><br />Use
-          <code>steward@example.test</code>, then code <code>123456</code>.
-          <code>visitor@example.test</code> demonstrates denied access.
-        </aside>
+        <details id="demo-help" hidden class="notice">
+          <summary>Local demo — no email is sent</summary>
+          <p>
+            Use <code>steward@example.test</code>, then code <code>123456</code>.
+            <code>visitor@example.test</code> demonstrates denied access.
+          </p>
+        </details>
         <noscript
           >JavaScript is required to sign in and review applications.</noscript
         >

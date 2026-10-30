@@ -121,12 +121,52 @@ h3 {
   border: 1px solid var(--line);
 }
 .login {
-  max-width: 32rem;
-  margin: 4rem auto;
-  padding: 2.5rem;
+  width: min(100%, 32rem);
+  margin: 0;
+  padding: clamp(1.25rem, 3svh, 2rem);
 }
-.login > p.muted {
-  margin-bottom: 2rem;
+body:has(.login:not([hidden])) {
+  min-height: 100svh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+body:has(.login:not([hidden])) .masthead {
+  height: clamp(60px, 10svh, 90px);
+}
+body:has(.login:not([hidden])) main {
+  display: grid;
+  place-items: center;
+  padding: clamp(0.5rem, 1.5svh, 1.25rem) 1rem;
+}
+body:has(.login:not([hidden])) footer {
+  padding: 0.5rem 1rem;
+}
+body:has(.login:not([hidden])) .dev-banner {
+  position: static;
+}
+.login .eyebrow {
+  margin-bottom: 0.5rem;
+}
+.login h1 {
+  font-size: clamp(1.75rem, 4svh, 2.25rem);
+  margin-bottom: 0.75rem;
+}
+.login p.login-description {
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 1.25rem;
+}
+.login .help {
+  margin: 0.5rem 0 0;
+}
+.login #code-help {
+  margin-bottom: 1rem;
+}
+.login .text-button {
+  min-height: 44px;
+  margin-top: 0.25rem;
+  line-height: 1.4;
 }
 label {
   display: block;
@@ -181,7 +221,7 @@ button:disabled {
 }
 .login button[type="submit"] {
   width: 100%;
-  margin-top: 1.25rem;
+  margin-top: 1rem;
   display: flex;
   justify-content: space-between;
 }
@@ -193,8 +233,17 @@ button:disabled {
   color: var(--ink-mid);
 }
 .login .notice {
-  margin-top: 2rem;
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
   font-size: 0.8rem;
+}
+.login .notice summary {
+  cursor: pointer;
+  font-weight: 600;
+  min-height: 24px;
+}
+.login .notice p {
+  margin: 0.75rem 0 0;
 }
 code {
   overflow-wrap: anywhere;
@@ -205,6 +254,11 @@ code {
 }
 #login-message {
   margin-top: 1rem;
+}
+.login #login-message {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
 }
 .workspace {
   display: grid;
@@ -489,10 +543,6 @@ footer {
   .desk-label {
     font-size: 0.75rem;
   }
-  .login {
-    margin: 2rem 1rem;
-    padding: 1.5rem;
-  }
   .page-heading {
     display: block;
   }
@@ -551,8 +601,7 @@ footer {
   color: var(--forest);
   letter-spacing: 0.2em;
 }
-#view-description,
-.login > .muted {
+#view-description {
   font-family: var(--font-serif);
   font-size: 1.1rem;
   line-height: 1.7;

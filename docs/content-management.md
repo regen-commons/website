@@ -148,5 +148,14 @@ The rendered synthetic dashboard was exercised at desktop and 390px mobile
 widths, including Seed moderation, Contribution creation/editing, keyboard form
 access, sign-out, and preserved drafts during session rechecks. Browser evidence
 is local fixture proof; no real notifications or membership records were created.
+
+The sign-in layout was compacted after laptop-height feedback. At 1280×720 the
+initial card is about 413px tall, down from 646px. Email entry, code entry, and
+invalid-code feedback fit without page scrolling at 1280×720, 1024×600, and
+390×667. At 480px height the document scrolls naturally; the card has no fixed
+height or nested scrolling. Demo instructions use a native, keyboard-accessible
+disclosure. The fixture banner stays in document flow during sign-in so it cannot
+cover the form. These layout changes preserve the existing sign-in behavior.
+
 The [work plan](work-plan.md) owns remaining migration work; the
 [roadmap](steward-roadmap-and-migration.md) records the research baseline.
