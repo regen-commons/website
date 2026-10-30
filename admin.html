@@ -20,7 +20,13 @@
     <a class="skip-link" href="#main">Skip to content</a>
     <header class="masthead">
       <a class="wordmark logo-mark" href="/index.html">
-        <canvas id="logo-canvas" width="76" height="76" data-static aria-hidden="true"></canvas>
+        <canvas
+          id="logo-canvas"
+          width="76"
+          height="76"
+          data-static
+          aria-hidden="true"
+        ></canvas>
         <span class="logo-mark-label">Regen Commons</span>
       </a>
       <div class="header-actions">
@@ -40,7 +46,8 @@
         <p class="eyebrow">Care for the commons</p>
         <h1>A place for stewardship.</h1>
         <p class="muted">
-          Review applications and the profiles taking shape in our network.
+          Tend Seeds, Contributions, and the people and organizations joining
+          the commons.
         </p>
         <form id="email-form" method="post" action="/api/admin">
           <label for="email">Steward email</label>
@@ -105,13 +112,19 @@
           <p class="eyebrow">Workspace</p>
           <nav aria-label="Steward workspace">
             <a id="nav-applications" href="#applications"
-              >Applications <span aria-hidden="true">↗</span></a
+              >Membership requests <span aria-hidden="true">↗</span></a
             ><a id="nav-members" href="#members"
               >Members <span aria-hidden="true">↗</span></a
             >
+            <a id="nav-seeds" href="#seeds"
+              >Seeds <span aria-hidden="true">↗</span></a
+            >
+            <a id="nav-contributions" href="#contributions"
+              >Contributions <span aria-hidden="true">↗</span></a
+            >
           </nav>
           <div class="sidebar-note">
-            <span class="small-label">Review access</span>
+            <span class="small-label">Steward access</span>
             <p>
               Private answers stay here. Public profiles are curated separately.
             </p>
@@ -125,16 +138,17 @@
           <div id="page-heading" class="page-heading">
             <div>
               <p class="eyebrow">Regen Commons / Stewardship</p>
-              <h1 id="view-title" tabindex="-1">Applications</h1>
+              <h1 id="view-title" tabindex="-1">Membership requests</h1>
               <p id="view-description" class="muted">
                 Get to know the people and organizations joining the commons.
               </p>
             </div>
-            <span class="badge">Read-only pilot</span>
+            <span class="badge">Steward workspace</span>
           </div>
           <p class="notice governance-note">
-            Acceptance and publication are separate decisions. Decision actions
-            will be added once council authority is agreed.
+            Seeds and new Contributions publish immediately. You can hide or
+            restore them with a recorded reason. Membership requests remain
+            private; membership decisions are a separate step.
           </p>
           <section id="queue">
             <form
@@ -145,7 +159,7 @@
               action="/admin"
             >
               <div class="search-field">
-                <label for="search">Search applications</label
+                <label for="search">Search membership requests</label
                 ><input
                   type="search"
                   id="search"
@@ -186,6 +200,11 @@
           <section id="members" hidden aria-label="Member profiles">
             <div id="member-list" class="member-grid"></div>
           </section>
+          <section
+            id="content-management"
+            hidden
+            aria-label="Content management"
+          ></section>
           <p id="load-message" role="status" aria-live="polite"></p>
           <button id="retry" type="button" class="secondary" hidden>
             Try again

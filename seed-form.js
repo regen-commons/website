@@ -3,6 +3,7 @@
 
   function createSaver(render, dependencies) {
     var state = "idle";
+    var lastText = null, requestId = null;
     return async function save(value, honeypot) {
       if (state === "saving" || state === "saved") return;
       var text = value.trim();
@@ -10,12 +11,13 @@
         render({ status: "invalid", message: "Please write between 3 and 240 characters." });
         return;
       }
+      if (text !== lastText) { requestId = crypto.randomUUID(); lastText = text; }
       state = "saving";
       render({ status: state, message: "Saving your seed…" });
       try {
         var data = await RegenData.requestJson("/api/seeds", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", "Idempotency-Key": requestId },
           body: JSON.stringify({ text: text, website_confirm: honeypot || "" }),
         }, dependencies);
         if (!data || data.ok !== true) throw new Error("invalid_response");

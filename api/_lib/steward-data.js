@@ -14,6 +14,8 @@ const memberColumns =
 
 function result({ data, error, count, status }) {
   if (error) {
+    if (/^PT(400|403|404|409|429)$/.test(error.code || ""))
+      throw new AdminError(Number(error.code.slice(2)), error.message);
     const limited = (error.status ?? status) === 429;
     throw new AdminError(
       limited ? 429 : 503,
@@ -179,6 +181,78 @@ export function createSupabaseProvider({ url, key, request = fetch }) {
           ),
         ]);
       return { members, affiliations, contributions, contributionMembers };
+    },
+    async content(
+      token,
+      resource,
+      { search = "", state = "", offset = 0 } = {},
+    ) {
+      let query = client(token).from(resource).select("*", { count: "exact" });
+      if (search)
+        query = query.ilike(
+          resource === "seeds" ? "text" : "title",
+          `%${search.replace(/[\\%_]/g, "\\$&")}%`,
+        );
+      if (state) query = query.eq("publication_state", state);
+      const { data, count } = result(
+        await query
+          .order("created_at", { ascending: false })
+          .order("id")
+          .range(offset, offset + 24),
+      );
+      return { items: data, total: count, offset };
+    },
+    async contentDetail(token, resource, id) {
+      const db = client(token);
+      const item = result(
+        await db.from(resource).select("*").eq("id", id).maybeSingle(),
+      ).data;
+      if (!item) throw new AdminError(404, "content_not_found");
+      const history = [];
+      for (let offset = 0; ; offset += 500) {
+        const page = result(
+          await db
+            .from("content_events")
+            .select("id,action,revision,reason,created_at,actor_id,actor_label")
+            .eq(resource === "seeds" ? "seed_id" : "contribution_id", id)
+            .order("created_at")
+            .order("id")
+            .range(offset, offset + 499),
+        ).data;
+        history.push(...page);
+        if (page.length < 500) break;
+      }
+      const contributors =
+        resource === "contributions"
+          ? result(
+              await db
+                .from("contribution_members")
+                .select("member_id")
+                .eq("contribution_id", id),
+            ).data.map((r) => r.member_id)
+          : [];
+      return { item, history, contributor_ids: contributors };
+    },
+    async moderate(token, body) {
+      return result(
+        await client(token).rpc("moderate_content", {
+          p_resource: body.resource,
+          p_id: body.id,
+          p_revision: body.revision,
+          p_state: body.state,
+          p_reason: body.reason,
+        }),
+      ).data;
+    },
+    async saveContribution(token, body) {
+      return result(
+        await client(token).rpc("save_contribution", {
+          p_id: body.id || null,
+          p_revision: body.revision || null,
+          p_payload: body.payload,
+          p_request_id: body.request_id,
+        }),
+      ).data;
     },
   };
 }

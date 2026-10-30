@@ -1,5 +1,10 @@
 # Steward dashboard pilot
 
+This records the original read-only slice and hosted sign-in evidence. The
+[content management guide](content-management.md) covers the new Seeds and
+Contributions actions and Supabase-only public adapters. Their hosted migration
+and cutover have not yet been applied.
+
 The first `/admin` slice supports email-code sign-in, explicitly authorized
 steward reads, application search and filters, private application detail, a
 curated profile preview, and a member view with affiliations and contributions.

@@ -8,9 +8,11 @@ the [admin guide](../admin/AGENTS.md) for dashboard flows, and the
 
 ## Boundaries
 
-- Keep provider SDKs and credentials on the server. Public intake and map/member
-  reads retain their existing provider until an explicit migration changes
-  them. A new Supabase table or dashboard route does not authorize a cutover.
+- Keep provider SDKs and credentials on the server. Public reads use Supabase
+  allowlisted projections; bounded intake uses the separate server-held intake
+  capability. Follow [migration gates](../docs/content-management.md) before
+  hosted cutover. A new table, handler, or dashboard route does not prove the
+  source data has been reconciled or authorize deployment by itself.
 - For steward reads, verify the user and current steward authorization on every
   request. Keep database calls scoped to the user's token so row-level security
   remains effective. Email possession, client state, and user-editable metadata

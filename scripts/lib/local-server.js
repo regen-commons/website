@@ -1,7 +1,7 @@
 import { createServer } from "node:http";
 import { gzipSync } from "node:zlib";
 import { readFile } from "node:fs/promises";
-import { handlers } from "./fixtures.js";
+import { createFixtureHandlers } from "./fixtures.js";
 import { resolvePublicFile } from "./site-files.js";
 import { createScenarios } from "./scenarios.js";
 import { createAdminHandler } from "../../api/admin.js";
@@ -42,6 +42,7 @@ async function readBody(req, limit) {
 
 export function createLocalServer({ stewardProvider = createStewardFixtures() } = {}) {
   const scenarios = createScenarios();
+  const handlers = createFixtureHandlers(stewardProvider);
   const admin = createAdminHandler({ provider: () => stewardProvider, secureCookies: false, origin: (req) => `http://${req.headers.host}` });
   return createServer(async (req, res) => {
     res.setHeader("Cache-Control", "no-store");
@@ -63,7 +64,7 @@ export function createLocalServer({ stewardProvider = createStewardFixtures() } 
       }
       const handler = path === "/api/admin" ? admin : handlers[path];
       if (handler) {
-        if (req.method === "POST") req.body = await readBody(req, path === "/api/apply" ? 32768 : 8192);
+        if (req.method === "POST") req.body = await readBody(req, ["/api/apply","/api/admin"].includes(path) ? 32768 : 8192);
         if (await scenarios.respond(req, res, path)) return;
         // Do not let forwarded headers bypass the real handlers' local rate limits.
         delete req.headers["x-forwarded-for"];

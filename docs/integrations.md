@@ -1,13 +1,21 @@
 # Architecture and integration contracts
 
-The public browser calls four Vercel handlers. Only those handlers talk to
+The [content management guide](content-management.md) owns the Supabase runtime
+contract on this feature branch. Public routes no longer import the Notion
+provider. The Notion details below are retained as a **legacy export mapping**;
+hosted data migration/cutover is still pending. Use them to inspect source
+exports, not to infer current production or branch deployment status.
+
+## Legacy Notion contract and export mapping
+
+Before this migration, the public browser called four Vercel handlers backed by
 Notion, Resend, and the separate Telegram agent. The separate `/admin` browser
 calls `/api/admin`, whose Supabase client carries the authenticated user's token
 and remains subject to row policies. There is no frontend framework or bundler.
 The [steward contract](steward-dashboard.md) owns dashboard schema, access,
-configuration, and verification. Public intake/read providers are unchanged.
+configuration, and verification. The historical response fields below guide compatibility and export mapping.
 
-| Route | Current behavior | Owning implementation |
+| Route | Legacy behavior | Route implementation |
 |---|---|---|
 | `GET /api/members` | Paginated Members query, `Status = Active`, public projection | [members.js](../api/members.js) |
 | `GET /api/contributions` | Paginated active contributions plus related member names | [contributions.js](../api/contributions.js) |

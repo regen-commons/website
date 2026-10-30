@@ -11,6 +11,12 @@
     rate_limited: "Too many attempts. Wait a minute before trying again.",
     admin_not_configured:
       "Steward sign-in is not configured yet. Contact the project administrator.",
+    revision_conflict:
+      "Someone changed this record. Reload to see the latest revision before trying again.",
+    request_conflict:
+      "This save was already attempted with different content. Check the Contributions list before creating another entry.",
+    invalid_contribution: "Check the title and field lengths, then try again.",
+    content_not_found: "This content could not be found.",
     application_not_found: "This application could not be found.",
   };
   let signedIn = false,
@@ -25,6 +31,7 @@
     return element;
   }
   function date(value) {
+    if (!value || Number.isNaN(Date.parse(value))) return "Date not recorded";
     return new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(
       new Date(value),
     );
@@ -74,6 +81,7 @@
       "detail",
       "queue-count",
       "load-message",
+      "content-management",
     ])
       $(id).replaceChildren();
     $("retry").hidden = true;
@@ -82,7 +90,7 @@
     signedIn = false;
     clearPrivateData();
     $("signed-in").textContent = "";
-    $("view-title").textContent = "Applications";
+    $("view-title").textContent = "Membership requests";
     $("view-description").textContent = "";
     for (const key of Object.keys(filters)) {
       filters[key] = "";
@@ -213,7 +221,7 @@
   }
   function renderQueue(data) {
     $("queue-count").textContent =
-      `${data.total} ${data.total === 1 ? "application" : "applications"}${data.total ? ` · ${offset + 1}–${offset + data.applications.length}` : ""}`;
+      `${data.total} ${data.total === 1 ? "membership request" : "membership requests"}${data.total ? ` · ${offset + 1}–${offset + data.applications.length}` : ""}`;
     for (const application of data.applications) {
       if (
         ![...$("state").options].some(
@@ -254,7 +262,7 @@
       $("application-list").append(
         node(
           "p",
-          "No applications match these filters. Try a different name or select all types and states.",
+          "No membership requests match these filters. Try a different name or select all types and states.",
           "empty",
         ),
       );
@@ -279,7 +287,7 @@
     $("view-title").textContent = application.display_name;
     $("view-description").textContent =
       `${label(application.applicant_type)} · Submitted ${date(application.submitted_at)} · Revision ${application.revision}`;
-    $("detail").append(link("← Back to applications", "#applications"));
+    $("detail").append(link("← Back to membership requests", "#applications"));
     const grid = node("div", null, "detail-grid"),
       privateColumn = node("div"),
       publicColumn = node("div");
@@ -382,6 +390,328 @@
       $("member-list").append(card);
     }
   }
+  const contentFilters = {
+    seeds: { search: "", state: "", offset: 0 },
+    contributions: { search: "", state: "", offset: 0 },
+  };
+  function control(form, key, title, value, options = {}) {
+    const wrap = node("div", null, "editor-field"),
+      id = "edit-" + key;
+    const labelElement = node("label", title);
+    labelElement.htmlFor = id;
+    const input = document.createElement(
+      options.multiline ? "textarea" : "input",
+    );
+    input.id = id;
+    input.name = key;
+    input.value = value || "";
+    if (options.max) input.maxLength = options.max;
+    if (options.required) input.required = true;
+    if (options.multiline) input.rows = 4;
+    wrap.append(labelElement, input);
+    form.append(wrap);
+    return input;
+  }
+  async function performWrite(form, body, done) {
+    const current = generation,
+      controls = [...form.querySelectorAll("button,input,textarea,select")].map(
+        (element) => ({ element, disabled: element.disabled }),
+      );
+    const status = form.querySelector('[role="status"]');
+    controls.forEach(({ element }) => (element.disabled = true));
+    status.textContent = "Saving…";
+    try {
+      const result = await api(null, body);
+      if (current !== generation || !signedIn) return;
+      done(result);
+    } catch (error) {
+      if (current !== generation || !signedIn) return;
+      if ([401, 403].includes(error.status)) {
+        showLogin(error.message);
+        $("email").focus();
+        return;
+      }
+      status.textContent = error.status
+        ? error.message
+        : "We couldn’t confirm this save. Keep this form open and retry, or check the list before creating another entry.";
+      if (error.code === "revision_conflict") {
+        const reload = node("button", "Reload latest revision", "secondary");
+        reload.type = "button";
+        reload.addEventListener("click", loadView);
+        status.append(document.createTextNode(" "), reload);
+      }
+    } finally {
+      controls.forEach(
+        ({ element, disabled }) => (element.disabled = disabled),
+      );
+    }
+  }
+  function renderContentList(resource, data) {
+    const root = $("content-management"),
+      filter = contentFilters[resource],
+      form = node("form", null, "filters");
+    form.setAttribute("role", "search");
+    control(form, "content-search", "Search " + resource, filter.search, {
+      max: 100,
+    });
+    const wrap = node("div"),
+      caption = node("label", "Publication state"),
+      select = node("select");
+    caption.htmlFor = "content-state";
+    select.id = "content-state";
+    for (const [value, title] of [
+      ["", "All states"],
+      ["published", "Published"],
+      ["hidden", "Hidden"],
+      ...(resource === "contributions" ? [["draft", "Draft"]] : []),
+    ]) {
+      const option = node("option", title);
+      option.value = value;
+      select.append(option);
+    }
+    select.value = filter.state;
+    wrap.append(caption, select);
+    form.append(wrap, node("button", "Apply filters", "secondary"));
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      filter.search = form.elements["content-search"].value.trim();
+      filter.state = select.value;
+      filter.offset = 0;
+      loadView();
+    });
+    root.append(form);
+    if (resource === "contributions")
+      root.append(link("Add contribution →", "#contributions/new"));
+    root.append(
+      node(
+        "p",
+        `${data.total} ${data.total === 1 ? resource.slice(0, -1) : resource} · newest first`,
+        "help",
+      ),
+    );
+    if (!data.items.length)
+      root.append(node("p", "No content matches these filters.", "empty"));
+    for (const item of data.items) {
+      const row = node("article", null, "application-row"),
+        identity = node("div");
+      identity.append(
+        link(item.text || item.title, `#${resource}/${item.id}`),
+        node("p", (item.tags || []).join(" · "), "help"),
+      );
+      row.append(
+        identity,
+        node("span", label(item.publication_state), "badge"),
+        node("span", date(item.created_at), "help"),
+      );
+      root.append(row);
+    }
+    if (data.total > 25) {
+      const pager = node("div", null, "pagination");
+      for (const [title, delta] of [
+        ["Previous", -25],
+        ["Next", 25],
+      ]) {
+        const button = node("button", title, "secondary");
+        button.type = "button";
+        button.disabled =
+          delta < 0
+            ? filter.offset === 0
+            : filter.offset + data.items.length >= data.total;
+        button.addEventListener("click", () => {
+          filter.offset += delta;
+          loadView();
+        });
+        pager.append(button);
+      }
+      root.append(pager);
+    }
+  }
+  function contributionEditor(item, contributorIds, members) {
+    const form = node("form", null, "detail-card contribution-editor");
+    form.append(
+      node("h2", item ? "Edit contribution" : "Add contribution"),
+      node(
+        "p",
+        item
+          ? "Editing keeps the current publication state."
+          : "Saving publishes this contribution immediately.",
+        "help",
+      ),
+    );
+    for (const [key, title, max, multiline] of [
+      ["title", "Title", 200, false],
+      ["description", "Description", 10000, true],
+      ["contribution_type", "Type", 100, false],
+      ["stage", "Stage", 100, false],
+      ["tier", "Tier", 100, false],
+      ["terms", "Terms", 10000, true],
+      ["license", "License", 200, false],
+    ])
+      control(form, key, title, item?.[key], {
+        max,
+        multiline,
+        required: key === "title",
+      });
+    control(form, "tags", "Tags separated by commas", item?.tags?.join(", "), {
+      max: 1600,
+    });
+    control(
+      form,
+      "capital_forms",
+      "Capital forms separated by commas",
+      item?.capital_forms?.join(", "),
+      { max: 1600 },
+    );
+    const fieldset = node("fieldset");
+    fieldset.append(node("legend", "Contributors"));
+    fieldset.append(
+      node(
+        "p",
+        "Only published members are attributed on the public library.",
+        "help",
+      ),
+    );
+    for (const member of members) {
+      const labelElement = node("label", null, "contributor-option"),
+        checkbox = node("input");
+      checkbox.type = "checkbox";
+      checkbox.name = "contributor_ids";
+      checkbox.value = member.id;
+      checkbox.checked = contributorIds.includes(member.id);
+      labelElement.append(
+        checkbox,
+        document.createTextNode(
+          `${member.name} · ${label(member.member_type)} · ${label(member.publication_state)}`,
+        ),
+      );
+      fieldset.append(labelElement);
+    }
+    form.append(fieldset);
+    const status = node("p");
+    status.setAttribute("role", "status");
+    const save = node("button", item ? "Save changes" : "Publish contribution");
+    form.append(save, status);
+    const requestId = crypto.randomUUID();
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const values = new FormData(form),
+        payload = {};
+      for (const key of [
+        "title",
+        "description",
+        "contribution_type",
+        "stage",
+        "tier",
+        "terms",
+        "license",
+      ])
+        payload[key] = values.get(key);
+      for (const key of ["tags", "capital_forms"])
+        payload[key] = values
+          .get(key)
+          .split(",")
+          .map((v) => v.trim())
+          .filter(Boolean);
+      payload.contributor_ids = values.getAll("contributor_ids");
+      performWrite(
+        form,
+        {
+          action: "save-contribution",
+          request_id: requestId,
+          ...(item ? { id: item.id, revision: item.revision } : {}),
+          payload,
+        },
+        (result) => {
+          if (location.hash === `#contributions/${result.id}`) loadView();
+          else location.hash = `contributions/${result.id}`;
+        },
+      );
+    });
+    return form;
+  }
+  function renderContentDetail(resource, data, memberData) {
+    const root = $("content-management"),
+      item = data?.item;
+    root.append(link(`← Back to ${resource}`, `#${resource}`));
+    if (item) {
+      $("view-title").textContent = resource === "seeds" ? "Seed" : item.title;
+      const card = node("article", null, "detail-card");
+      card.append(
+        node("span", label(item.publication_state), "badge"),
+        node("h2", item.text || item.title),
+        node(
+          "p",
+          `Revision ${item.revision} · ${date(item.created_at)}`,
+          "help",
+        ),
+      );
+      if (resource === "seeds")
+        card.append(
+          node("p", item.author || "Anonymous", "muted"),
+          node("p", (item.tags || []).join(" · "), "help"),
+        );
+      const form = node("form", null, "moderation-form");
+      control(form, "reason", "Reason for this moderation action", "", {
+        required: true,
+        max: 1000,
+        multiline: true,
+      });
+      const button = node(
+        "button",
+        item.publication_state === "hidden"
+          ? "Restore publication"
+          : "Hide from public site",
+        "secondary",
+      );
+      const status = node("p");
+      status.setAttribute("role", "status");
+      form.append(button, status);
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        performWrite(
+          form,
+          {
+            action: "moderate",
+            resource,
+            id: item.id,
+            revision: item.revision,
+            state: item.publication_state === "hidden" ? "published" : "hidden",
+            reason: form.elements.reason.value,
+          },
+          loadView,
+        );
+      });
+      card.append(form);
+      root.append(card);
+    }
+    if (resource === "contributions")
+      root.append(
+        contributionEditor(
+          item,
+          data?.contributor_ids || [],
+          memberData.members,
+        ),
+      );
+    if (item) {
+      const history = node("section", null, "detail-card");
+      history.append(node("h2", "Content history"));
+      if (!data.history.length)
+        history.append(
+          node("p", "No steward actions have been recorded.", "muted"),
+        );
+      for (const event of data.history)
+        history.append(
+          node("h3", label(event.action)),
+          node(
+            "p",
+            `${date(event.created_at)} · Revision ${event.revision} · ${event.actor_label || "Steward"}`,
+            "help",
+          ),
+          node("p", event.reason || ""),
+        );
+      root.append(history);
+    }
+  }
   async function loadView() {
     if (!signedIn) return;
     clearPrivateData();
@@ -389,26 +719,54 @@
     const route = location.hash.slice(1),
       detailId = route.startsWith("applications/") ? route.split("/")[1] : null;
     const members = route === "members";
-    $("queue").hidden = members || !!detailId;
+    const [resource, contentId] = route.split("/");
+    const managing = ["seeds", "contributions"].includes(resource);
+    $("content-management").hidden = !managing;
+    $("queue").hidden = managing || members || !!detailId;
     $("members").hidden = !members;
     $("detail").hidden = !detailId;
     $("pagination").hidden = true;
-    $("view-title").textContent = members
-      ? "Members"
-      : detailId
-        ? "Application"
-        : "Applications";
-    $("view-description").textContent = members
-      ? "Curated profiles, affiliations, and contributions. Publication is tracked separately."
-      : "Get to know the people and organizations joining the commons.";
-    $("nav-applications").removeAttribute("aria-current");
-    $("nav-members").removeAttribute("aria-current");
-    (members ? $("nav-members") : $("nav-applications")).setAttribute(
-      "aria-current",
-      "page",
-    );
+    $("view-title").textContent = managing
+      ? label(resource)
+      : members
+        ? "Members"
+        : detailId
+          ? "Membership request"
+          : "Membership requests";
+    $("view-description").textContent = managing
+      ? "Published immediately, tended through hide and restore moderation."
+      : members
+        ? "Curated profiles, affiliations, and contributions. Publication is tracked separately."
+        : "Get to know the people and organizations joining the commons.";
+    for (const section of ["applications", "members", "seeds", "contributions"])
+      $("nav-" + section).removeAttribute("aria-current");
+    (managing
+      ? $("nav-" + resource)
+      : members
+        ? $("nav-members")
+        : $("nav-applications")
+    ).setAttribute("aria-current", "page");
     $("load-message").textContent = "Loading…";
     try {
+      if (managing) {
+        if (contentId) {
+          const [data, memberData] = await Promise.all([
+            contentId === "new" && resource === "contributions"
+              ? null
+              : api({ resource: "content", kind: resource, id: contentId }),
+            resource === "contributions" ? api({ resource: "members" }) : null,
+          ]);
+          if (current !== generation || !signedIn) return;
+          renderContentDetail(resource, data, memberData);
+        } else {
+          const data = await api({ resource, ...contentFilters[resource] });
+          if (current !== generation || !signedIn) return;
+          renderContentList(resource, data);
+        }
+        $("load-message").textContent = "";
+        $("view-title").focus();
+        return;
+      }
       const params = members
         ? { resource: "members" }
         : detailId
@@ -451,10 +809,13 @@
   $("retry").addEventListener("click", loadView);
   window.addEventListener("hashchange", loadView);
   async function checkSession() {
-    const current = ++generation;
+    const current = generation;
     try {
       const data = await api({ resource: "session" });
-      if (current === generation) showWorkspace(data.user);
+      if (current === generation) {
+        if (signedIn) $("signed-in").textContent = data.user.email;
+        else showWorkspace(data.user);
+      }
     } catch (error) {
       if (current === generation)
         showLogin(error.status === 401 ? "" : error.message);

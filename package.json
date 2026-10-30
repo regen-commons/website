@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Regen Commons public site — static frontend + Vercel serverless functions backed by Notion and Resend.",
+  "description": "Regen Commons public site — static frontend + Supabase-backed Vercel functions and steward dashboard.",
   "scripts": {
     "dev": "node scripts/dev.js",
     "dev:live": "vercel dev --listen 3502",

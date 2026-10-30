@@ -76,6 +76,28 @@ plus email/Telegram delivery if enabled. Record cleanup and rollback steps.
 authorize any data move. Review the database-creation script's legacy default ID
 before use. Live test writes/messages require authorization for the targets.
 
+## 2a. Seeds and Contributions management and Supabase cutover — in progress
+
+**Implemented on the feature branch:** Seeds list/search/filter and hide/restore;
+Contribution creation/editing, attribution, immediate publishing, and hide/restore;
+recorded actors/reasons/revisions; Supabase public projections and private intake;
+durable request identities, shared quotas, and notification jobs. Membership
+requests are private applications; Members has Individual and Organization types.
+See [implementation and migration gates](content-management.md) and the
+[research roadmap](steward-roadmap-and-migration.md).
+
+**Verified locally:** check, regression tests, HTTP smoke, native Postgres 17
+migrations and both permission suites. Rendered desktop/mobile proof uses
+synthetic fixtures. This work stays separate from public-site polish.
+
+**Pending:** the user's Members/Seeds/Contributions CSV/Markdown exports,
+attachments, and recovered failed-submission messages; actual-source mapping and
+reconciliation; hosted migration approval and advisors; intake credential and
+production environment; deployment, final source delta, cache purge, and verified
+cutover. Public production remains on its currently deployed provider until those
+gates pass. Automatic review rejected hosted DDL rehearsal; no hosted schema or
+source content was changed by this implementation.
+
 ## 3. Make application and notification failures observable
 
 **Scope:** `api/apply.js`, `api/seeds.js`, `api/_lib/notify.js`, provider-boundary tests.

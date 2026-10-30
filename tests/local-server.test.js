@@ -14,6 +14,7 @@ process.env.RESEND_API_KEY = "must-be-removed";
 process.env.SUPABASE_URL = "https://must-not-be-called.example.test";
 process.env.SUPABASE_PUBLISHABLE_KEY = "must-be-removed";
 process.env.SUPABASE_SERVICE_ROLE_KEY = "must-be-removed";
+process.env.SUPABASE_INTAKE_SECRET = "must-be-removed";
 const { createLocalServer } = await import("../scripts/lib/local-server.js");
 const server = createLocalServer();
 server.listen(0, "127.0.0.1");
@@ -29,8 +30,8 @@ const post = (path, body) => request(path, {
 });
 
 test("fixture mode replaces credentials and reports its limits", async () => {
-  assert.equal(process.env.NOTION_TOKEN, "local-fixture-token");
-  for (const key of ["NOTIFY_URL", "NOTIFY_WEBHOOK_SECRET", "RESEND_API_KEY", "SUPABASE_URL", "SUPABASE_PUBLISHABLE_KEY", "SUPABASE_SERVICE_ROLE_KEY"]) assert.equal(process.env[key], undefined);
+  assert.equal(process.env.NOTION_TOKEN, undefined);
+  for (const key of ["NOTIFY_URL", "NOTIFY_WEBHOOK_SECRET", "RESEND_API_KEY", "SUPABASE_URL", "SUPABASE_PUBLISHABLE_KEY", "SUPABASE_SERVICE_ROLE_KEY", "SUPABASE_INTAKE_SECRET"]) assert.equal(process.env[key], undefined);
   assert.deepEqual(await (await request("/__dev/health")).json(), {
     ok: true, mode: "fixture", persistence: "memory", externalWrites: false,
   });
@@ -114,6 +115,8 @@ test("application validation, pending publication gate, and rate limiting use ac
   assert.deepEqual(await (await post("/api/apply", body)).json(), { ok: true });
   const { members } = await (await request("/api/members")).json();
   assert.ok(!members.some((member) => member.name === body["full-name"]));
+  assert.equal((await post("/api/apply", body)).status, 200);
+  assert.equal((await post("/api/apply", body)).status, 200);
   assert.equal((await post("/api/apply", body)).status, 429);
 });
 

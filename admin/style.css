@@ -53,7 +53,7 @@ p {
   margin-top: 0;
 }
 h1 {
-  font: 300 clamp(2rem, 4vw, 3rem)/1.14 var(--font-display);
+  font: 300 clamp(2rem, 4vw, 3rem) / 1.14 var(--font-display);
   letter-spacing: -0.035em;
   margin-bottom: 1rem;
 }
@@ -422,7 +422,7 @@ footer {
 }
 @media (max-width: 850px) {
   .workspace {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .sidebar {
     border-right: 0;
@@ -440,11 +440,16 @@ footer {
   }
   .sidebar nav {
     flex-direction: row;
-    gap: 1.5rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
     margin-right: auto;
+    min-width: 0;
+    width: 100%;
   }
   .sidebar nav a {
-    gap: 1rem;
+    gap: 0.6rem;
+    flex: 1 1 40%;
+    min-width: 0;
   }
   .sidebar button {
     min-height: 44px;
@@ -563,4 +568,51 @@ footer {
   .desk-label {
     display: none;
   }
+}
+
+#content-management .detail-card {
+  margin-top: 1.5rem;
+}
+.editor-field {
+  display: grid;
+  gap: 0.5rem;
+  margin-bottom: 1.1rem;
+  min-width: 0;
+}
+textarea {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  resize: vertical;
+}
+textarea:focus-visible {
+  outline: 2px solid var(--forest);
+  outline-offset: 3px;
+}
+.contribution-editor fieldset {
+  border: 1px solid var(--line);
+  padding: 1rem;
+  margin: 1rem 0;
+  min-width: 0;
+}
+.contributor-option {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin: 0.7rem 0;
+}
+.contributor-option input {
+  width: auto;
+  flex: 0 0 auto;
+}
+.application-row a,
+.detail-card h2,
+.detail-card p {
+  overflow-wrap: anywhere;
 }
