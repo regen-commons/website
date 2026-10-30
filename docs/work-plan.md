@@ -51,7 +51,8 @@ entry, and authenticated application/member reads succeeded; no public provider
 cutover has occurred. Dashboard design alignment uses shared website tokens and
 self-hosted dashboard fonts on `codex/steward-smtp-design`. It reuses the website's
 mycelium logo in still mode. Gmail desktop feedback prompted a table-based email
-layout; the revised email is delivered and awaits a client formatting check.
+layout; the revised email is delivered and the recipient confirmed correct
+padding in Gmail desktop.
 
 **Next boundary:** deploy the verified steward surface, then agree
 acceptance/publication authority and migration scope. The remaining

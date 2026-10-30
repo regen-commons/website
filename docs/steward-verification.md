@@ -118,7 +118,9 @@ depended on an HTML5 `main` element. The revised template uses presentation
 tables, inline cell padding with `cellpadding` fallbacks, and an Outlook width
 fallback. A synthetic 390px browser preview has 40px left content spacing and no
 horizontal overflow. Supabase saved the revision, and Resend confirms a second
-real email was delivered. Final Gmail rendering confirmation is still pending.
+real email was delivered. The recipient confirmed that padding is now correct
+in Gmail desktop.
+
 Exact hosted origins/redirects remain a deployment prerequisite.
 
 Vercel routing/security headers remain unverified in deployment because this

@@ -121,9 +121,10 @@ applications or profiles were imported for the test.
 
 Gmail desktop displayed the original template without its intended padding.
 The template now uses presentation tables, inline cell padding, and a fixed-width
-Outlook fallback. A fresh code email was delivered after that update; final
-Gmail rendering confirmation is pending. The dashboard also reuses the public
-website's `logo-canvas.js` artwork in still mode, with the same circle and wordmark.
+Outlook fallback. A fresh code email was delivered after that update, and the
+recipient confirmed correct padding in Gmail desktop. The dashboard also reuses
+the public website's `logo-canvas.js` artwork in still mode, with the same circle
+and wordmark.
 
 The email provider currently uses eight-digit OTPs with a 3,600-second expiry.
 Public signup is enabled at the project level; the dashboard's own requests use
