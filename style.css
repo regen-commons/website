@@ -4,77 +4,7 @@
   Reference: Decompose the Empire / Cykofa / alifeelectric parallax layers
 */
 
-/* ── TOKENS ──────────────────────────────────────────────────────────────── */
-:root {
-  --font-serif: 'Source Serif 4', Georgia, serif;
-  --font-display: 'Fraunces', Georgia, serif;
-  --font-sans: 'Space Grotesk', system-ui, sans-serif;
-  --font-mono:  'Courier New', Courier, monospace;
-  --pad: clamp(1.8rem, 6vw, 5rem);
-  --card-radius: 2px;
-}
-
-/* ── DARK THEME — default (Decompose the Empire — botanical darkness) ── */
-:root {
-  --paper:      #0D100A;
-  --parchment:  #141810;
-  --vellum:     #1C2118;
-
-  --ink:        #E2DAC8;
-  --ink-mid:    #B8AE96;
-  --ink-dim:    #787060;
-
-  --forest:     #7AAA6A;
-  --moss:       #8EC472;
-  --circuit:    #6A9A78;
-  --sage:       #A5C490;
-
-  --copper:     #C47838;
-  --gold:       #D4A030;
-  --amber:      #E07830;
-
-  --signal:     #5AACCC;
-  --teal:       #48B890;
-
-  --copper-rgb: 196, 120, 56;
-  --forest-rgb: 122, 170, 106;
-  --gold-rgb: 212, 160, 48;
-  --teal-rgb: 72, 184, 144;
-  --forest-glow: rgba(122, 170, 106, 0.10);
-  --grain-blend: screen;
-  --grain-opacity: 0.12;
-}
-
-/* ── LIGHT THEME (warm vellum field notebook) ──────────────────────────── */
-[data-theme="light"] {
-  --paper:      #EDE5D4;
-  --parchment:  #E0D6C0;
-  --vellum:     #D2C5AA;
-
-  --ink:        #1A1408;
-  --ink-mid:    #4A3E2C;
-  --ink-dim:    #8A7A60;
-
-  --forest:     #1E3A10;
-  --moss:       #3C6618;
-  --circuit:    #4A7A58;
-  --sage:       #7A9A60;
-
-  --copper:     #944818;
-  --gold:       #A87010;
-  --amber:      #C05210;
-
-  --signal:     #2A6888;
-  --teal:       #1A7860;
-
-  --copper-rgb: 148, 72, 24;
-  --forest-rgb: 30, 58, 16;
-  --gold-rgb: 168, 112, 16;
-  --teal-rgb: 26, 120, 96;
-  --forest-glow: rgba(30, 58, 16, 0.12);
-  --grain-blend: multiply;
-  --grain-opacity: 0.35;
-}
+@import url("./design-tokens.css");
 
 /* ── PER-PAGE ACCENT — one dominant color per page ─────────────────────── */
 body[data-page="landing"]     { --accent: var(--forest); --accent-rgb: var(--forest-rgb); }

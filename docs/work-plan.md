@@ -41,13 +41,21 @@ for seed and application writes remains follow-up work in item 3.
 
 **Updated direction:** Supabase and `/admin` email-code access are confirmed;
 Directus is not part of the plan. The [read-only dashboard slice](steward-dashboard.md)
-is implemented on `codex/steward-dashboard`. Its schema and PostgreSQL access
+was merged in [PR #3](https://github.com/regen-commons/website/pull/3), after the
+foundation PRs. Its schema and PostgreSQL access
 tests ran against Regen Commons / Website. Local auth and review flows use
-synthetic fixtures. Live Auth SMTP/code templates, named steward provisioning,
-and delivery remain unverified; no public provider cutover has occurred.
+synthetic fixtures. Resend's `auth.regencommons.com` domain is verified, custom
+SMTP and the code template are saved, and the approved steward is provisioned.
+Resend confirms real test-code delivery. The approved steward completed code
+entry, and authenticated application/member reads succeeded; no public provider
+cutover has occurred. Dashboard design alignment uses shared website tokens and
+self-hosted dashboard fonts on `codex/steward-smtp-design`. It reuses the website's
+mycelium logo in still mode. Gmail desktop feedback prompted a table-based email
+layout; the revised email is delivered and the recipient confirmed correct
+padding in Gmail desktop.
 
-**Next boundary:** establish real steward login in an authorized test environment,
-then agree acceptance/publication authority and migration scope. The remaining
+**Next boundary:** deploy the verified steward surface, then agree
+acceptance/publication authority and migration scope. The remaining
 Notion work below is source inventory/export and reconciliation, not investment
 in a lasting replacement development database. Preserve separate acceptance and
 publication until council policy is agreed.

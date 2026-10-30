@@ -13,6 +13,8 @@
   if (!canvas) return;
 
   var ctx = canvas.getContext("2d");
+  // Steward pages reuse the website's mark without a continuous animation.
+  var staticMark = canvas.hasAttribute("data-static");
   var S = 76;
   var CX = S / 2, CY = S / 2;
   var R = 34; // circle radius
@@ -57,11 +59,12 @@
     pal = PALETTES[theme];
     ctx.clearRect(0, 0, S, S);
     branches = [];
+    if (staticMark) renderStatic();
   });
 
   // Hover detection on the logo-mark container
   var logoMark = canvas.closest(".logo-mark");
-  if (logoMark) {
+  if (logoMark && !staticMark) {
     logoMark.addEventListener("mouseenter", function () { isHovered = true; });
     logoMark.addEventListener("mouseleave", function () { isHovered = false; });
   }
@@ -178,7 +181,7 @@
   }
 
   function loop() {
-    requestAnimationFrame(loop);
+    if (!staticMark) requestAnimationFrame(loop);
 
     // Fade slower on hover so the network fills and persists
     ctx.fillStyle = isHovered ? pal.fadeHover : pal.fade;
@@ -203,7 +206,19 @@
     branches = branches.filter(function (b) { return b.opacity > 0.01; });
   }
 
-  spawnBranch();
-  spawnBranch();
-  loop();
+  function renderStatic() {
+    ctx.clearRect(0, 0, S, S);
+    branches = [];
+    spawnTimer = 0;
+    spawnBranch();
+    spawnBranch();
+    for (var frame = 0; frame < 120; frame++) loop();
+  }
+
+  if (staticMark) renderStatic();
+  else {
+    spawnBranch();
+    spawnBranch();
+    loop();
+  }
 })();
