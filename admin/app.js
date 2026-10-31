@@ -32,6 +32,8 @@
       "This email has reached its three-attempt limit. Check the failure reason and Resend.",
     manual_review_required:
       "This email needs manual review in Resend before another send.",
+    email_retry_not_configured:
+      "Email retries are not configured. Ask an administrator to check the sending service.",
   };
   let signedIn = false,
     loginEmail = "",
@@ -442,7 +444,7 @@
     const blocks = {
       already_sent: "Accepted emails cannot be retried here.",
       retry_window_expired:
-        "Retry closed: more than 24 hours since this email was queued. Check Resend manually.",
+        "Retry closed: the safe sending window has ended. Check Resend manually.",
       retry_limit_reached:
         "Retry closed: three attempts have been made. Check Resend manually.",
       notification_busy:

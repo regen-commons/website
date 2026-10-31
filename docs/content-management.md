@@ -222,24 +222,29 @@ It does not change the membership receipt template or membership decision rules.
 **Retry receipt email** and **Retry steward email** send only their selected saved
 job. The database checks the active steward role and live Auth session, application
 identity, current attempt count, and lease under a row lock. It retains the original
-`membership/<job ID>` Resend idempotency key and the three-attempt / 24-hour limits.
+`membership/<job ID>` Resend idempotency key and the three-attempt / 24-hour limits. New claims stop one minute
+early to leave time for bounded network calls.
 Fresh in-flight attempts, accepted messages, stale commands, exhausted jobs and
 expired windows are rejected. An abandoned email lease can be reclaimed after five
 minutes within the original window. Attempts are never reset, and Telegram cannot
-be retried through this action. A retry records the actor and time. The recipient
+be retried through this action. A retry records the actor and time. Only the server-held intake capability can
+record its provider outcome, including if the initiating session ends after the
+send. The recipient
 comes from the saved application, not the browser command.
 
-Apply `20261030081846_steward_email_delivery.sql` before deploying this branch.
+Apply `20261031001734_steward_email_delivery.sql` before deploying this branch.
 The previous worker API remains compatible during rollout, but older runtime code
 cannot record new provider diagnostics. No historical status or message ID is
-backfilled. The migration is prepared in this PR; production application and live
-retry verification require a separate release. No scheduled worker or Resend
+backfilled. The reviewed migration is applied to Regen Commons / Website under hosted
+version `20261031001734`; the local filename matches that migration history.
+Runtime release and live retry verification are recorded in the PR. No scheduled worker or Resend
 webhook is introduced.
 
 The disposable database checks in
 [notification-access.sql](../supabase/tests/notification-access.sql) exercise
 private projections, non-steward denial, metadata spoofing, role/session revocation,
-lease ownership, stale commands, retry limits and provider-result persistence.
+lease fencing, stale commands, retry limits, session expiry during sending,
+active-lease cleanup and provider-result persistence.
 Node transport tests use synthetic Resend responses; the default fixture dashboard
 simulates a failed receipt, an accepted steward email, an expired window and an
 empty imported ledger without making external calls.

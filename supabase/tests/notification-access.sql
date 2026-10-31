@@ -38,7 +38,7 @@ set local role authenticated;
 do $$ begin
  begin perform public.application_notifications('a1000000-0000-4000-8000-000000000001'); raise exception 'visitor read allowed'; exception when sqlstate 'PT403' then null; end;
  begin perform public.retry_notification('a1000000-0000-4000-8000-000000000001','b1000000-0000-4000-8000-000000000001',1); raise exception 'visitor retry allowed'; exception when sqlstate 'PT403' then null; end;
- begin perform public.complete_notification_retry('b1000000-0000-4000-8000-000000000001',null,'sent',null,null); raise exception 'visitor completion allowed'; exception when sqlstate 'PT403' then null; end;
+ begin perform public.notification_result('synthetic-secret','b1000000-0000-4000-8000-000000000001',null,'sent',null,null); raise exception 'visitor completion allowed'; exception when insufficient_privilege then null; end;
 end $$;
 reset role;
 set local request.jwt.claims='{"sub":"91000000-0000-4000-8000-000000000001","session_id":"92000000-0000-4000-8000-000000000001"}';
@@ -60,21 +60,19 @@ set local role authenticated;
 do $$ begin
  begin perform public.retry_notification('a1000000-0000-4000-8000-000000000001','b1000000-0000-4000-8000-000000000001',1); raise exception 'duplicate stale command accepted'; exception when sqlstate 'PT409' then null; end;
  begin perform public.retry_notification('a1000000-0000-4000-8000-000000000001','b1000000-0000-4000-8000-000000000001',2); raise exception 'in-flight retry accepted'; exception when sqlstate 'PT409' then null; end;
- begin perform public.complete_notification_retry('b1000000-0000-4000-8000-000000000001',gen_random_uuid(),'sent',null,null); raise exception 'incorrect lease completed'; exception when sqlstate 'PT409' then null; end;
+ begin perform public.notification_result('synthetic-secret','b1000000-0000-4000-8000-000000000001',current_setting('test.notification_lease')::uuid,'sent','c1000000-0000-4000-8000-000000000002',null); raise exception 'steward forged a provider result'; exception when insufficient_privilege then null; end;
  begin perform public.retry_notification('a1000000-0000-4000-8000-000000000003','b1000000-0000-4000-8000-000000000003',3); raise exception 'attempt limit bypassed'; exception when sqlstate 'PT409' then null; end;
  begin perform public.retry_notification('a1000000-0000-4000-8000-000000000004','b1000000-0000-4000-8000-000000000004',1); raise exception '24 hour boundary bypassed'; exception when sqlstate 'PT409' then null; end;
  begin perform public.retry_notification('a1000000-0000-4000-8000-000000000005','b1000000-0000-4000-8000-000000000005',1); raise exception 'active lease bypassed'; exception when sqlstate 'PT409' then null; end;
 end $$;
 reset role;
-set local request.jwt.claims='{"sub":"91000000-0000-4000-8000-000000000003","session_id":"92000000-0000-4000-8000-000000000003"}';
-set local role authenticated;
+set local role anon;
 do $$ begin
- begin perform public.complete_notification_retry('b1000000-0000-4000-8000-000000000001',current_setting('test.notification_lease')::uuid,'sent',null,null); raise exception 'other steward completed the lease'; exception when sqlstate 'PT409' then null; end;
+ begin perform public.notification_result('synthetic-secret','b1000000-0000-4000-8000-000000000001',gen_random_uuid(),'sent',null,null); raise exception 'incorrect lease completed'; exception when sqlstate 'PT409' then null; end;
 end $$;
+select public.notification_result('synthetic-secret','b1000000-0000-4000-8000-000000000001',current_setting('test.notification_lease')::uuid,'sent','c1000000-0000-4000-8000-000000000002',null);
 reset role;
-set local request.jwt.claims='{"sub":"91000000-0000-4000-8000-000000000001","session_id":"92000000-0000-4000-8000-000000000001"}';
 set local role authenticated;
-select public.complete_notification_retry('b1000000-0000-4000-8000-000000000001',current_setting('test.notification_lease')::uuid,'sent','c1000000-0000-4000-8000-000000000002',null);
 do $$ begin
  begin perform public.retry_notification('a1000000-0000-4000-8000-000000000001','b1000000-0000-4000-8000-000000000001',2); raise exception 'accepted email resent'; exception when sqlstate 'PT409' then null; end;
 end $$;
@@ -106,8 +104,24 @@ reset role;
 delete from auth.sessions where id='92000000-0000-4000-8000-000000000001';
 set local role authenticated;
 do $$ begin
- begin perform public.complete_notification_retry('b1000000-0000-4000-8000-000000000006',current_setting('test.notification_lease')::uuid,'sent',null,null); raise exception 'revoked session completion allowed'; exception when sqlstate 'PT403' then null; end;
+ begin perform public.notification_result('synthetic-secret','b1000000-0000-4000-8000-000000000006',current_setting('test.notification_lease')::uuid,'sent',null,null); raise exception 'client completion allowed'; exception when insufficient_privilege then null; end;
 end $$;
 reset role;
+-- Completion remains recordable after a session ends and another batch expires
+-- old queued work. Active leases must not be retired underneath a provider call.
+update private.notification_jobs set status='sending',created_at=now()-interval '25 hours',updated_at=now()
+ where id='b1000000-0000-4000-8000-000000000006';
+set local role anon;
+select public.notification_work('synthetic-secret','a1000000-0000-4000-8000-000000000002',null,null,null);
+select public.notification_result('synthetic-secret','b1000000-0000-4000-8000-000000000006',current_setting('test.notification_lease')::uuid,'sent','c1000000-0000-4000-8000-000000000003',null);
+reset role;
+select pg_temp.assert_true((select status='sent' from private.notification_jobs where id='b1000000-0000-4000-8000-000000000006'),'accepted result lost after session expiry or queue cleanup');
+update private.notification_jobs set created_at=now()-interval '23 hours 59 minutes 30 seconds',status='failed'
+ where id='b1000000-0000-4000-8000-000000000004';
+select pg_temp.assert_true((select private.email_retry_block(j)='retry_window_expired' from private.notification_jobs j where id='b1000000-0000-4000-8000-000000000004'),'network safety margin missing');
+set local role anon;
+select pg_temp.assert_true(jsonb_array_length(public.notification_work('synthetic-secret','a1000000-0000-4000-8000-000000000004',null,null,null))=0,'worker claimed outside safe send window');
+reset role;
+select pg_temp.assert_true(not exists(select 1 from pg_proc p join pg_namespace n on n.oid=p.pronamespace where p.proname='complete_notification_retry' and n.nspname in ('private','public')),'client-authored completion RPC exposed');
 rollback;
 select 'PASS: private email projection, active steward/session checks, safe result persistence, attempt/window limits, lease fencing, stale clicks, cross-application denial, acceptance deduplication; synthetic data rolled back' as result;

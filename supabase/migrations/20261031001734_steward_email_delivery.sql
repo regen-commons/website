@@ -15,13 +15,14 @@ alter table private.notification_jobs
 create index notification_retry_actor on private.notification_jobs(retry_actor_id);
 
 -- One rule for the steward's eligibility display and the locked retry command.
--- Stay inside Resend's 24-hour idempotency window; never reset the original clock.
+-- End claims a minute early so bounded network calls remain inside Resend's
+-- 24-hour idempotency window. Never reset the original clock.
 create function private.email_retry_block(j private.notification_jobs) returns text
 language sql stable security invoker set search_path='' as $$
   select case
     when j.channel not in ('receipt','steward') then 'email_only'
     when j.status='sent' or j.provider_message_id is not null then 'already_sent'
-    when j.created_at<=now()-interval '24 hours' then 'retry_window_expired'
+    when j.created_at<=now()-interval '24 hours'+interval '1 minute' then 'retry_window_expired'
     when j.attempts>=3 then 'retry_limit_reached'
     when j.status='sending' and j.updated_at>now()-interval '5 minutes' then 'notification_busy'
     when j.status not in ('pending','failed','skipped','sending') then 'manual_review_required'
@@ -103,26 +104,11 @@ end $$;
 create function public.retry_notification(p_application_id uuid,p_job_id uuid,p_attempts integer) returns jsonb
 language sql security invoker set search_path='' as $$ select private.retry_notification(p_application_id,p_job_id,p_attempts); $$;
 
-create function private.complete_notification_retry(p_job_id uuid,p_lease uuid,p_status text,p_provider_message_id uuid,p_failure_code text)
-returns jsonb language plpgsql security definer set search_path='' as $$
-begin
-  if not private.is_active_steward() then raise sqlstate 'PT403' using message='steward_required'; end if;
-  if not exists(select 1 from private.notification_jobs where id=p_job_id and retry_actor_id=auth.uid()
-    and lease_id=p_lease and channel in ('receipt','steward')) then
-    raise sqlstate 'PT409' using message='notification_lease_conflict'; end if;
-  return private.finish_notification(p_job_id,p_lease,p_status,p_provider_message_id,p_failure_code);
-end $$;
-create function public.complete_notification_retry(p_job_id uuid,p_lease uuid,p_status text,p_provider_message_id uuid,p_failure_code text)
-returns jsonb language sql security invoker set search_path='' as $$
-  select private.complete_notification_retry(p_job_id,p_lease,p_status,p_provider_message_id,p_failure_code);
-$$;
 revoke all on function private.application_notifications(uuid),public.application_notifications(uuid),
-  private.retry_notification(uuid,uuid,integer),public.retry_notification(uuid,uuid,integer),
-  private.complete_notification_retry(uuid,uuid,text,uuid,text),public.complete_notification_retry(uuid,uuid,text,uuid,text)
+  private.retry_notification(uuid,uuid,integer),public.retry_notification(uuid,uuid,integer)
   from public,anon,authenticated;
 grant execute on function private.application_notifications(uuid),public.application_notifications(uuid),
-  private.retry_notification(uuid,uuid,integer),public.retry_notification(uuid,uuid,integer),
-  private.complete_notification_retry(uuid,uuid,text,uuid,text),public.complete_notification_retry(uuid,uuid,text,uuid,text)
+  private.retry_notification(uuid,uuid,integer),public.retry_notification(uuid,uuid,integer)
   to authenticated;
 
 -- Preserve the existing worker API during rollout; record new attempt times
@@ -139,13 +125,15 @@ declare jobs jsonb; begin
   return '[]'::jsonb;
  end if;
  update private.notification_jobs set status='needs_review',updated_at=now()
-  where status in ('pending','failed','sending') and (created_at<now()-interval '24 hours'
-   or (channel='telegram' and status='sending' and updated_at<now()-interval '5 minutes'));
+  where (status in ('pending','failed') and created_at<now()-interval '24 hours')
+   or (status='sending' and updated_at<now()-interval '5 minutes'
+     and (created_at<now()-interval '24 hours' or channel='telegram'));
  with candidates as (
-  select id from private.notification_jobs where (p_application_id is null or application_id=p_application_id)
-   and created_at>now()-interval '24 hours' and attempts<3
-   and (status='pending' or (channel<>'telegram' and (status='failed' or (status='sending' and updated_at<now()-interval '5 minutes'))))
-  order by created_at,id for update skip locked limit 10
+  select j.id from private.notification_jobs j where (p_application_id is null or j.application_id=p_application_id)
+   and j.created_at>now()-interval '24 hours' and j.attempts<3
+   and ((j.channel='telegram' and j.status='pending')
+     or (j.channel<>'telegram' and j.status in ('pending','failed','sending') and private.email_retry_block(j) is null))
+  order by j.created_at,j.id for update skip locked limit 10
  ), claimed as (
   update private.notification_jobs j set status='sending',attempts=attempts+1,lease_id=gen_random_uuid(),updated_at=now(),last_attempt_at=now()
    from candidates c where j.id=c.id returning j.*

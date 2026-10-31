@@ -214,7 +214,7 @@ export function createStewardFixtures({
   ];
   function retryBlock(job) {
     if (job.status === "sent" || job.provider_message_id) return "already_sent";
-    if (Date.parse(job.created_at) <= now() - 86400000)
+    if (Date.parse(job.created_at) <= now() - 86400000 + 60000)
       return "retry_window_expired";
     if (job.attempts >= 3) return "retry_limit_reached";
     if (job.status === "sending" && Date.parse(job.updated_at) > now() - 300000)

@@ -153,13 +153,14 @@ test("failed retries retain a safe reason and stop at the attempt and time limit
   );
 });
 
-test("the real adapter sends only the claimed email and records its Resend ID using user-scoped RPCs", async () => {
+test("the adapter claims with the user session and records Resend results with the server capability", async () => {
   const calls = [],
     providerId = "60000000-0000-4000-8000-000000000009";
   const provider = createSupabaseProvider({
     url: "https://synthetic.supabase.co",
     key: "sb_publishable_synthetic",
     env: {
+      SUPABASE_INTAKE_SECRET: "synthetic-intake-secret",
       RESEND_API_KEY: "synthetic-resend-secret",
       RESEND_FROM_EMAIL: "membership@example.test",
     },
@@ -186,10 +187,16 @@ test("the real adapter sends only the claimed email and records its Resend ID us
     email: "forged@example.test",
   });
   for (const call of calls.filter((c) => c.url.includes("/rpc/"))) {
-    assert.equal(
-      new Headers(call.options.headers).get("Authorization"),
-      "Bearer synthetic-user-token",
+    const authorization = new Headers(call.options.headers).get(
+      "Authorization",
     );
+    if (call.url.includes("/notification_result")) {
+      assert.notEqual(authorization, "Bearer synthetic-user-token");
+      assert.equal(call.body.p_secret, "synthetic-intake-secret");
+    } else {
+      assert.equal(authorization, "Bearer synthetic-user-token");
+      assert.equal(call.body.p_secret, undefined);
+    }
     assert.doesNotMatch(
       JSON.stringify(call.body),
       /synthetic-resend-secret|forged@example/,
@@ -198,9 +205,7 @@ test("the real adapter sends only the claimed email and records its Resend ID us
   const send = calls.find((c) => c.url === "https://api.resend.com/emails");
   assert.deepEqual(send.body.to, ["saved@example.test"]);
   assert.equal(send.options.headers["Idempotency-Key"], `membership/${job_id}`);
-  const complete = calls.find((c) =>
-    c.url.includes("/complete_notification_retry"),
-  );
+  const complete = calls.find((c) => c.url.includes("/notification_result"));
   assert.equal(complete.body.p_provider_message_id, providerId);
   assert.equal(complete.body.p_failure_code, null);
 });
@@ -245,5 +250,75 @@ test("automatic receipt processing stores the provider result through the bounde
   assert.doesNotMatch(
     JSON.stringify(result.body),
     /synthetic-resend-secret|saved@example/,
+  );
+});
+
+test("accepted results are recorded even if the steward session expires during the send", async () => {
+  let sent = false,
+    recorded = false;
+  const provider = createSupabaseProvider({
+    url: "https://synthetic.supabase.co",
+    key: "sb_publishable_synthetic",
+    env: {
+      SUPABASE_INTAKE_SECRET: "synthetic-intake-secret",
+      RESEND_API_KEY: "synthetic",
+      RESEND_FROM_EMAIL: "sender@example.test",
+    },
+    request: async (url, options) => {
+      const path = String(url),
+        user =
+          new Headers(options.headers).get("Authorization") ===
+          "Bearer expires-during-send";
+      if (sent && user)
+        return Response.json(
+          { message: "Expired session", code: "PGRST301" },
+          { status: 401 },
+        );
+      if (path.includes("/retry_notification"))
+        return Response.json({
+          id: job_id,
+          lease_id: "lease",
+          application_id,
+          channel: "receipt",
+          email: "saved@example.test",
+        });
+      if (path === "https://api.resend.com/emails") {
+        sent = true;
+        return Response.json({ id: "60000000-0000-4000-8000-000000000011" });
+      }
+      if (path.includes("/notification_result")) {
+        recorded = true;
+        return Response.json([]);
+      }
+      return Response.json([]);
+    },
+  });
+  await assert.rejects(
+    provider.retryNotification("expires-during-send", {
+      application_id,
+      job_id,
+      attempts: 1,
+    }),
+  );
+  assert.equal(
+    recorded,
+    true,
+    "A later read may fail, but the provider outcome must already be saved",
+  );
+});
+
+test("missing retry completion capability fails before consuming an attempt", async () => {
+  const provider = createSupabaseProvider({
+    url: "https://synthetic.supabase.co",
+    key: "synthetic",
+    env: {},
+    request: () => {
+      throw new Error("Must not claim or send");
+    },
+  });
+  await assert.rejects(
+    provider.retryNotification("user", { application_id, job_id, attempts: 1 }),
+    (error) =>
+      error.status === 503 && error.message === "email_retry_not_configured",
   );
 });
