@@ -220,3 +220,30 @@ anonymous denial, closed private tables and no client completion endpoint. The
 64 Node tests, check, smoke and disposable SQL suites pass. The broad synthetic
 Auth/role mutation suite was not run in production. Native PostgreSQL CI, merge,
 deployment and the named-account email verification complete the release.
+# Membership review and profile management
+
+Separate draft PR from public-site polish. User confirmed one active steward may
+record review decisions, request changes, and reopen with a reason. Approval,
+membership standing, and visibility remain separate.
+
+- [x] Add transactional, revision-checked review and profile commands with
+  actor-scoped retry identities and private audit evidence.
+- [x] Preserve original answers and legacy visibility; initialize standing as
+  unconfirmed without inventing historical decisions.
+- [x] Add draft creation/linking, curated profile editing, affiliations, standing
+  and visibility controls to the steward desk.
+- [x] Add API and disposable SQL coverage for independent states, stale writes,
+  replay, private projections, validation, and current authorization.
+- [x] Check, all 71 Node tests, smoke, and all five SQL suites pass locally.
+  Browser checks cover 1280×800, 390×844 and 320×568; both themes, keyboard
+  submission/menu, required reasons, independent state changes, draft creation,
+  conflict recovery with retained values, and private-state clearing on sign-out.
+- [ ] Later authorized release: review/apply the migration, deploy, and verify
+  approved disposable records in the hosted environment. This is outside the draft PR task.
+
+The separate PR records publication and current-head CI results. Local screenshots
+are ignored artifacts under artifacts/membership-management; no real data or live
+messages were used.
+
+Contract, tradeoffs, and later release prerequisites:
+[membership management](membership-management.md).

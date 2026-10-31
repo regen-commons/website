@@ -14,7 +14,19 @@
     revision_conflict:
       "Someone changed this record. Reload to see the latest revision before trying again.",
     request_conflict:
-      "This save was already attempted with different content. Check the Contributions list before creating another entry.",
+      "This request was already saved with different content. Reload the record before making another change.",
+    invalid_membership_command:
+      "Check the required reason, selected state, and profile fields.",
+    invalid_profile:
+      "Check the profile fields. URLs must start with http:// or https://.",
+    invalid_affiliation:
+      "Affiliations must link an individual to an existing organization.",
+    profile_type_immutable:
+      "Member type cannot change after a profile is created.",
+    profile_type_mismatch: "The profile type must match the applicant type.",
+    invalid_review_transition:
+      "Reopen a completed decision before recording a different outcome.",
+    member_not_found: "This member profile could not be found.",
     invalid_contribution: "Check the title and field lengths, then try again.",
     content_not_found: "This content could not be found.",
     application_not_found: "This application could not be found.",
@@ -586,11 +598,14 @@
     update();
     return card;
   }
-  function renderDetail({ application, profile, history }) {
+  function renderDetail({ application, profile, history }, memberData) {
     $("view-title").textContent = application.display_name;
     $("view-description").textContent =
       `${label(application.applicant_type)} · Submitted ${date(application.submitted_at)} · Revision ${application.revision}`;
-    $("detail").append(link("← Back to membership requests", "#applications"));
+    $("detail").append(
+      link("← Back to membership requests", "#applications"),
+      membershipUI.applicationControls({ application, profile }, memberData),
+    );
     const grid = node("div", null, "detail-grid application-grid"),
       privateColumn = node("div", null, "application-answers"),
       publicColumn = node("div", null, "application-profile");
@@ -632,10 +647,24 @@
         node("h3", label(event.event_type)),
         node(
           "p",
-          `${date(event.created_at)} · Revision ${event.reviewed_revision}`,
+          `${date(event.created_at)} · Reviewed revision ${event.reviewed_revision}${event.actor_label ? " · " + event.actor_label : ""}${event.to_state && event.event_type !== "profile_linked" ? " · " + label(event.from_state) + " → " + label(event.to_state) : ""}`,
           "help",
         ),
         node("p", event.note),
+        ...(event.event_type === "profile_linked" && event.changes
+          ? [
+              node(
+                "p",
+                "Profile link: " +
+                  (memberData.members.find((m) => m.id === event.changes.before)
+                    ?.name || "None") +
+                  " → " +
+                  (memberData.members.find((m) => m.id === event.changes.after)
+                    ?.name || "None"),
+                "help",
+              ),
+            ]
+          : []),
       );
     privateColumn.append(answers, events);
     publicColumn.append(
@@ -659,10 +688,19 @@
     $("detail").append(grid);
   }
   function renderMembers(data) {
+    $("member-list").append(link("Create a draft profile →", "#members/new"));
     if (!data.members.length)
       $("member-list").append(node("p", "No curated members yet.", "empty"));
     for (const member of data.members) {
       const card = profileCard(member);
+      card.append(
+        node(
+          "p",
+          "Membership standing: " + label(member.membership_status),
+          "state-summary",
+        ),
+        link("Manage profile →", "#members/" + member.id),
+      );
       const affiliations = data.affiliations
         .filter((item) => item.member_id === member.id)
         .map(
@@ -737,7 +775,7 @@
       status.textContent = error.status
         ? error.message
         : "We couldn’t confirm this save. Keep this form open and retry, or check the list before creating another entry.";
-      if (error.code === "revision_conflict") {
+      if (["revision_conflict", "request_conflict"].includes(error.code)) {
         const reload = node("button", "Reload latest revision", "secondary");
         reload.type = "button";
         reload.addEventListener("click", loadView);
@@ -1015,6 +1053,15 @@
       root.append(history);
     }
   }
+  const membershipUI = window.createMembershipUI({
+    node,
+    link,
+    label,
+    date,
+    control,
+    performWrite,
+    loadView,
+  });
   async function loadView() {
     if (!signedIn) return;
     closeMenu();
@@ -1022,8 +1069,8 @@
     const current = generation;
     const route = location.hash.slice(1),
       detailId = route.startsWith("applications/") ? route.split("/")[1] : null;
-    const members = route === "members";
-    const [resource, contentId] = route.split("/");
+    const [resource, contentId, sourceApplicationId] = route.split("/");
+    const members = resource === "members";
     const managing = ["seeds", "contributions"].includes(resource);
     $("content-management").hidden = !managing;
     $("queue").hidden = managing || members || !!detailId;
@@ -1052,6 +1099,36 @@
     ).setAttribute("aria-current", "page");
     $("load-message").textContent = "Loading…";
     try {
+      if (members) {
+        const [memberData, detail, source] = await Promise.all([
+          api({ resource: "members" }),
+          contentId && contentId !== "new"
+            ? api({ resource: "member", id: contentId })
+            : null,
+          contentId === "new" && sourceApplicationId
+            ? api({ resource: "application", id: sourceApplicationId })
+            : null,
+        ]);
+        if (current !== generation || !signedIn) return;
+        $("member-list").className = contentId
+          ? "member-detail"
+          : "member-grid";
+        if (contentId) {
+          $("view-title").textContent =
+            detail?.member.name || "Create a draft profile";
+          $("view-description").textContent =
+            "Application approval, membership standing, and public visibility are managed separately.";
+          membershipUI.renderMember(
+            $("member-list"),
+            detail,
+            memberData,
+            source?.application,
+          );
+        } else renderMembers(memberData);
+        $("load-message").textContent = "";
+        if (!menuIsOpen()) $("view-title").focus();
+        return;
+      }
       if (managing) {
         if (contentId) {
           const [data, memberData] = await Promise.all([
@@ -1071,15 +1148,15 @@
         if (!menuIsOpen()) $("view-title").focus();
         return;
       }
-      const params = members
-        ? { resource: "members" }
-        : detailId
-          ? { resource: "application", id: detailId }
-          : { resource: "applications", ...filters, offset };
-      const data = await api(params);
+      const params = detailId
+        ? { resource: "application", id: detailId }
+        : { resource: "applications", ...filters, offset };
+      const [data, memberData] = await Promise.all([
+        api(params),
+        detailId ? api({ resource: "members" }) : null,
+      ]);
       if (current !== generation || !signedIn) return;
-      if (members) renderMembers(data);
-      else if (detailId) renderDetail(data);
+      if (detailId) renderDetail(data, memberData);
       else renderQueue(data);
       $("load-message").textContent = "";
       if (!menuIsOpen()) $("view-title").focus();

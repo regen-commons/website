@@ -621,6 +621,68 @@ footer {
   margin-bottom: 1.1rem;
   min-width: 0;
 }
+.membership-controls,
+.membership-state-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+  align-items: start;
+  margin-block: 1.5rem;
+}
+.member-detail {
+  max-width: 64rem;
+}
+.member-facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+.member-facts dt {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.member-facts dd {
+  margin: 0.35rem 0 0;
+}
+.member-detail > .detail-card,
+.member-detail > .profile-card {
+  margin-block: 1.5rem;
+}
+.membership-form fieldset {
+  border: 1px solid var(--line);
+  padding: 1rem;
+  margin-block: 1rem;
+  min-width: 0;
+}
+.membership-form :is(input, textarea, select) {
+  max-width: 100%;
+}
+.membership-form h2,
+.membership-controls summary {
+  margin-top: 0;
+}
+.membership-controls summary {
+  cursor: pointer;
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+}
+.state-summary {
+  font-family: var(--font-sans);
+  color: var(--ink);
+}
+.member-detail li {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+@media (max-width: 850px) {
+  .member-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .membership-controls,
+  .membership-state-grid {
+    grid-template-columns: 1fr;
+  }
+}
 .filters .editor-field {
   margin-bottom: 0;
 }

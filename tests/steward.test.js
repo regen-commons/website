@@ -182,7 +182,7 @@ test("revocation takes effect with an existing session and sign-out invalidates 
   assert.equal((await read("?resource=applications", cookie)).status, 401);
 });
 
-test("API rejects cross-origin, malformed and unsupported actions; no decision writes exist", async () => {
+test("API rejects cross-origin, malformed and unsupported shortcuts and role grants", async () => {
   const cookie = sessionCookie(await signIn());
   assert.equal(
     (
