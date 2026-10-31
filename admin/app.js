@@ -765,6 +765,7 @@
       const result = await api(null, body);
       if (current !== generation || !signedIn) return;
       done(result);
+      return { ok: true };
     } catch (error) {
       if (current !== generation || !signedIn) return;
       if ([401, 403].includes(error.status)) {
@@ -781,6 +782,7 @@
         reload.addEventListener("click", loadView);
         status.append(document.createTextNode(" "), reload);
       }
+      return { status: error.status, code: error.code };
     } finally {
       controls.forEach(
         ({ element, disabled }) => (element.disabled = disabled),

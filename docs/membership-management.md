@@ -1,9 +1,10 @@
 # Membership review and profile management
 
-This draft adds steward actions for private application review, curated member
+This feature adds steward actions for private application review, curated member
 profiles, membership standing, and profile visibility. It is separate from public
-site polish. The migration is prepared for review, not applied to production.
-Merge, deployment, real decisions, and member notifications are outside this PR.
+site polish. The reviewed migration is applied to Regen Commons / Website under
+hosted version 20261031024410. Runtime release and temporary-record verification
+are tracked in PR #9. No live member decisions or notification backfill are implied.
 
 ## Independent decisions
 
@@ -76,7 +77,10 @@ New standing and audit fields have no anonymous grants. Existing published field
 projections remain unchanged. Review and member histories paginate through provider
 limits. Private forms remain in memory, retain values on write failures, and clear
 on sign-out, lost authorization, navigation, or page exit. Uncertain requests retain
-their identity; reload the latest record before a different command.
+their exact command and identity. An uncertain save locks its values until retry
+recovers the outcome. A definitive validation failure allows correction. Profile
+revision and current affiliation choices are read in one PostgREST statement, so
+a stale directory response cannot silently overwrite newer relationship edits.
 
 ## Verification and release
 
@@ -85,9 +89,10 @@ belongs only in a disposable database and rolls back its synthetic records. CI
 applies every migration to PostgreSQL 17 and runs it alongside the existing suites.
 The owning work-plan entry records executed checks and browser evidence.
 
-Before a later release, review and apply
-[20261031013242_membership_management.sql](../supabase/migrations/20261031013242_membership_management.sql)
-to the intended Supabase project, inspect advisors, then deploy the matching API
-and dashboard. Verify independent states and public privacy boundaries with
-approved disposable records. Do not run the broad synthetic Auth/role suites in
+The applied
+[20261031024410_membership_management.sql](../supabase/migrations/20261031024410_membership_management.sql)
+matches the hosted migration history. Post-apply checks preserve the existing
+profile/application digests and published counts. Deploy the matching API and
+dashboard, then verify independent states and public privacy boundaries with
+authorized temporary records. Do not run the broad synthetic Auth/role suites in
 production or infer hosted verification from fixtures.

@@ -210,14 +210,20 @@ export function createSupabaseProvider({
     },
     async member(token, id) {
       const db = client(token);
-      const member = result(
+      // One PostgREST statement pairs editable affiliations with this revision.
+      // The separately loaded member directory is only a list of choices.
+      const record = result(
         await db
           .from("members")
-          .select(memberColumns)
+          .select(
+            memberColumns +
+              ",affiliations!affiliations_member_id_fkey(organization_id,organization:members!affiliations_organization_id_fkey(id,name))",
+          )
           .eq("id", id)
           .maybeSingle(),
       ).data;
-      if (!member) throw new AdminError(404, "member_not_found");
+      if (!record) throw new AdminError(404, "member_not_found");
+      const { affiliations = [], ...member } = record;
       const history = await auditRows(
         db,
         "member_events",
@@ -225,7 +231,11 @@ export function createSupabaseProvider({
         "member_id",
         id,
       );
-      return { member, history };
+      return {
+        member,
+        history,
+        organizations: affiliations.map((a) => a.organization),
+      };
     },
     async membershipCommand(token, requestId, command) {
       return result(

@@ -37,6 +37,12 @@ export function membershipFixtures({
       if (!member) throw new AdminError(404, "member_not_found");
       return structuredClone({
         member,
+        organizations: relationships.affiliations
+          .filter((a) => a.member_id === id)
+          .map((a) => {
+            const org = members.find((m) => m.id === a.organization_id);
+            return { id: org.id, name: org.name };
+          }),
         history: memberEvents.filter((e) => e.member_id === id),
       });
     },

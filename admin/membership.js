@@ -1,4 +1,21 @@
 /* Private steward forms. Persistence and authority stay behind /api/admin. */
+window.createMembershipSubmission = function () {
+  let pending = null;
+  return async (makeCommand, send) => {
+    pending ||= structuredClone(makeCommand());
+    const outcome = await send(pending);
+    // A transport/server failure may follow a committed write. Recover that
+    // exact command before allowing another payload with its request identity.
+    if (
+      outcome?.ok ||
+      (outcome?.status >= 400 &&
+        outcome.status < 500 &&
+        outcome.code !== "request_conflict")
+    )
+      pending = null;
+    return { uncertain: pending !== null };
+  };
+};
 window.createMembershipUI = function ({
   node,
   link,
@@ -54,17 +71,31 @@ window.createMembershipUI = function ({
     status.setAttribute("role", "status");
     el.append(button, status);
     const requestId = crypto.randomUUID();
-    el.addEventListener("submit", (event) => {
+    const submit = window.createMembershipSubmission();
+    const inputs = [...el.querySelectorAll("input,textarea,select")].map(
+      (element) => ({ element, disabled: element.disabled }),
+    );
+    el.addEventListener("submit", async (event) => {
       event.preventDefault();
-      performWrite(
-        el,
-        {
+      const { uncertain } = await submit(
+        () => ({
           ...command(new FormData(el)),
           request_id: requestId,
           reason: reason.value,
-        },
-        done,
+        }),
+        (body) => performWrite(el, body, done),
       );
+      if (!el.isConnected) return;
+      inputs.forEach(({ element, disabled }) => {
+        element.disabled = uncertain || disabled;
+      });
+      button.textContent = uncertain ? "Retry previous save" : title;
+      if (uncertain)
+        status.append(
+          document.createTextNode(
+            " The last save is uncertain. Values are locked; retry the previous save before making another change.",
+          ),
+        );
     });
     return el;
   }
@@ -221,7 +252,7 @@ window.createMembershipUI = function ({
     }
     return root;
   }
-  function editor(member, data, application) {
+  function editor(member, data, application, currentOrganizations) {
     const el = form(
       member ? "Edit curated profile" : "Create a draft profile",
       member?.publication_state === "published"
@@ -288,16 +319,20 @@ window.createMembershipUI = function ({
         "help",
       ),
     );
-    for (const org of data.members.filter(
-      (m) => m.member_type === "organization",
-    )) {
+    const organizations = new Map(
+      data.members
+        .filter((m) => m.member_type === "organization")
+        .map((m) => [m.id, m]),
+    );
+    for (const org of currentOrganizations) organizations.set(org.id, org);
+    for (const org of organizations.values()) {
       const caption = node("label", null, "contributor-option"),
         checkbox = node("input");
       checkbox.type = "checkbox";
       checkbox.name = "organization_ids";
       checkbox.value = org.id;
-      checkbox.checked = data.affiliations.some(
-        (a) => a.member_id === member?.id && a.organization_id === org.id,
+      checkbox.checked = currentOrganizations.some(
+        (current) => current.id === org.id,
       );
       caption.append(checkbox, document.createTextNode(org.name));
       affiliations.append(caption);
@@ -414,7 +449,7 @@ window.createMembershipUI = function ({
           "help",
         ),
       );
-    root.append(editor(member, data, application));
+    root.append(editor(member, data, application, detail?.organizations || []));
     if (member) root.append(history(detail.history));
   }
   return { applicationControls, renderMember };

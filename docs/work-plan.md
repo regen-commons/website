@@ -234,12 +234,15 @@ membership standing, and visibility remain separate.
   and visibility controls to the steward desk.
 - [x] Add API and disposable SQL coverage for independent states, stale writes,
   replay, private projections, validation, and current authorization.
-- [x] Check, all 71 Node tests, smoke, and all five SQL suites pass locally.
+- [x] Check, all 74 Node tests, smoke, and all five SQL suites pass locally.
   Browser checks cover 1280×800, 390×844 and 320×568; both themes, keyboard
   submission/menu, required reasons, independent state changes, draft creation,
   conflict recovery with retained values, and private-state clearing on sign-out.
-- [ ] Later authorized release: review/apply the migration, deploy, and verify
-  approved disposable records in the hosted environment. This is outside the draft PR task.
+- [x] PR #9 review fixes preserve a revision-consistent affiliation snapshot and
+  replay the original command after uncertain saves. All 74 tests pass.
+- [x] Applied hosted migration 20261031024410; prior member/application digests
+  and all 19 published profiles are unchanged. Standing is unconfirmed for all 24 profiles.
+- [ ] Finish the authorized PR #9 merge/deployment and temporary-record verification.
 
 The separate PR records publication and current-head CI results. Local screenshots
 are ignored artifacts under artifacts/membership-management; no real data or live
