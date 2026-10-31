@@ -139,6 +139,14 @@ export function membershipCommand(body) {
             : ["draft", "published", "hidden"];
       if (!states.includes(body.state)) fail();
       command.state = body.state;
+      if (body.action === "review-application" && body.state !== "pending") {
+        fields.push("applicant_message");
+        command.applicant_message = text(
+          body.applicant_message,
+          4000,
+          body.state === "changes_requested",
+        );
+      }
     }
   }
   if (

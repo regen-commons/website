@@ -41,19 +41,19 @@ select pg_temp.expect_error($q$select * from private.membership_requests$q$,'425
 
 -- Approval neither activates nor publishes; replay is exactly once.
 select public.membership_command('a5000000-0000-4000-8000-000000000001',
- '{"action":"review-application","id":"a4000000-0000-4000-8000-000000000001","revision":1,"state":"approved","reason":"Reviewed this exact revision"}');
+ '{"action":"review-application","id":"a4000000-0000-4000-8000-000000000001","revision":1,"state":"approved","reason":"Reviewed this exact revision","applicant_message":""}');
 select public.membership_command('a5000000-0000-4000-8000-000000000001',
- '{"action":"review-application","id":"a4000000-0000-4000-8000-000000000001","revision":1,"state":"approved","reason":"Reviewed this exact revision"}');
+ '{"action":"review-application","id":"a4000000-0000-4000-8000-000000000001","revision":1,"state":"approved","reason":"Reviewed this exact revision","applicant_message":""}');
 select pg_temp.assert_true((select review_state='approved' and revision=2 and original_answers->>'constraints'='private original evidence' from public.applications where id='a4000000-0000-4000-8000-000000000001'),'approval corrupted evidence');
 select pg_temp.assert_true((select membership_status='unconfirmed' and publication_state='published' and revision=1 from public.members where id='a3000000-0000-4000-8000-000000000001'),'approval changed membership or visibility');
 select pg_temp.assert_true((select count(*)=1 from public.review_events where application_id='a4000000-0000-4000-8000-000000000001'),'replay recorded two decisions');
 select pg_temp.assert_true((select reviewed_revision=1 and resulting_revision=2 and actor_label='membership-steward@example.test' from public.review_events where application_id='a4000000-0000-4000-8000-000000000001'),'decision lacks exact revision or actor');
-select pg_temp.expect_error($q$select public.membership_command('a5000000-0000-4000-8000-000000000001','{"action":"review-application","id":"a4000000-0000-4000-8000-000000000001","revision":1,"state":"declined","reason":"Different"}')$q$,'PT409');
-select pg_temp.expect_error($q$select public.membership_command(gen_random_uuid(),'{"action":"review-application","id":"a4000000-0000-4000-8000-000000000001","revision":1,"state":"approved","reason":"Stale"}')$q$,'PT409');
-select pg_temp.expect_error($q$select public.membership_command(gen_random_uuid(),'{"action":"review-application","id":"a4000000-0000-4000-8000-000000000001","revision":2,"state":"declined","reason":"Must reopen"}')$q$,'PT409');
+select pg_temp.expect_error($q$select public.membership_command('a5000000-0000-4000-8000-000000000001','{"action":"review-application","id":"a4000000-0000-4000-8000-000000000001","revision":1,"state":"declined","reason":"Different","applicant_message":""}')$q$,'PT409');
+select pg_temp.expect_error($q$select public.membership_command(gen_random_uuid(),'{"action":"review-application","id":"a4000000-0000-4000-8000-000000000001","revision":1,"state":"approved","reason":"Stale","applicant_message":""}')$q$,'PT409');
+select pg_temp.expect_error($q$select public.membership_command(gen_random_uuid(),'{"action":"review-application","id":"a4000000-0000-4000-8000-000000000001","revision":2,"state":"declined","reason":"Must reopen","applicant_message":""}')$q$,'PT409');
 select public.membership_command(gen_random_uuid(),'{"action":"review-application","id":"a4000000-0000-4000-8000-000000000001","revision":2,"state":"pending","reason":"Reopen deliberately"}');
-select public.membership_command(gen_random_uuid(),'{"action":"review-application","id":"a4000000-0000-4000-8000-000000000001","revision":3,"state":"changes_requested","reason":"Need clarification"}');
-select public.membership_command(gen_random_uuid(),'{"action":"review-application","id":"a4000000-0000-4000-8000-000000000001","revision":4,"state":"declined","reason":"Record separate decision"}');
+select public.membership_command(gen_random_uuid(),'{"action":"review-application","id":"a4000000-0000-4000-8000-000000000001","revision":3,"state":"changes_requested","reason":"Need clarification","applicant_message":"Please clarify your contribution."}');
+select public.membership_command(gen_random_uuid(),'{"action":"review-application","id":"a4000000-0000-4000-8000-000000000001","revision":4,"state":"declined","reason":"Record separate decision","applicant_message":""}');
 
 -- Independent member commands and conflicting profile edits.
 select public.membership_command(gen_random_uuid(),'{"action":"set-membership-status","id":"a3000000-0000-4000-8000-000000000001","revision":1,"state":"active","reason":"Explicitly confirmed standing"}');
@@ -96,7 +96,7 @@ select pg_temp.expect_error($q$select public.membership_command(gen_random_uuid(
 select pg_temp.expect_error($q$select public.membership_command(gen_random_uuid(),'{"action":"save-profile","reason":"Unsafe URL","payload":{"name":"Bad profile","member_type":"individual","location":"","summary":"","vision":"","website":"javascript:alert(1)","avatar":"","focus_areas":[],"contribution_areas":[],"organization_ids":[]}}')$q$,'PT400');
 select pg_temp.expect_error($q$select public.membership_command(gen_random_uuid(),'{"action":"save-profile","reason":"Bad affiliation","payload":{"name":"Bad profile","member_type":"individual","location":"","summary":"","vision":"","website":"","avatar":"","focus_areas":[],"contribution_areas":[],"organization_ids":["a3000000-0000-4000-8000-000000000001"]}}')$q$,'PT400');
 reset role;
-select pg_temp.assert_true((select count(*)=0 from private.notification_jobs),'membership commands queued messages');
+select pg_temp.assert_true((select count(*)=3 from private.notification_jobs where channel='decision'),'explicit decisions did not queue exactly three messages');
 select pg_temp.assert_true((select count(*)=1 from private.steward_roles),'membership commands granted access');
 set local role anon;
 select pg_temp.assert_true((select count(*)=0 from public.website_members where name in ('Updated synthetic person','New curated organization')),'hidden or draft profile leaked');

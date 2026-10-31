@@ -16,7 +16,11 @@
     request_conflict:
       "This request was already saved with different content. Reload the record before making another change.",
     invalid_membership_command:
-      "Check the required reason, selected state, and profile fields.",
+      "Check the private reason, applicant message, selected state, and profile fields.",
+    invalid_applicant_message:
+      "Add a message when requesting changes. Applicant messages must be 4,000 characters or fewer.",
+    decision_superseded:
+      "A newer review decision replaced this email. It cannot be sent again.",
     invalid_profile:
       "Check the profile fields. URLs must start with http:// or https://.",
     invalid_affiliation:
@@ -431,6 +435,7 @@
       failed: "Failed",
       skipped: "Not sent",
       needs_review: "Needs review",
+      superseded: "Superseded",
     };
     const reasons = {
       resend_not_configured: "Email sending is not configured.",
@@ -454,6 +459,8 @@
         "The connection failed before the send outcome was confirmed.",
     };
     const blocks = {
+      decision_superseded:
+        "A newer review decision replaced this email. No further attempt will be made.",
       already_sent: "Accepted emails cannot be retried here.",
       retry_window_expired:
         "Retry closed: the safe sending window has ended. Check Resend manually.",
@@ -493,14 +500,27 @@
             title =
               job.channel === "receipt"
                 ? "Membership receipt"
-                : "Steward notification",
+                : job.channel === "decision"
+                  ? `${label(job.decision_state)} email · Revision ${job.decision_revision}`
+                  : "Steward notification",
             list = node("dl");
           entry.append(
             node("h3", title),
             node("span", states[job.status] || "Unknown", "badge"),
           );
-          if (job.channel === "receipt")
-            entry.append(node("p", application.email, "help email-recipient"));
+          if (["receipt", "decision"].includes(job.channel))
+            entry.append(
+              node(
+                "p",
+                job.recipient || application.email,
+                "help email-recipient",
+              ),
+            );
+          if (job.applicant_message)
+            entry.append(
+              node("p", "Message to applicant", "help"),
+              node("p", job.applicant_message, "applicant-message"),
+            );
           list.append(
             node("dt", "Attempts"),
             node("dd", `${job.attempts} of 3`),
@@ -548,7 +568,11 @@
               "button",
               job.channel === "receipt"
                 ? "Retry receipt email"
-                : "Retry steward email",
+                : job.channel === "decision"
+                  ? job.attempts
+                    ? "Retry decision email"
+                    : "Send decision email"
+                  : "Retry steward email",
               "secondary",
             );
             retry.type = "button";
@@ -651,6 +675,12 @@
           "help",
         ),
         node("p", event.note),
+        ...(event.applicant_message
+          ? [
+              node("p", "Message to applicant", "help"),
+              node("p", event.applicant_message, "applicant-message"),
+            ]
+          : []),
         ...(event.event_type === "profile_linked" && event.changes
           ? [
               node(

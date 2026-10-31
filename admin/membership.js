@@ -56,7 +56,13 @@ window.createMembershipUI = function ({
     el.append(node("h2", title), node("p", help, "help"));
     return el;
   }
-  function finish(el, title, command, done = loadView) {
+  function finish(
+    el,
+    title,
+    command,
+    done = loadView,
+    buttonLabel = () => title,
+  ) {
     const reason = control(
       el,
       title.replaceAll(" ", "-").toLowerCase() + "-reason",
@@ -65,7 +71,7 @@ window.createMembershipUI = function ({
       { required: true, max: 1000, multiline: true },
     );
     reason.rows = 2;
-    const button = node("button", title),
+    const button = node("button", buttonLabel()),
       status = node("p");
     button.type = "submit";
     status.setAttribute("role", "status");
@@ -89,7 +95,7 @@ window.createMembershipUI = function ({
       inputs.forEach(({ element, disabled }) => {
         element.disabled = uncertain || disabled;
       });
-      button.textContent = uncertain ? "Retry previous save" : title;
+      button.textContent = uncertain ? "Retry previous save" : buttonLabel();
       if (uncertain)
         status.append(
           document.createTextNode(
@@ -103,7 +109,7 @@ window.createMembershipUI = function ({
     const root = node("section", null, "membership-controls");
     const review = form(
       "Application review",
-      "This records a decision on the private application. Membership standing and profile visibility stay unchanged. No email is sent.",
+      "Approve, decline, or request changes and email the applicant. Membership standing and profile visibility stay unchanged. Reopening sends no email.",
     );
     review.append(
       node(
@@ -125,14 +131,67 @@ window.createMembershipUI = function ({
       ]),
     ]);
     choice.required = true;
-    root.append(
-      finish(review, "Record decision", (values) => ({
-        action: "review-application",
-        id: application.id,
-        revision: application.revision,
-        state: values.get("review-decision"),
-      })),
+    const recipient = node(
+      "p",
+      "Choose a decision to see the email recipient.",
+      "help",
     );
+    recipient.setAttribute("aria-live", "polite");
+    review.append(recipient);
+    const applicantMessage = control(
+      review,
+      "applicant-message",
+      "Message to applicant",
+      "",
+      { max: 4000, multiline: true },
+    );
+    applicantMessage.rows = 4;
+    const messageField = applicantMessage.closest(".editor-field");
+    const messageHelp = node(
+      "p",
+      "Required when requesting changes. This message is included in the email; the private reason below is never included.",
+      "help",
+    );
+    messageHelp.id = "applicant-message-help";
+    applicantMessage.setAttribute("aria-describedby", messageHelp.id);
+    messageField.append(messageHelp);
+    messageField.hidden = true;
+    const buttonLabel = () =>
+      choice.value === "pending"
+        ? "Reopen for review"
+        : "Record decision and email applicant";
+    root.append(
+      finish(
+        review,
+        "Record decision",
+        (values) => ({
+          action: "review-application",
+          id: application.id,
+          revision: application.revision,
+          state: values.get("review-decision"),
+          ...(values.get("review-decision") !== "pending"
+            ? { applicant_message: applicantMessage.value }
+            : {}),
+        }),
+        loadView,
+        buttonLabel,
+      ),
+    );
+    choice.addEventListener("change", () => {
+      const sends = choice.value && choice.value !== "pending";
+      messageField.hidden = !sends;
+      applicantMessage.required = choice.value === "changes_requested";
+      messageField.querySelector("label").textContent =
+        applicantMessage.required
+          ? "Message to applicant (required)"
+          : "Message to applicant (optional)";
+      recipient.textContent = sends
+        ? `${label(choice.value)} email to ${application.email}. Review the message before recording the decision.`
+        : choice.value === "pending"
+          ? "Reopening records a private review change. No email is sent."
+          : "Choose a decision to see the email recipient.";
+      review.querySelector('button[type="submit"]').textContent = buttonLabel();
+    });
     const section = node("details", null, "detail-card");
     section.append(
       node("summary", profile ? "Linked profile" : "Create or link a profile"),

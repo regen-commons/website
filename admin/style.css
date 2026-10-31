@@ -836,3 +836,7 @@ textarea:focus-visible {
     max-height: calc(100dvh - 96px);
   }
 }
+.applicant-message {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

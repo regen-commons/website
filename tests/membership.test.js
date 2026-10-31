@@ -65,6 +65,9 @@ const payload = (overrides = {}) => ({
 const command = (fields) => ({
   request_id: randomUUID(),
   reason: "Synthetic steward decision",
+  ...(fields.action === "review-application" && fields.state !== "pending"
+    ? { applicant_message: "" }
+    : {}),
   ...fields,
 });
 

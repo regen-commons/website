@@ -165,7 +165,7 @@ export function createSupabaseProvider({
         auditRows(
           db,
           "review_events",
-          "id,event_type,created_at,reviewed_revision,note,actor_label,from_state,to_state,resulting_revision,changes",
+          "id,event_type,created_at,reviewed_revision,note,actor_label,from_state,to_state,resulting_revision,changes,applicant_message",
           "application_id",
           id,
         ),
@@ -238,12 +238,27 @@ export function createSupabaseProvider({
       };
     },
     async membershipCommand(token, requestId, command) {
-      return result(
+      const saved = result(
         await client(token).rpc("membership_command", {
           p_request_id: requestId,
           p_command: command,
         }),
       ).data;
+      if (saved.notification_id) {
+        try {
+          // The review and outbox already committed. A repeated command can
+          // recover an unclaimed job, but cannot retry an attempted email.
+          await this.retryNotification(token, {
+            application_id: saved.id,
+            job_id: saved.notification_id,
+            attempts: 0,
+          });
+        } catch {
+          // Delivery status is queried separately. A failed/uncertain send
+          // must not make the saved decision look like a rejected mutation.
+        }
+      }
+      return saved;
     },
     async notifications(token, applicationId) {
       return {
