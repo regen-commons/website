@@ -92,18 +92,38 @@ own rate limits still apply after a synthetic failure is cleared.
 - **`listen EPERM` inside an agent sandbox:** allow the bounded command to bind
   loopback using the harness permission flow. Do not alter repository/global
   sandbox policy.
-- **Node routes into an unavailable VM:** on the machine assessed on 29 October
-  2026, `node`, `npm`, and `bun` on PATH were dev-machine wrappers. For that
-  machine, this session-local override uses an existing local runtime:
+- **`[dev-machine] not run: this agent's sandbox blocks the connection`, or
+  `start VM: timed out waiting for VM to start`:** the machine is fine, and the
+  agent's sandbox is blocking the connection to it. See
+  [the dev machine](#the-dev-machine).
 
-  ```sh
-  export PATH=/Users/afo/.local/share/mise/installs/node/22.22.1/bin:/Users/afo/.bun/bin:$PATH
-  node --version
-  npm run dev
-  ```
+## The dev machine
 
-  Other contributors should select their own Node 22 installation. No global
-  runtime or Codex configuration changes are needed.
+On the maintainer's Mac, this repository runs in an isolated OrbStack machine
+named `regen-commons-site`. `node`, `npm`, `npx`, and `bun` started in the main
+checkout or in a worktree of it run inside the machine, so dependencies live
+there and `node_modules` stays empty on the Mac. Editing and Git stay on the Mac,
+and a local server still answers at `127.0.0.1:<port>` there. Other contributors
+have none of this and use their own Node 22.
+
+The quick start and the three checks above work unchanged. Anything that needs
+the Vercel CLI, a live provider, Docker, or `psql` does not: that covers
+`npm run dev:live`, `npm run deploy`, `scripts/sync-*`, and the disposable SQL
+suites, which CI runs. The machine can reach only package and toolchain hosts.
+Inside it, a command can change files but cannot create or remove folders outside
+`node_modules`, so make a new folder on the Mac first.
+
+When working on that Mac:
+
+- Work in the main checkout or in a worktree of it under `~/.codex/worktrees/`.
+  The machine cannot open a worktree anywhere else. A separate clone, in
+  `/private/tmp` for example, is never routed, so its code runs directly on the
+  Mac with no isolation.
+- If a command cannot reach the machine, do not override `PATH` or call a runtime
+  by its full path. Both run the code on the Mac. Report it instead.
+- A Codex chat reaches the machine only with **Custom (config.toml)** selected in
+  the permissions control below the composer, or with approval to run the command
+  outside the sandbox. Either way the command still runs in the machine.
 
 ## Live integration workflow
 

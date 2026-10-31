@@ -38,6 +38,10 @@ directory. `CLAUDE.md` imports this guide; keep repository policy in `AGENTS.md`
   instructions. Local setup does not authorize live submissions, schema writes,
   messaging, deployment, or account changes. Follow the user's actual scope.
 - Do not weaken sandbox, approval, or trust settings to make tooling work.
+- On the maintainer's Mac, commands in this repository run in an isolated
+  machine. Work in the main checkout or a worktree under `~/.codex/worktrees/`,
+  not a clone or `/private/tmp`, and do not override `PATH` to get around it. See
+  [the dev machine](docs/development.md#the-dev-machine).
 
 ## Workflow
 
