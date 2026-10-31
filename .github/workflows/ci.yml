@@ -49,6 +49,7 @@ jobs:
           psql -v ON_ERROR_STOP=1 -f supabase/tests/steward-access.sql
           psql -v ON_ERROR_STOP=1 -f supabase/tests/content-access.sql
           psql -v ON_ERROR_STOP=1 -f supabase/tests/feedback-access.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/notification-access.sql
       - uses: actions/setup-node@v4
         with:
           node-version: 22

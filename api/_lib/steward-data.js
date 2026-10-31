@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { drainNotifications } from "./intake-notifications.js";
 
 export class AdminError extends Error {
   constructor(status, code) {
@@ -36,8 +37,14 @@ function checkAuthService(error) {
     throw new AdminError(503, "provider_unavailable");
 }
 
-// Every database call carries the user's token. No service-role key is used.
-export function createSupabaseProvider({ url, key, request = fetch }) {
+// Steward reads and claims carry the user's token. Outcome recording uses the
+// existing bounded worker capability; no service-role key is used.
+export function createSupabaseProvider({
+  url,
+  key,
+  request = fetch,
+  env = process.env,
+}) {
   if (!url || !key) throw new AdminError(503, "admin_not_configured");
   const client = (token) =>
     createClient(url, key, {
@@ -181,6 +188,48 @@ export function createSupabaseProvider({ url, key, request = fetch }) {
           ),
         ]);
       return { members, affiliations, contributions, contributionMembers };
+    },
+    async notifications(token, applicationId) {
+      return {
+        notifications: result(
+          await client(token).rpc("application_notifications", {
+            p_application_id: applicationId,
+          }),
+        ).data,
+      };
+    },
+    async retryNotification(token, body) {
+      if (!env.SUPABASE_INTAKE_SECRET)
+        throw new AdminError(503, "email_retry_not_configured");
+      const db = client(token);
+      // The user's current session claims exactly one eligible email. It cannot
+      // supply a recipient, reset attempts, change channels or create a new job.
+      const job = result(
+        await db.rpc("retry_notification", {
+          p_application_id: body.application_id,
+          p_job_id: body.job_id,
+          p_attempts: body.attempts,
+        }),
+      ).data;
+      await drainNotifications({
+        request,
+        env,
+        claim: async () => [job],
+        finish: (job, status, outcome) =>
+          // Recording an already-performed send is server work. It must survive
+          // session expiry/revocation, and cannot accept browser-authored results.
+          client()
+            .rpc("notification_result", {
+              p_secret: env.SUPABASE_INTAKE_SECRET,
+              p_job_id: job.id,
+              p_lease: job.lease_id,
+              p_status: status,
+              p_provider_message_id: outcome.provider_message_id,
+              p_failure_code: outcome.failure_code,
+            })
+            .then(result),
+      });
+      return this.notifications(token, body.application_id);
     },
     async content(
       token,

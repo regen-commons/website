@@ -562,6 +562,47 @@ footer {
   font-family: var(--font-serif);
   font-size: 1.08rem;
 }
+.email-job + .email-job {
+  border-top: 1px solid var(--line);
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+}
+.application-grid > .application-answers {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+}
+.application-grid > .email-delivery,
+.application-grid > .application-profile {
+  grid-column: 2;
+  margin-bottom: 0;
+}
+.application-grid {
+  align-items: start;
+}
+.email-job h3 {
+  margin-bottom: 0.6rem;
+}
+.email-job dl {
+  margin-block: 1rem;
+}
+.email-job dd {
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+}
+.email-recipient {
+  margin-block: 0.6rem;
+}
+.email-delivery [role="status"] {
+  margin-block: 1rem 0;
+}
+@media (max-width: 850px) {
+  .application-grid > .email-delivery,
+  .application-grid > .application-answers,
+  .application-grid > .application-profile {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
 @media (max-width: 600px) {
   .header-actions {
     gap: 0.5rem;

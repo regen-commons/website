@@ -139,6 +139,29 @@ Choose a recoverable capture/idempotency strategy with clear data retention.
 Telegram is an appropriate destination for those private fields. Do not expand
 recipients or data sharing as an incidental implementation detail.
 
+### Steward email delivery status and retry — separate draft PR
+
+**Scope:** add a private email card to membership request details, with safe failure
+reasons, attempts, attempt timestamps, Resend IDs, refresh, and one-job retry.
+Preserve duplicate-send protection, active steward/session checks, existing
+membership semantics, and public-site styling. No public-site polish, schema
+application, production deployment, live send, webhook, or scheduled worker.
+
+**Acceptance:** an authorized steward can inspect and retry one eligible email;
+anonymous/non-steward/revoked sessions cannot read or retry; stale/concurrent
+commands cannot send twice; accepted, expired and exhausted jobs cannot be retried;
+status errors remain visible independently of application data. Verify database
+rules, injected provider failures, desktop/mobile rendering and keyboard access.
+Release requires the new migration before runtime deployment. See
+[email delivery contract](content-management.md#email-delivery-status-and-controlled-retries).
+
+**Local proof:** 64 Node tests, syntax/link checks, HTTP smoke, and all four SQL
+access suites pass in disposable PGlite PostgreSQL. Rendered fixtures cover
+1280×720 desktop and 390×844 mobile, both themes, keyboard retry, status-error
+recovery, empty history, expired retries, and clearing pending data on sign-out.
+GitHub CI supplies native PostgreSQL 17 proof for the draft revision. No real
+email was sent and the hosted schema remains unchanged.
+
 ## 4. Define publication rules and validate input at the API boundary
 
 **Scope:** all API handlers, Notion schema inspection, focused behavior tests.
@@ -181,3 +204,19 @@ Modernize the npm lockfile in a dedicated change, review SDK upgrade compatibili
 and the Node deprecation warning, and add repeatable browser smoke for the five
 routes and form success/failure paths. Keep one authoritative package manager and
 avoid a large formatter-only diff mixed into a product change.
+
+### Email delivery release follow-up — 30 October 2026
+
+Review reproduced client-authored acceptance metadata and loss of completion when
+queue cleanup retired an active send. The result path now uses the existing
+server-held intake capability, so the initiating session can end without losing
+the provider outcome. Active leases survive cleanup, and email claims stop a
+minute before the 24-hour cutoff to allow for bounded network calls.
+
+The corrected migration is applied to Regen Commons / Website as
+`20261031001734_steward_email_delivery.sql`; the local filename matches hosted
+history. Read-only hosted checks confirm active-steward projection grants,
+anonymous denial, closed private tables and no client completion endpoint. The
+64 Node tests, check, smoke and disposable SQL suites pass. The broad synthetic
+Auth/role mutation suite was not run in production. Native PostgreSQL CI, merge,
+deployment and the named-account email verification complete the release.

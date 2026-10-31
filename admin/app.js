@@ -18,6 +18,22 @@
     invalid_contribution: "Check the title and field lengths, then try again.",
     content_not_found: "This content could not be found.",
     application_not_found: "This application could not be found.",
+    notification_not_found:
+      "This email record could not be found. Refresh its status.",
+    notification_changed:
+      "Another attempt has already started. Refresh the status before retrying.",
+    already_sent:
+      "Resend has already accepted this email. It will not be sent again.",
+    notification_busy:
+      "An email attempt is already in progress. Refresh its status shortly.",
+    retry_window_expired:
+      "The safe retry window has ended. Check Resend before arranging another email.",
+    retry_limit_reached:
+      "This email has reached its three-attempt limit. Check the failure reason and Resend.",
+    manual_review_required:
+      "This email needs manual review in Resend before another send.",
+    email_retry_not_configured:
+      "Email retries are not configured. Ask an administrator to check the sending service.",
   };
   let signedIn = false,
     loginEmail = "",
@@ -147,7 +163,9 @@
               body: JSON.stringify(body),
             }
           : {}),
-        signal: AbortSignal.timeout(15000),
+        signal: AbortSignal.timeout(
+          body?.action === "retry-email" ? 45000 : 15000,
+        ),
       },
     );
     const data = await response.json();
@@ -374,14 +392,208 @@
     "agreement-reviewed": "Membership agreement",
     "contribution-area": "Contribution areas",
   };
+  function emailDeliveryCard(application) {
+    const card = node("section", null, "detail-card email-delivery"),
+      heading = node("h2", "Email delivery"),
+      content = node("div"),
+      status = node("p", "", "help"),
+      refresh = node("button", "Refresh email status", "text-button");
+    heading.tabIndex = -1;
+    status.setAttribute("role", "status");
+    refresh.type = "button";
+    card.append(
+      heading,
+      node(
+        "p",
+        "Accepted by Resend confirms the send request. Inbox delivery and bounces are not tracked here.",
+        "help",
+      ),
+      content,
+      status,
+      refresh,
+    );
+    const states = {
+      pending: "Pending",
+      sending: "Sending",
+      sent: "Accepted by Resend",
+      failed: "Failed",
+      skipped: "Not sent",
+      needs_review: "Needs review",
+    };
+    const reasons = {
+      resend_not_configured: "Email sending is not configured.",
+      recipients_not_configured:
+        "No steward notification recipients are configured.",
+      resend_authentication_failed:
+        "Resend denied this send. Ask an administrator to check the sending key and sender domain.",
+      resend_rate_limited:
+        "Resend temporarily limited sending. Wait before retrying.",
+      resend_idempotency_conflict:
+        "Resend found different email content for this send identity. Check Resend before sending again.",
+      resend_invalid_request:
+        "Resend rejected the email details. Check the sender and recipient configuration.",
+      resend_unavailable: "Resend was temporarily unavailable.",
+      resend_rejected: "Resend rejected the send request.",
+      resend_invalid_response:
+        "Resend did not return a usable message ID. The outcome is uncertain; check Resend.",
+      notification_timeout:
+        "The send timed out before its outcome was confirmed.",
+      notification_connection_failed:
+        "The connection failed before the send outcome was confirmed.",
+    };
+    const blocks = {
+      already_sent: "Accepted emails cannot be retried here.",
+      retry_window_expired:
+        "Retry closed: the safe sending window has ended. Check Resend manually.",
+      retry_limit_reached:
+        "Retry closed: three attempts have been made. Check Resend manually.",
+      notification_busy:
+        "An attempt is in progress. Refresh the status shortly.",
+      manual_review_required:
+        "Check Resend manually before arranging another email.",
+    };
+    let busy = false;
+    async function update(body) {
+      if (busy) return;
+      busy = true;
+      const current = generation;
+      card.setAttribute("aria-busy", "true");
+      const buttons = [...card.querySelectorAll("button")];
+      buttons.forEach((button) => (button.disabled = true));
+      status.textContent = body ? "Retrying email…" : "Checking email status…";
+      try {
+        const data = await api(
+          body ? null : { resource: "email-deliveries", id: application.id },
+          body,
+        );
+        if (current !== generation || !signedIn) return;
+        content.replaceChildren();
+        if (!data.notifications.length)
+          content.append(
+            node(
+              "p",
+              "No email delivery recorded. Imported requests are not emailed automatically.",
+              "muted",
+            ),
+          );
+        for (const job of data.notifications) {
+          const entry = node("article", null, "email-job"),
+            title =
+              job.channel === "receipt"
+                ? "Membership receipt"
+                : "Steward notification",
+            list = node("dl");
+          entry.append(
+            node("h3", title),
+            node("span", states[job.status] || "Unknown", "badge"),
+          );
+          if (job.channel === "receipt")
+            entry.append(node("p", application.email, "help email-recipient"));
+          list.append(
+            node("dt", "Attempts"),
+            node("dd", `${job.attempts} of 3`),
+          );
+          if (job.attempts)
+            list.append(
+              node("dt", "Last attempt"),
+              node(
+                "dd",
+                job.last_attempt_at
+                  ? new Intl.DateTimeFormat(undefined, {
+                      dateStyle: "medium",
+                      timeStyle: "short",
+                    }).format(new Date(job.last_attempt_at))
+                  : "Not recorded",
+              ),
+            );
+          const messageId = node("dd");
+          if (job.provider_message_id) {
+            messageId.append(node("code", job.provider_message_id));
+            const open = link(
+              "View in Resend ↗",
+              `https://resend.com/emails/${encodeURIComponent(job.provider_message_id)}`,
+            );
+            open.target = "_blank";
+            open.rel = "noreferrer noopener";
+            messageId.append(node("br"), open);
+          } else messageId.textContent = "Not recorded";
+          list.append(node("dt", "Resend message ID"), messageId);
+          if (
+            job.failure_code ||
+            ["failed", "needs_review"].includes(job.status)
+          )
+            list.append(
+              node("dt", "Last failure reason"),
+              node(
+                "dd",
+                reasons[job.failure_code] ||
+                  "No failure reason was recorded for this earlier attempt.",
+              ),
+            );
+          entry.append(list);
+          if (job.retry_block == null) {
+            const retry = node(
+              "button",
+              job.channel === "receipt"
+                ? "Retry receipt email"
+                : "Retry steward email",
+              "secondary",
+            );
+            retry.type = "button";
+            retry.addEventListener("click", () =>
+              update({
+                action: "retry-email",
+                application_id: application.id,
+                job_id: job.id,
+                attempts: job.attempts,
+              }),
+            );
+            entry.append(retry);
+          } else
+            entry.append(
+              node(
+                "p",
+                blocks[job.retry_block] || "Retry is unavailable.",
+                "help",
+              ),
+            );
+          content.append(entry);
+        }
+        status.textContent = body
+          ? "Email attempt recorded. Check the updated status above."
+          : "Email status is up to date.";
+        if (body) heading.focus();
+      } catch (error) {
+        if (current !== generation || !signedIn) return;
+        if ([401, 403].includes(error.status)) {
+          showLogin(error.message);
+          $("email").focus();
+          return;
+        }
+        status.textContent =
+          body && (!error.status || error.status >= 500)
+            ? "We couldn’t confirm this email attempt. Refresh email status before retrying."
+            : error.status
+              ? error.message
+              : "The connection failed. Refresh email status to check the outcome before retrying.";
+      } finally {
+        busy = false;
+        card.removeAttribute("aria-busy");
+        buttons.forEach((button) => (button.disabled = false));
+      }
+    }
+    refresh.addEventListener("click", () => update());
+    update();
+    return card;
+  }
   function renderDetail({ application, profile, history }) {
     $("view-title").textContent = application.display_name;
     $("view-description").textContent =
       `${label(application.applicant_type)} · Submitted ${date(application.submitted_at)} · Revision ${application.revision}`;
     $("detail").append(link("← Back to membership requests", "#applications"));
-    const grid = node("div", null, "detail-grid"),
-      privateColumn = node("div"),
-      publicColumn = node("div");
+    const grid = node("div", null, "detail-grid application-grid"),
+      privateColumn = node("div", null, "application-answers"),
+      publicColumn = node("div", null, "application-profile");
     const answers = node("section", null, "detail-card");
     answers.append(
       node("p", "Private · stewards only", "eyebrow"),
@@ -443,7 +655,7 @@
           "empty",
         ),
       );
-    grid.append(privateColumn, publicColumn);
+    grid.append(emailDeliveryCard(application), privateColumn, publicColumn);
     $("detail").append(grid);
   }
   function renderMembers(data) {
