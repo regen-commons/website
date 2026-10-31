@@ -3,6 +3,10 @@ import {
   contributionPayload,
   contentResources,
 } from "./_lib/content-contract.js";
+import {
+  membershipActions,
+  membershipCommand,
+} from "./_lib/membership-contract.js";
 
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -47,6 +51,15 @@ export function createAdminHandler({ provider, origin, secureCookies = true }) {
           if (token) await provider().signOut(token);
           res.setHeader("Set-Cookie", cookie());
           return res.status(200).json({ ok: true });
+        }
+        if (membershipActions.includes(body.action)) {
+          if (!token) throw new AdminError(401, "sign_in_required");
+          const db = provider();
+          await db.authorize(token);
+          const command = membershipCommand(body);
+          return res
+            .status(200)
+            .json(await db.membershipCommand(token, body.request_id, command));
         }
         if (body.action === "retry-email") {
           if (!token) throw new AdminError(401, "sign_in_required");
@@ -167,6 +180,11 @@ export function createAdminHandler({ provider, origin, secureCookies = true }) {
       }
       if (resource === "members")
         return res.status(200).json(await db.members(token));
+      if (resource === "member") {
+        const id = params.get("id");
+        if (!uuid.test(id || "")) throw new AdminError(400, "invalid_id");
+        return res.status(200).json(await db.member(token, id));
+      }
       if (contentResources.includes(resource)) {
         const search = params.get("search") || "",
           state = params.get("state") || "",

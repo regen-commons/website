@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { AdminError } from "../../api/_lib/steward-data.js";
+import { membershipFixtures } from "./membership-fixtures.js";
 
 // Local-only provider. This module is never imported by production handlers.
 export function createStewardFixtures({
@@ -223,7 +224,14 @@ export function createStewardFixtures({
       return "manual_review_required";
     return null;
   }
+  const membership = membershipFixtures({
+    members,
+    applications,
+    relationships,
+    now,
+  });
   return {
+    ...membership,
     ids,
     setActive(email, active) {
       users.get(email).active = active;
@@ -292,6 +300,7 @@ export function createStewardFixtures({
             created_at: application.submitted_at,
             note: "Synthetic application loaded for this local preview. No approval has been recorded.",
           },
+          ...membership.membershipReviewHistory(id),
         ],
       });
     },

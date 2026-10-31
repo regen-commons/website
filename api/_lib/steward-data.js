@@ -11,7 +11,7 @@ export class AdminError extends Error {
 const summaryColumns =
   "id,display_name,applicant_type,submitted_at,review_state,cohort,nominator,revision,member_id";
 const memberColumns =
-  "id,name,member_type,publication_state,location,summary,website,focus_areas,contribution_areas";
+  "id,name,member_type,publication_state,membership_status,revision,updated_at,location,summary,vision,website,avatar,applied_at,focus_areas,contribution_areas";
 
 function result({ data, error, count, status }) {
   if (error) {
@@ -24,6 +24,23 @@ function result({ data, error, count, status }) {
     );
   }
   return { data, count };
+}
+
+async function auditRows(db, table, columns, foreignKey, id) {
+  const rows = [];
+  for (let offset = 0; ; offset += 500) {
+    const page = result(
+      await db
+        .from(table)
+        .select(columns)
+        .eq(foreignKey, id)
+        .order("created_at")
+        .order("id")
+        .range(offset, offset + 499),
+    ).data;
+    rows.push(...page);
+    if (page.length < 500) return rows;
+  }
 }
 
 function checkAuthService(error) {
@@ -145,16 +162,18 @@ export function createSupabaseProvider({
               .eq("id", application.member_id)
               .maybeSingle()
           : { data: null },
-        db
-          .from("review_events")
-          .select("id,event_type,created_at,reviewed_revision,note")
-          .eq("application_id", id)
-          .order("created_at"),
+        auditRows(
+          db,
+          "review_events",
+          "id,event_type,created_at,reviewed_revision,note,actor_label,from_state,to_state,resulting_revision,changes",
+          "application_id",
+          id,
+        ),
       ]);
       return {
         application,
         profile: result(profile).data,
-        history: result(history).data,
+        history,
       };
     },
     async members(token) {
@@ -188,6 +207,43 @@ export function createSupabaseProvider({
           ),
         ]);
       return { members, affiliations, contributions, contributionMembers };
+    },
+    async member(token, id) {
+      const db = client(token);
+      // One PostgREST statement pairs editable affiliations with this revision.
+      // The separately loaded member directory is only a list of choices.
+      const record = result(
+        await db
+          .from("members")
+          .select(
+            memberColumns +
+              ",affiliations!affiliations_member_id_fkey(organization_id,organization:members!affiliations_organization_id_fkey(id,name))",
+          )
+          .eq("id", id)
+          .maybeSingle(),
+      ).data;
+      if (!record) throw new AdminError(404, "member_not_found");
+      const { affiliations = [], ...member } = record;
+      const history = await auditRows(
+        db,
+        "member_events",
+        "id,event_type,revision,reason,changes,created_at,actor_label",
+        "member_id",
+        id,
+      );
+      return {
+        member,
+        history,
+        organizations: affiliations.map((a) => a.organization),
+      };
+    },
+    async membershipCommand(token, requestId, command) {
+      return result(
+        await client(token).rpc("membership_command", {
+          p_request_id: requestId,
+          p_command: command,
+        }),
+      ).data;
     },
     async notifications(token, applicationId) {
       return {
