@@ -1,4 +1,4 @@
-import { membershipReceipt } from "./membership-email.js";
+import { membershipReceipt, membershipDecision } from "./membership-email.js";
 import {
   resendFailure,
   transportFailure,
@@ -57,26 +57,28 @@ export async function drainNotifications({
             result.failure_code = response.ok ? null : "notification_rejected";
           }
         } else if (env.RESEND_API_KEY && env.RESEND_FROM_EMAIL) {
-          const recipients =
-            job.channel === "receipt"
-              ? [job.email]
-              : (env.STEWARD_NOTIFY_EMAILS || "")
-                  .split(",")
-                  .map((s) => s.trim())
-                  .filter(Boolean);
+          const recipients = ["receipt", "decision"].includes(job.channel)
+            ? [job.email]
+            : (env.STEWARD_NOTIFY_EMAILS || "")
+                .split(",")
+                .map((s) => s.trim())
+                .filter(Boolean);
           result.failure_code = "recipients_not_configured";
           if (recipients.length) {
-            const receipt = job.channel === "receipt";
-            const message = receipt
-              ? membershipReceipt(job.name)
-              : {
-                  subject: "New Regen Commons membership request",
-                  html: mailBody(
-                    "New membership request",
-                    `${job.name} has submitted a membership request.`,
-                    url,
-                  ),
-                };
+            const applicant = ["receipt", "decision"].includes(job.channel);
+            const message =
+              job.channel === "decision"
+                ? membershipDecision(job)
+                : job.channel === "receipt"
+                  ? membershipReceipt(job.name)
+                  : {
+                      subject: "New Regen Commons membership request",
+                      html: mailBody(
+                        "New membership request",
+                        `${job.name} has submitted a membership request.`,
+                        url,
+                      ),
+                    };
             const response = await request("https://api.resend.com/emails", {
               method: "POST",
               headers: {
@@ -88,7 +90,7 @@ export async function drainNotifications({
                 from: `Regen Commons <${env.RESEND_FROM_EMAIL}>`,
                 to: recipients,
                 ...message,
-                ...(receipt
+                ...(applicant
                   ? {
                       reply_to:
                         env.RESEND_REPLY_TO_EMAIL || "regencommons@gmail.com",

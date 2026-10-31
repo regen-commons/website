@@ -19,7 +19,9 @@ steward role, a live Auth session, a request identity, and the expected record r
 | Profile visibility  | draft, published, hidden                                               | Controls public website visibility                               |
 
 Approval changes only application review. It does not create a member, activate
-membership, publish a profile, change submitted consent, grant access, or send mail.
+membership, publish a profile, change submitted consent, or grant access.
+The separate [decision-email feature](membership-decision-emails.md) adds explicit
+applicant notifications while preserving these state boundaries.
 Standing and visibility are also independent: pausing membership does not hide an
 already published profile. The UI describes each operation before its save action.
 Standing can be maintained for manually curated members without an application;
@@ -70,7 +72,8 @@ The exposed membership_command RPC runs as its caller. Its private implementatio
 checks current role/session before replay or mutation, validates allowlisted fields,
 locks the affected row, rejects stale revisions, and records the change and history
 in one transaction. It cannot change original answers, source identities, Auth
-accounts, steward roles, or notification jobs. Direct table writes stay denied.
+accounts or steward roles. The decision-email extension queues only the message
+for an explicit review outcome. Direct table writes stay denied.
 Neither a service-role key nor the public-intake capability is used.
 
 New standing and audit fields have no anonymous grants. Existing published field

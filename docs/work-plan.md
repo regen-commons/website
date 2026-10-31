@@ -242,7 +242,9 @@ membership standing, and visibility remain separate.
   replay the original command after uncertain saves. All 74 tests pass.
 - [x] Applied hosted migration 20261031024410; prior member/application digests
   and all 19 published profiles are unchanged. Standing is unconfirmed for all 24 profiles.
-- [ ] Finish the authorized PR #9 merge/deployment and temporary-record verification.
+- [x] PR #9 merged as dafc048 and deployed. Live temporary records verified
+  independent review, standing, visibility, profile edits, and affiliations; all
+  temporary records were removed and original digests reconciled.
 
 The separate PR records publication and current-head CI results. Local screenshots
 are ignored artifacts under artifacts/membership-management; no real data or live
@@ -250,3 +252,26 @@ messages were used.
 
 Contract, tradeoffs, and later release prerequisites:
 [membership management](membership-management.md).
+
+## Membership decision emails
+
+Separate draft PR from public-site polish; automatic production release is outside
+this task. Add approved, declined, and changes-requested emails using the website
+design and existing Resend delivery diagnostics. Preserve private review reasons
+and independent membership/profile states. Test real delivery only with the named
+account authorized in the chat.
+
+- [x] Atomic decision/outbox command with immutable recipient/content snapshot,
+  idempotent replay, private/public text separation, and obsolete-email blocking.
+- [x] Steward recipient/message controls and per-decision email status/retries.
+- [x] Shared branded HTML shell and text alternative for all three decisions.
+- [x] 79 Node tests, check, smoke, and six disposable SQL suites pass.
+- [x] Desktop/mobile, both themes, keyboard submission, required public message,
+  reopening without mail, and uncertain-save recovery verified with synthetic data.
+- [x] Three labeled Resend template test emails arrived in Gmail for the named
+  account; padding, typography, content, sender, and Reply-To verified.
+
+The separate draft PR owns publication and current-head CI results. The migration
+is unapplied and automatic production dispatch remains a release verification step.
+
+Contract and release limits: [membership decision emails](membership-decision-emails.md).

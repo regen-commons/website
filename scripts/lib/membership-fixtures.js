@@ -8,6 +8,8 @@ export function membershipFixtures({
   applications,
   relationships,
   now,
+  notifications,
+  decisionFailure = false,
 }) {
   const requests = new Map(),
     reviewEvents = [],
@@ -56,7 +58,7 @@ export function membershipFixtures({
         return structuredClone(prior.result);
       }
       const { action, reason } = command;
-      let item, result;
+      let item, result, notificationId;
       const stamp = () => ({
         id: randomUUID(),
         actor_id: actor.id,
@@ -88,7 +90,7 @@ export function membershipFixtures({
           const before = item.review_state,
             revision = item.revision++;
           item.review_state = command.state;
-          reviewEvents.push({
+          const event = {
             ...stamp(),
             application_id: item.id,
             event_type:
@@ -98,7 +100,39 @@ export function membershipFixtures({
             from_state: before,
             to_state: item.review_state,
             note: reason,
-          });
+            applicant_message: command.applicant_message ?? null,
+          };
+          reviewEvents.push(event);
+          for (const job of notifications)
+            if (
+              job.application_id === item.id &&
+              job.channel === "decision" &&
+              ["pending", "failed", "skipped"].includes(job.status)
+            )
+              Object.assign(job, {
+                status: "superseded",
+                updated_at: new Date(now()).toISOString(),
+              });
+          if (command.state !== "pending") {
+            notificationId = randomUUID();
+            notifications.push({
+              id: notificationId,
+              application_id: item.id,
+              channel: "decision",
+              review_event_id: event.id,
+              decision_state: command.state,
+              decision_revision: item.revision,
+              applicant_message: command.applicant_message,
+              recipient: item.email,
+              status: decisionFailure ? "failed" : "sent",
+              attempts: 1,
+              provider_message_id: decisionFailure ? null : randomUUID(),
+              failure_code: decisionFailure ? "resend_unavailable" : null,
+              created_at: event.created_at,
+              updated_at: event.created_at,
+              last_attempt_at: event.created_at,
+            });
+          }
         } else {
           const profile = members.find((m) => m.id === command.member_id);
           if (
@@ -209,6 +243,7 @@ export function membershipFixtures({
         });
       }
       result = { id: item.id, revision: item.revision };
+      if (notificationId) result.notification_id = notificationId;
       requests.set(requestId, {
         actor: actor.id,
         command: serialized,
