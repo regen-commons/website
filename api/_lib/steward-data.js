@@ -37,7 +37,8 @@ function checkAuthService(error) {
     throw new AdminError(503, "provider_unavailable");
 }
 
-// Every database call carries the user's token. No service-role key is used.
+// Steward reads and claims carry the user's token. Outcome recording uses the
+// existing bounded worker capability; no service-role key is used.
 export function createSupabaseProvider({
   url,
   key,
@@ -198,6 +199,8 @@ export function createSupabaseProvider({
       };
     },
     async retryNotification(token, body) {
+      if (!env.SUPABASE_INTAKE_SECRET)
+        throw new AdminError(503, "email_retry_not_configured");
       const db = client(token);
       // The user's current session claims exactly one eligible email. It cannot
       // supply a recipient, reset attempts, change channels or create a new job.
@@ -213,8 +216,11 @@ export function createSupabaseProvider({
         env,
         claim: async () => [job],
         finish: (job, status, outcome) =>
-          db
-            .rpc("complete_notification_retry", {
+          // Recording an already-performed send is server work. It must survive
+          // session expiry/revocation, and cannot accept browser-authored results.
+          client()
+            .rpc("notification_result", {
+              p_secret: env.SUPABASE_INTAKE_SECRET,
               p_job_id: job.id,
               p_lease: job.lease_id,
               p_status: status,
