@@ -421,7 +421,7 @@
       heading,
       node(
         "p",
-        "Accepted by Resend confirms the send request. Inbox delivery and bounces are not tracked here.",
+        "Delivered means the recipient’s mail server accepted the email. It does not confirm inbox placement.",
         "help",
       ),
       content,
@@ -504,10 +504,25 @@
                   ? `${label(job.decision_state)} email · Revision ${job.decision_revision}`
                   : "Steward notification",
             list = node("dl");
+          const delivery = job.delivery_outcome === "delivered"
+            ? "Delivered"
+            : job.delivery_outcome === "bounced" ? "Bounced" : null;
           entry.append(
             node("h3", title),
-            node("span", states[job.status] || "Unknown", "badge"),
+            node("span", delivery || states[job.status] || "Unknown", "badge"),
           );
+          if (job.delivery_outcome === "bounced")
+            entry.append(node("p", "Check the recipient address and view the bounce details in Resend before arranging another email.", "help"));
+          if (delivery && job.delivery_occurred_at)
+            list.append(
+              node("dt", job.delivery_outcome === "bounced" ? "Bounced at" : "Delivered at"),
+              node("dd", new Intl.DateTimeFormat(undefined, {
+                dateStyle: "medium",
+                timeStyle: "short",
+              }).format(new Date(job.delivery_occurred_at))),
+            );
+          if (job.status === "sent" && !delivery && ["receipt", "decision"].includes(job.channel))
+            entry.append(node("p", "No delivery or bounce reported.", "help"));
           if (["receipt", "decision"].includes(job.channel))
             entry.append(
               node(

@@ -53,8 +53,8 @@ This release attempts delivery in the decision request and exposes manual
 recovery. It does not add a scheduled dispatcher. Anonymous intake draining
 cannot claim decision emails. A pending job after an interrupted request can be
 recovered by replaying the original command or by an active steward's send action.
-Resend acceptance confirms a send request; inbox delivery and bounces remain
-outside the dashboard's tracking contract.
+Resend acceptance confirms a send request. The [delivery webhook guide](resend-delivery-webhooks.md)
+covers recipient mail server delivery and bounces.
 
 ## Design and verification
 
