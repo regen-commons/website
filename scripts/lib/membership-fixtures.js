@@ -127,6 +127,8 @@ export function membershipFixtures({
               status: decisionFailure ? "failed" : "sent",
               attempts: 1,
               provider_message_id: decisionFailure ? null : randomUUID(),
+              delivery_outcome: decisionFailure ? null : "bounced",
+              delivery_occurred_at: decisionFailure ? null : event.created_at,
               failure_code: decisionFailure ? "resend_unavailable" : null,
               created_at: event.created_at,
               updated_at: event.created_at,

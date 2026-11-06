@@ -215,9 +215,9 @@ Provider response bodies, credentials and arbitrary error messages are never
 stored or returned. Older attempts without diagnostics remain **Not recorded**;
 imported requests with no jobs are not emailed automatically.
 
-**Accepted by Resend** means the send API returned a message ID. This release does
-not track inbox delivery, bounces, opens or clicks; those require provider events.
-It does not change the membership receipt template or membership decision rules.
+**Accepted by Resend** means the send API returned a message ID. With
+[delivery webhooks](resend-delivery-webhooks.md) enabled, receipt and decision
+emails show delivery or bounce events from Resend.
 
 **Retry receipt email** and **Retry steward email** send only their selected saved
 job. The database checks the active steward role and live Auth session, application
@@ -237,8 +237,8 @@ The previous worker API remains compatible during rollout, but older runtime cod
 cannot record new provider diagnostics. No historical status or message ID is
 backfilled. The reviewed migration is applied to Regen Commons / Website under hosted
 version `20261031001734`; the local filename matches that migration history.
-Runtime release and live retry verification are recorded in the PR. No scheduled worker or Resend
-webhook is introduced.
+Runtime release and live retry verification are recorded in PR #8. Retries
+remain steward initiated.
 
 The disposable database checks in
 [notification-access.sql](../supabase/tests/notification-access.sql) exercise

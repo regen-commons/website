@@ -335,6 +335,10 @@ export function createStewardFixtures({
       job.attempts++;
       job.status = retryFailure ? "failed" : "sent";
       job.provider_message_id = retryFailure ? null : randomUUID();
+      if (!retryFailure && job.channel === "receipt") {
+        job.delivery_outcome = "delivered";
+        job.delivery_occurred_at = new Date(now()).toISOString();
+      }
       job.failure_code = retryFailure ? "resend_unavailable" : null;
       job.updated_at = new Date(now()).toISOString();
       return this.notifications(token, body.application_id);

@@ -43,6 +43,15 @@ export function createPublicProvider({
     return data;
   }
   const provider = {
+    async recordEmailDelivery({ id, outcome, at }) {
+      if (!secret) throw new AdminError(503, "data_not_configured");
+      checked(await db.rpc("record_email_delivery", {
+        p_secret: secret,
+        p_provider_message_id: id,
+        p_outcome: outcome,
+        p_occurred_at: at,
+      }));
+    },
     async notifySeed(text) {
       if (!process.env.NOTIFY_URL || !process.env.NOTIFY_WEBHOOK_SECRET) return;
       const response = await request(process.env.NOTIFY_URL, {
