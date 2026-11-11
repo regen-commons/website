@@ -218,7 +218,7 @@ overflow. Capture reproducible browser evidence and check console errors.
 Extract large inline scripts into feature files only where it improves this work,
 preserving behavior. A framework migration is not a prerequisite.
 
-### 5a. Council-call polish round — implemented, in review
+### 5a. Council-call polish round — merged and deployed
 
 From the 5 November council call and the maintainer's site review. Separate
 from the Supabase cutover and steward work.
@@ -242,8 +242,9 @@ from the Supabase cutover and steward work.
 fixtures in the in-app browser: Join submission and every validation path at
 1440×900 and 375×812; API rejections over local HTTP; Learn seed cards and card
 fit at 1280×720, 1280×800, 1366×768, 1440×900, 1536×864 and 1920×1080; map
-labels and hover card with 19 synthetic members. Share previews can only be
-confirmed after deployment.
+labels and hover card with 19 synthetic members. Merged as PR #15 and deployed
+on 11 November; the live pages, share images, photos and links were checked
+after deploy. No application was submitted through the live form.
 
 **Defaults awaiting confirmation:** 120-character minimum; required
 organization representative; left-column wording on what becomes public.

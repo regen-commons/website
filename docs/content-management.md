@@ -100,7 +100,7 @@ still handles sign-in mail separately; it does not configure receipt senders.
 Set production `RESEND_API_KEY` to a sending-only key scoped to the verified
 `regencommons.com` domain and `RESEND_FROM_EMAIL=membership@regencommons.com`.
 Store the key as a Vercel Secret. `RESEND_REPLY_TO_EMAIL` selects a monitored
-reply inbox; it defaults to the website's public `regencommons@gmail.com` address.
+reply inbox; it defaults to the website's public `regencommons@proton.me` address.
 These settings do not alter Supabase Auth SMTP or its existing auth subdomain.
 
 The receipt uses the website's light palette and wordmark with inline styles,

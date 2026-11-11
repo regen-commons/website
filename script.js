@@ -737,10 +737,10 @@
             code === "rate_limited"
               ? "Too many submissions from this connection. Please try again later."
               : code === "network_error"
-              ? "We couldn't reach the server. Check your connection and try again, or email regencommons@gmail.com."
+              ? "We couldn't reach the server. Check your connection and try again, or email regencommons@proton.me."
               : code === "invalid_answer_length" || code === "missing_required_fields"
               ? "Some answers are missing or too short. Go back through the steps, then try again."
-              : "Something went wrong sending your application. Please try again, or email regencommons@gmail.com."
+              : "Something went wrong sending your application. Please try again, or email regencommons@proton.me."
           );
           if (submitBtn) {
             submitBtn.disabled = false;
