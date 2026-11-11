@@ -218,7 +218,7 @@ overflow. Capture reproducible browser evidence and check console errors.
 Extract large inline scripts into feature files only where it improves this work,
 preserving behavior. A framework migration is not a prerequisite.
 
-### 5a. Council-call polish round — implemented locally, uncommitted
+### 5a. Council-call polish round — implemented, in review
 
 From the 5 November council call and the maintainer's site review. Separate
 from the Supabase cutover and steward work.
