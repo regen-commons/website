@@ -566,7 +566,7 @@
       var pad      = 14;
       var lh       = 19;
 
-      sfCtx.font = "italic 13px Lora, Georgia, serif";
+      sfCtx.font = "italic 13px 'Source Serif 4', Georgia, serif";
       var words = revealed.split(" ");
       var lines = [], line = "";
       for (var i = 0; i < words.length; i++) {
@@ -603,7 +603,7 @@
       sfCtx.fillStyle = node.isUser
         ? (isDark ? "rgba(122,170,106,0.95)" : "rgba(30,58,16,0.95)")
         : (isDark ? "rgba(226,218,200,0.88)" : "rgba(26,20,8,0.88)");
-      sfCtx.font = "italic 13px Lora, Georgia, serif";
+      sfCtx.font = "italic 13px 'Source Serif 4', Georgia, serif";
       sfCtx.textAlign = "left";
       for (var li = 0; li < lines.length; li++) {
         sfCtx.fillText(lines[li], bx + pad, by + pad + (li + 1) * lh - 3);

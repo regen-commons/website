@@ -13,6 +13,8 @@ body[data-page="learn"]       { --accent: var(--copper); --accent-rgb: var(--cop
 body[data-page="seeds"]       { --accent: var(--gold);   --accent-rgb: 212, 160, 48; }
 body[data-page="join"]        { --accent: var(--copper); --accent-rgb: var(--copper-rgb); }
 body[data-page="map"]         { --accent: var(--teal);   --accent-rgb: 72, 184, 144; }
+body[data-page="about"]       { --accent: var(--forest); --accent-rgb: var(--forest-rgb); }
+body[data-page="constitution"] { --accent: var(--gold);  --accent-rgb: 212, 160, 48; }
 
 /* ── RESET ───────────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1758,29 +1760,84 @@ p:last-child { margin-bottom: 0; }
   max-width: 520px;
 }
 
-/* ── Fields ── */
+/* ── Fields ──
+   Hierarchy, strongest first: question, typed answer, context hint. */
 .join-field {
-  margin-bottom: 1.6rem;
+  margin: 0 0 1.6rem;
 }
+fieldset.join-field,
+.join-org-fields {
+  border: 0;
+  padding: 0;
+  min-width: 0;
+}
+.join-field legend,
+.join-org-fields legend {
+  padding: 0;
+}
+/* Short single-line fields (name, email, links). */
 .join-label {
   display: block;
   font-family: var(--font-sans);
-  font-size: 0.68rem;
-  letter-spacing: 0.10em;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+  margin-bottom: 0.4rem;
+}
+/* Written and multiple-choice questions. */
+.join-question {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--ink);
+  margin-bottom: 0.45rem;
+  text-wrap: pretty;
+}
+.join-subhead {
+  font-family: var(--font-sans);
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--ink-mid);
-  margin-bottom: 0.5rem;
+  color: var(--accent, var(--copper));
+  margin-bottom: 1rem;
+}
+.join-org-fields {
+  margin: 0.4rem 0 0;
+  padding-top: 1.2rem;
+  border-top: 1px solid rgba(var(--copper-rgb), 0.12);
 }
 .join-hint {
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   color: var(--ink-dim);
-  margin: 0 0 0.6rem;
-  line-height: 1.6;
+  margin: 0 0 0.7rem;
+  line-height: 1.55;
+  max-width: 62ch;
 }
+.join-counter {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-dim);
+  margin: 0.45rem 0 0;
+}
+.join-counter.is-met { color: var(--ink-mid); }
+/* Short fields pair up once the form card is wide enough. */
+.join-row {
+  display: grid;
+  column-gap: 1.5rem;
+}
+@container (min-width: 34rem) {
+  .join-row { grid-template-columns: 1fr 1fr; }
+}
+/* 16px is the standard control size and the smallest that keeps iOS Safari
+   from zooming into a field on focus. */
 .join-input {
   width: 100%;
   font-family: var(--font-serif);
-  font-size: 0.95rem;
+  font-size: 16px;
   color: var(--ink);
   background: transparent;
   border: none;
@@ -1801,15 +1858,15 @@ p:last-child { margin-bottom: 0; }
 .join-textarea {
   width: 100%;
   font-family: var(--font-serif);
-  font-size: 0.95rem;
+  font-size: 16px;
   color: var(--ink);
   background: rgba(var(--copper-rgb), 0.03);
   border: 1px solid rgba(var(--copper-rgb), 0.12);
   border-radius: 2px;
-  padding: 0.8rem 1rem;
+  padding: 0.7rem 0.9rem;
   outline: none;
   resize: vertical;
-  line-height: 1.7;
+  line-height: 1.6;
   transition: border-color 0.2s;
   box-sizing: border-box;
 }

@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /council
+Disallow: /admin
+Disallow: /api/
+
+Sitemap: https://regencommons.com/sitemap.xml

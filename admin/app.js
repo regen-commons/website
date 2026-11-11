@@ -407,6 +407,9 @@
     "other-colleagues": "Colleague contact details",
     "agreement-reviewed": "Membership agreement",
     "contribution-area": "Contribution areas",
+    values: "Values that matter most",
+    participation: "How they'd like to take part",
+    constraints: "Availability and access needs",
   };
   function emailDeliveryCard(application) {
     const card = node("section", null, "detail-card email-delivery"),

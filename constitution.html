@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Constitution · Regen Commons</title>
+  <meta name="description" content="The Regen Commons constitution: its purpose, values, structure, roles and shared assets, with a short summary in plain words." />
+  <link rel="canonical" href="https://regencommons.com/constitution" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Regen Commons" />
+  <meta property="og:title" content="The Regen Commons Constitution" />
+  <meta property="og:description" content="The Regen Commons constitution: its purpose, values, structure, roles and shared assets, with a short summary in plain words." />
+  <meta property="og:url" content="https://regencommons.com/constitution" />
+  <meta property="og:image" content="https://regencommons.com/assets/share/constitution.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="The Regen Commons Constitution." />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="theme-color" content="#0D100A" />
+  <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="preload" href="/assets/fonts/fraunces-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/fonts.css" />
+  <link rel="stylesheet" href="/style.css" />
+  <script>(function(){try{var t=localStorage.getItem('rc-theme')||'dark';document.documentElement.setAttribute('data-theme',t)}catch(_){}})()</script>
+  <style>
+    .const-page {
+      position: relative;
+      z-index: 2;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 8rem var(--pad) 5rem;
+      display: grid;
+      grid-template-columns: 220px minmax(0, 1fr);
+      gap: 4rem;
+      color: var(--ink);
+    }
+    .const-hero, .const-summary { grid-column: 1 / -1; }
+    .const-hero { max-width: 760px; }
+    .const-hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.4rem, 5.5vw, 4rem);
+      font-weight: 300;
+      line-height: 1.08;
+      margin: 1rem 0 0.8rem;
+    }
+    .const-version {
+      font-family: var(--font-sans);
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 0 0 1.4rem;
+    }
+    .const-hero p:not(.const-version) {
+      font-size: 1.08rem;
+      line-height: 1.8;
+      color: var(--ink-mid);
+      max-width: 62ch;
+    }
+    .const-print {
+      margin-top: 1.4rem;
+      padding: 0.7rem 1.1rem;
+      font-family: var(--font-sans);
+      font-size: 0.66rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink);
+      background: transparent;
+      border: 1px solid rgba(var(--copper-rgb), 0.35);
+      cursor: pointer;
+    }
+    .const-print:hover { border-color: var(--accent); }
+
+    /* Plain-words summary */
+    .const-summary {
+      background: var(--parchment);
+      border: 1px solid rgba(var(--accent-rgb), 0.3);
+      padding: 2rem 2.2rem;
+    }
+    .const-summary h2 {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 400;
+      margin: 0 0 0.4rem;
+    }
+    .const-summary-note {
+      font-size: 0.85rem;
+      font-style: italic;
+      color: var(--ink-dim);
+      margin: 0 0 1.4rem;
+    }
+    .const-summary ul {
+      margin: 0;
+      padding-left: 1.2rem;
+      display: grid;
+      gap: 0.7rem;
+      max-width: 70ch;
+    }
+    .const-summary li { line-height: 1.65; color: var(--ink-mid); }
+    .const-summary strong { color: var(--ink); font-weight: 600; }
+
+    /* Contents */
+    .const-toc { position: sticky; top: 6.5rem; align-self: start; }
+    .const-toc summary {
+      font-family: var(--font-sans);
+      font-size: 0.66rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+      cursor: pointer;
+      padding-block: 0.4rem;
+    }
+    .const-toc ol { list-style: none; margin: 0.8rem 0 0; padding: 0; }
+    .const-toc li { margin: 0; }
+    .const-toc a {
+      display: block;
+      padding: 0.35rem 0 0.35rem 0.8rem;
+      border-left: 1px solid rgba(var(--copper-rgb), 0.2);
+      font-size: 0.88rem;
+      color: var(--ink-mid);
+      text-decoration: none;
+    }
+    .const-toc a:hover { color: var(--ink); border-left-color: var(--accent); }
+    .const-toc ol ol a { padding-left: 1.6rem; font-size: 0.82rem; }
+
+    /* Constitution text */
+    .const-text { max-width: 70ch; }
+    .const-text section { scroll-margin-top: 6.5rem; }
+    .const-text > section + section { margin-top: 3.5rem; padding-top: 3rem; border-top: 1px solid rgba(var(--copper-rgb), 0.12); }
+    .const-text h2 {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 3vw, 2.1rem);
+      font-weight: 300;
+      margin: 0 0 0.8rem;
+    }
+    .const-text h3 {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 400;
+      margin: 2.4rem 0 0.3rem;
+      scroll-margin-top: 6.5rem;
+    }
+    .const-text p, .const-text li, .const-text dd { line-height: 1.75; color: var(--ink-mid); }
+    .const-text p { margin: 0 0 1rem; }
+    .const-lede { font-size: 0.85rem; font-family: var(--font-sans); letter-spacing: 0.02em; color: var(--ink-dim) !important; margin-bottom: 0.9rem !important; }
+    .const-statement {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 300;
+      line-height: 1.5 !important;
+      color: var(--ink) !important;
+      border-left: 2px solid var(--accent);
+      padding-left: 1.2rem;
+      margin: 0.6rem 0 0.9rem !important;
+    }
+    .const-test { font-size: 0.9rem; font-style: italic; color: var(--ink-dim) !important; }
+    .const-text ul { padding-left: 1.2rem; margin: 0 0 1rem; }
+    .const-facts { margin: 0.8rem 0 0; display: grid; grid-template-columns: max-content 1fr; gap: 0.5rem 1.2rem; }
+    .const-facts dt {
+      font-family: var(--font-sans);
+      font-size: 0.66rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+      padding-top: 0.3rem;
+    }
+    .const-facts dd { margin: 0; }
+    .const-values { margin: 0.8rem 0 0; }
+    .const-values dt { font-family: var(--font-display); font-size: 1.05rem; color: var(--ink); margin-top: 0.9rem; }
+    .const-values dd { margin: 0.1rem 0 0; }
+    .const-notes {
+      margin-top: 1.4rem;
+      padding: 1.2rem 1.4rem;
+      background: var(--parchment);
+      border: 1px solid rgba(var(--copper-rgb), 0.12);
+    }
+    .const-notes p { font-size: 0.9rem; margin: 0 0 0.5rem; }
+    .const-notes p:last-child { margin-bottom: 0; }
+    .const-text a, .const-summary a, .const-hero a { color: var(--ink); text-decoration-color: rgba(var(--accent-rgb), 0.6); text-underline-offset: 0.2em; }
+
+    @media (max-width: 960px) {
+      .const-page { grid-template-columns: 1fr; gap: 2.5rem; }
+      .const-toc { position: static; border: 1px solid rgba(var(--copper-rgb), 0.15); padding: 0.6rem 1rem; }
+      .const-facts { grid-template-columns: 1fr; gap: 0.1rem; }
+      .const-facts dd { margin-bottom: 0.6rem; }
+    }
+
+    @media print {
+      body::before, .skip-link, .logo-mark, .theme-toggle, .page-nav, .mobile-nav-toggle,
+      .feedback-indicator, .const-print, .const-toc, .dev-banner { display: none !important; }
+      body { background: #fff !important; }
+      .const-page { display: block; padding: 0; color: #111; }
+      .const-page *, .const-statement { color: #111 !important; }
+      .const-summary, .const-notes { background: none; border: 1px solid #999; }
+      .const-text > section + section { break-before: auto; }
+      a { text-decoration: none; }
+    }
+  </style>
+</head>
+<body data-page="constitution">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <a href="/" class="logo-mark" data-easter-egg>
+    <canvas aria-hidden="true" id="logo-canvas" width="76" height="76"></canvas>
+    <span class="logo-mark-label">Regen Commons</span>
+  </a>
+
+  <button class="theme-toggle" id="theme-toggle" aria-label="Toggle light/dark mode">
+    <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+
+  <nav class="page-nav" aria-label="Site navigation">
+    <a href="/" class="page-nav-dot" data-label="Home" aria-label="Home"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg></a>
+    <a href="/learn" class="page-nav-dot" data-label="Learn" aria-label="Learn"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></a>
+    <a href="/learn#plant" class="page-nav-dot" data-label="Plant" aria-label="Plant"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 22V8"/><path d="M5 12H2a10 10 0 0 0 10-10v3a7 7 0 0 1-7 7z"/><path d="M19 12h3a10 10 0 0 1-10-10v3a7 7 0 0 0 7 7z"/></svg></a>
+    <a href="/map" class="page-nav-dot" data-label="Map" aria-label="Map"><svg aria-hidden="true" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></a>
+    <a href="/join" class="page-nav-dot" data-label="Join" aria-label="Join"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg></a>
+    <!-- The constitution sits under About. -->
+    <a href="/about" class="page-nav-dot active" data-label="About" aria-label="About"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></a>
+  </nav>
+
+  <main id="main-content" class="const-page" tabindex="-1">
+    <header class="const-hero">
+      <span class="section-label mono"><a href="/about">About</a> / Constitution</span>
+      <h1>The Regen Commons Constitution</h1>
+      <p class="const-version">MVP constitution · version 2</p>
+      <p>The governing agreement of the commons: why it exists, how it is organized, and who holds which responsibilities. A short summary in plain words comes first, then the full text.</p>
+      <button type="button" class="const-print" id="const-print">Print or save as PDF</button>
+    </header>
+
+    <aside class="const-summary" aria-labelledby="summary-title">
+      <h2 id="summary-title">In plain words</h2>
+      <p class="const-summary-note">This summary is not part of the constitution. Where the two differ, the full text below governs.</p>
+      <ul>
+        <li><strong>Why it exists:</strong> to care for the shared identity of the regenerative movement as a commons, protecting its integrity while keeping it open to many kinds of practice.</li>
+        <li><strong>Freedom to act:</strong> anyone may act toward the commons&rsquo; purpose within the roles they hold, as long as they follow its protocols and uphold its values.</li>
+        <li><strong>Who decides:</strong> an elected steward council manages the treasury and day-to-day governance by simple majority within agreed limits. All members form the Community Assembly, which advises on major decisions and selects stewards.</li>
+        <li><strong>Members:</strong> people aligned with the purpose and values, admitted by invitation and consent. Members can vote on proposals within scope, propose projects and use member resources.</li>
+        <li><strong>Projects:</strong> approved initiatives govern themselves within their agreed scope and receive funding as they reach milestones.</li>
+        <li><strong>What is held in common:</strong> a governance forum, a shared treasury, brand assets, core intellectual property and the constitution itself.</li>
+        <li><strong>Today:</strong> during the foundation period, the <a href="https://portal.opencivics.co/regen-commons-membership-agreement">Membership Agreement</a> sets out the parts in operation. Some parts, such as the treasury and on-chain roles, are scaffolding for later.</li>
+      </ul>
+    </aside>
+
+    <nav class="const-toc" aria-label="Constitution contents">
+      <details open id="const-toc-details">
+        <summary>Contents</summary>
+        <ol>
+          <li><a href="#context">Context</a></li>
+          <li><a href="#freedom">Freedom to participate</a></li>
+          <li><a href="#identity">Identity</a>
+            <ol>
+              <li><a href="#vision">Vision</a></li>
+              <li><a href="#purpose">Purpose</a></li>
+              <li><a href="#mission">Mission</a></li>
+              <li><a href="#values">Values</a></li>
+              <li><a href="#worldview">Worldview</a></li>
+              <li><a href="#mandates">Mandates</a></li>
+            </ol>
+          </li>
+          <li><a href="#structure">Structure</a></li>
+          <li><a href="#roles">Roles</a></li>
+          <li><a href="#assets">Assets</a></li>
+          <li><a href="#protocols">Protocols</a></li>
+          <li><a href="#building-blocks">Building blocks</a></li>
+        </ol>
+      </details>
+    </nav>
+
+    <article class="const-text">
+      <section id="context" aria-labelledby="context-title">
+        <h2 id="context-title">Context</h2>
+        <p>Regen Commons is a cooperative governance container that stewards shared cultural, intellectual, and ecological assets for the regenerative movement during its MVP phase.</p>
+      </section>
+
+      <section id="freedom" aria-labelledby="freedom-title">
+        <h2 id="freedom-title">Freedom to participate</h2>
+        <p>You are free to take any action that fulfills the Purpose of the organization and the Roles that you hold — as long as you do not violate any Protocols; and you seek to uphold the Values and principles of this Constitution.</p>
+      </section>
+
+      <section id="identity" aria-labelledby="identity-title">
+        <h2 id="identity-title">Identity</h2>
+        <p>The core meaning and intentionality of the Commons — why it exists, what it serves, and how it stays oriented over time.</p>
+
+        <h3 id="vision">Vision</h3>
+        <p class="const-lede">The world we seek to help create</p>
+        <p class="const-statement">Regenerative culture, ecology, and economy flourish together as a coherent movement, safeguarded and sustained by shared governance infrastructure that keeps the Regen Movement open, trusted, and life-affirming.</p>
+        <p class="const-test">Test: If this came true, the organization might no longer be needed.</p>
+
+        <h3 id="purpose">Purpose</h3>
+        <p class="const-lede">Why we exist now.</p>
+        <p class="const-statement">Regen Commons exists to care for regen identity as a shared cultural commons — protecting its integrity while enabling its plurality and cooperative use across the movement.</p>
+        <p class="const-test">Test: This would remain true even if our form evolves.</p>
+
+        <h3 id="mission">Mission</h3>
+        <p class="const-lede">What we do to fulfill our purpose.</p>
+        <p class="const-statement">Develop and maintain commons-based governance, recognition, and licensing systems that safeguard Regen Movement assets, support aligned use, and equip the ecosystem with knowledge, IP, and tools to thrive.</p>
+        <p class="const-test">Test: It might change every few years — it&rsquo;s how the purpose is pursued today.</p>
+
+        <h3 id="values">Values</h3>
+        <p class="const-lede">What we stand for.</p>
+        <dl class="const-values">
+          <dt>Care</dt>
+          <dd>Grounding all work in responsibility to people, place, and planet.</dd>
+          <dt>Stewardship beyond ownership</dt>
+          <dd>Holding identity in trust, never as property.</dd>
+          <dt>Transparency</dt>
+          <dd>Creating clarity and openness in decisions and processes.</dd>
+          <dt>Reciprocity</dt>
+          <dd>Ensuring benefits flow back to those who nurture the commons.</dd>
+          <dt>Plurality</dt>
+          <dd>Honoring many expressions of regenerative practice while sustaining coherence.</dd>
+          <dt>Integrity</dt>
+          <dd>Prioritizing what is right for the commons over expedience or control.</dd>
+        </dl>
+        <p class="const-test">Test: If this value was violated, the organization would feel out of integrity — even if its mission was achieved.</p>
+
+        <h3 id="worldview">Worldview</h3>
+        <p class="const-lede">A core worldview or system of understanding that informs how the organization relates to life, place, and purpose.</p>
+        <p class="const-statement">We understand the Regen movement as a living cultural commons. Legitimacy emerges through participatory process, identity and trust are stewarded (not owned), and living systems offer the deepest models for regenerative governance and cultural design. Shared assets must remain open, cared-for, and participatory through protective-yet-permeable membranes and adaptive protocols.</p>
+        <p class="const-test">Test: If this philosophy were removed or violated, the organization&rsquo;s identity and integrity would be fundamentally altered — even if its activities remained the same.</p>
+
+        <h3 id="mandates">Mandates</h3>
+        <p class="const-lede">A clearly defined area of responsibility the organization is committed to upholding through its roles, actions, and structures.</p>
+        <ul>
+          <li>Steward Regen identity and brand integrity as a shared commons</li>
+          <li>Maintain transparent protocols for membership, funding, and brand/IP use</li>
+          <li>Curate and protect shared assets (knowledge, technology, branding, legal)</li>
+          <li>Enable contribution recognition and reciprocal value flows</li>
+          <li>Safeguard legitimacy via accountable governance and conflict transformation</li>
+        </ul>
+        <p class="const-test">Test: If this mandate were abandoned or neglected, the organization would no longer be fulfilling its reason for existing — even if other work continued.</p>
+      </section>
+
+      <section id="structure" aria-labelledby="structure-title">
+        <h2 id="structure-title">Structure</h2>
+        <p>A map of the components that make up the organization.</p>
+        <p>This section defines the membranes that compose Regen Commons (MVP).</p>
+
+        <h3 id="steward-council">Steward Council</h3>
+        <p>Interim stewardship membrane composed of elected multisig stewards to manage treasury and MVP governance execution.</p>
+        <dl class="const-facts">
+          <dt>Decision making</dt><dd>Simple majority on operational matters within protocol-defined thresholds</dd>
+          <dt>Meeting cadence</dt><dd>Bi-weekly first 6 months, then monthly</dd>
+          <dt>Transparency</dt><dd>Decisions documented and shared with assembly</dd>
+          <dt>Oversight</dt><dd>Assembly advice and review on major decisions</dd>
+          <dt>Roles</dt><dd>Steward (Multisig)</dd>
+          <dt>Protocols</dt><dd>Decision-Making Protocol, Treasury Management Protocol, Member Protocol</dd>
+          <dt>Assets</dt><dd>Commons Treasury Multi-Sig, Constitution</dd>
+        </dl>
+
+        <h3 id="community-assembly">Community Assembly</h3>
+        <p>Advisory and participatory membrane composed of all recognized members for sensemaking, selection, and guidance.</p>
+        <dl class="const-facts">
+          <dt>Composition</dt><dd>All founding and admitted members</dd>
+          <dt>Meetings</dt><dd>Monthly community calls; ad hoc as needed</dd>
+          <dt>Powers</dt><dd>Advisory input on major decisions; steward selection; proposal incubation</dd>
+          <dt>Participation</dt><dd>Open discussion; temperature checks; recommendations</dd>
+          <dt>Roles</dt><dd>Member</dd>
+          <dt>Protocols</dt><dd>Member Protocol, Decision-Making Protocol</dd>
+        </dl>
+
+        <h3 id="project">Project</h3>
+        <p>Scoped membrane for approved initiatives operating under a self-governance plan and milestone-based funding.</p>
+        <dl class="const-facts">
+          <dt>Composition</dt><dd>Members listed in approved project plan or selected by Project Lead</dd>
+          <dt>Meetings</dt><dd>Defined by scope</dd>
+          <dt>Powers</dt><dd>Any action within approved scope consistent with constitution and protocols</dd>
+          <dt>Participation</dt><dd>Defined by scope</dd>
+          <dt>Roles</dt><dd>Project Lead, Project Participant</dd>
+          <dt>Protocols</dt><dd>Project Protocol, Treasury Management Protocol, Decision-Making Protocol</dd>
+        </dl>
+      </section>
+
+      <section id="roles" aria-labelledby="roles-title">
+        <h2 id="roles-title">Roles</h2>
+
+        <h3 id="member">Member</h3>
+        <p>Certified commoner with baseline governance rights and responsibilities.</p>
+        <dl class="const-facts">
+          <dt>Criteria</dt><dd>Verified alignment with Purpose and Values; invitation and consent per Member Protocol.</dd>
+          <dt>Responsibilities</dt><dd>Participate in governance; uphold values; peer accountability; vote on proposals within scope.</dd>
+          <dt>Benefits</dt><dd>Voting rights; ability to propose projects; access to member-only resources.</dd>
+          <dt>Membrane</dt><dd>Community Assembly</dd>
+        </dl>
+
+        <h3 id="steward">Steward (Multisig)</h3>
+        <p>Interim guardians and decision-makers managing treasury and operational execution during MVP.</p>
+        <dl class="const-facts">
+          <dt>Criteria</dt><dd>Selected via community election; meets eligibility defined by Member Protocol; term-limited.</dd>
+          <dt>Responsibilities</dt><dd>Manage treasury per protocol; approve project funding; maintain transparency; execute on-chain actions.</dd>
+          <dt>Benefits</dt><dd>Stewardship authority within defined scope; recognition.</dd>
+          <dt>Membrane</dt><dd>Steward Council</dd>
+          <dt>Role address</dt><dd>Multisig signer (Gnosis Safe), Hats role (TBD)</dd>
+        </dl>
+
+        <h3 id="project-lead">Project Lead</h3>
+        <p>Scope lead for an approved project within Regen Commons.</p>
+        <dl class="const-facts">
+          <dt>Criteria</dt><dd>Capacity to execute approved scope; proposal accepted by Steward Council.</dd>
+          <dt>Responsibilities</dt><dd>Deliver outcomes; manage allocated funds per milestones; coordinate contributors; report progress.</dd>
+          <dt>Benefits</dt><dd>Funding per milestones; attribution for completed work; authority within approved scope.</dd>
+          <dt>Membrane</dt><dd>Project</dd>
+        </dl>
+
+        <h3 id="project-participant">Project Participant</h3>
+        <p>Contributor to an approved project scope.</p>
+        <dl class="const-facts">
+          <dt>Criteria</dt><dd>Capacity to contribute meaningfully; selected per project scope.</dd>
+          <dt>Responsibilities</dt><dd>Execute assigned tasks; communicate progress; uphold values.</dd>
+          <dt>Benefits</dt><dd>Compensation via project funds; attribution for contributions.</dd>
+          <dt>Membrane</dt><dd>Project</dd>
+        </dl>
+
+        <h3 id="licensed-partner">Licensed Partner</h3>
+        <p>Organization using Regen brand under lightweight licensing agreements.</p>
+        <dl class="const-facts">
+          <dt>Criteria</dt><dd>Values alignment assessment; license approval per protocol.</dd>
+          <dt>Responsibilities</dt><dd>Adhere to brand guidelines; contribute back via fees/stories; uphold legitimacy.</dd>
+          <dt>Benefits</dt><dd>Brand usage rights; community recognition; access to shared resources.</dd>
+          <dt>Membrane</dt><dd>Community Assembly</dd>
+          <dt>Role address</dt><dd>Access credential/NFT (TBD)</dd>
+        </dl>
+      </section>
+
+      <section id="assets" aria-labelledby="assets-title">
+        <h2 id="assets-title">Assets</h2>
+        <p>This section defines the assets owned and managed by the Commons (MVP).</p>
+
+        <h3 id="governance-forum">Governance Forum</h3>
+        <p>Primary venue for proposals, records, and communications. Public record-keeping for legitimacy and transparency.</p>
+        <dl class="const-facts">
+          <dt>Type</dt><dd>Infrastructural</dd>
+          <dt>Protocols</dt><dd>Publishing Protocol, Decision-Making Protocol</dd>
+          <dt>Location</dt><dd>Forum/website (TBD)</dd>
+        </dl>
+
+        <h3 id="treasury">Commons Treasury Multi-Sig</h3>
+        <p>Primary treasury for MVP, controlled by Steward Council for allocations per protocol.</p>
+        <dl class="const-facts">
+          <dt>Type</dt><dd>Financial</dd>
+          <dt>Protocols</dt><dd>Treasury Management Protocol, Decision-Making Protocol</dd>
+          <dt>Allocation tiers</dt><dd>Ops, mid-tier, strategic (see Decision-Making Protocol)</dd>
+          <dt>Transparency</dt><dd>Transactions logged; reports published by stewards</dd>
+          <dt>Location</dt><dd>Gnosis Safe (address TBD)</dd>
+        </dl>
+
+        <h3 id="brand-assets">Brand Assets</h3>
+        <p>Regen identity assets including trademark, logos, domains, and narrative guidelines. Protocols for access and revocation to prevent Regen-washing. License tiers and usage guidelines.</p>
+        <dl class="const-facts">
+          <dt>Type</dt><dd>Reputational</dd>
+          <dt>Protocols</dt><dd>Brand Usage Protocol</dd>
+          <dt>Location</dt><dd>regen.eth (domain/account), brand repository (TBD)</dd>
+        </dl>
+
+        <h3 id="core-ip">Core IP</h3>
+        <p>Foundational intellectual property and documentation stewarded by the Commons. Contribution intake, attribution, and licensing managed via protocols.</p>
+        <dl class="const-facts">
+          <dt>Type</dt><dd>Intellectual property</dd>
+          <dt>Protocols</dt><dd>IP Protocol, Publishing Protocol</dd>
+          <dt>Location</dt><dd>Repositories and knowledge bases (TBD)</dd>
+        </dl>
+
+        <h3 id="constitution-asset">Constitution</h3>
+        <p>The governing agreement of the Commons during MVP.</p>
+        <dl class="const-facts">
+          <dt>Type</dt><dd>Agreement</dd>
+          <dt>Protocols</dt><dd>Constitution Protocol</dd>
+        </dl>
+      </section>
+
+      <section id="protocols" aria-labelledby="protocols-title">
+        <h2 id="protocols-title">Protocols</h2>
+        <p>This index provides a complete list of governance protocols during the MVP.</p>
+        <dl class="const-facts">
+          <dt>Role protocols</dt><dd>Member Protocol</dd>
+          <dt>Membrane protocols</dt><dd>Project Protocol</dd>
+          <dt>Asset protocols</dt><dd>Treasury Management Protocol, IP Protocol, Brand Usage Protocol, Publishing Protocol, Constitution Protocol</dd>
+          <dt>Cultural protocols</dt><dd>Decision-Making Protocol</dd>
+        </dl>
+        <div class="const-notes">
+          <p>Note: the protocols are documented separately from this text. During the foundation period, the <a href="https://portal.opencivics.co/regen-commons-membership-agreement">Membership Agreement</a> sets out the membership, decision-making and conflict protocols in use.</p>
+        </div>
+      </section>
+
+      <section id="building-blocks" aria-labelledby="blocks-title">
+        <h2 id="blocks-title">Building blocks</h2>
+        <p>The fundamental categories and building blocks we use to name, organize, and relate to ourselves. This section defines the core objects within the Commons&rsquo; operational reality.</p>
+
+        <h3 id="asset-definition">Asset</h3>
+        <p>This object defines an asset owned or managed by the Commons. Assets can be financial, digital, reputational, or intellectual property. Each asset is stewarded by one or more roles and governed by specific protocols.</p>
+
+        <h3 id="membrane-definition">Membrane</h3>
+        <p>Boundaries that regulate participation, permissions, and trust thresholds. Membranes are semi-permeable boundaries that define coherent units of action, intention, and collaboration. Each membrane has entry/exit criteria, maintains appropriate internal governance, is accountable to values and protocols, and can steward its own subset of assets, roles, and responsibilities.</p>
+
+        <h3 id="protocol-definition">Protocol</h3>
+        <p>The core life processes required to sustain and evolve the organism. This object defines a protocol, which is a repeatable, documented process for coordinating action within the Commons.</p>
+
+        <h3 id="role-definition">Role</h3>
+        <p>Containers of agency and responsibility within the organization. This object defines a role within the Commons. Roles are distinct sets of responsibilities and permissions that can be held by members. They are the building blocks of the organization&rsquo;s structure.</p>
+
+        <div class="const-notes">
+          <p>Notes for readers, not part of the constitution:</p>
+          <p><strong>Multisig:</strong> a shared account that needs several stewards to approve before funds move. Gnosis Safe is one such account.</p>
+          <p><strong>Hats role:</strong> an on-chain record of who holds a role. The constitution plans for these; they are not yet in use.</p>
+        </div>
+      </section>
+    </article>
+  </main>
+
+  <script src="/logo-canvas.js"></script>
+  <script src="/script.js"></script>
+  <script>
+    // Print button, and a collapsed contents list on small screens.
+    document.getElementById('const-print').addEventListener('click', function () { window.print(); });
+    if (window.matchMedia('(max-width: 960px)').matches) {
+      document.getElementById('const-toc-details').removeAttribute('open');
+    }
+  </script>
+</body>
+</html>
