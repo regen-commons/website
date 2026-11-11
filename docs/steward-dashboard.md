@@ -22,7 +22,8 @@ The canonical dashboard path is `/council`. `/admin` and `/admin.html` redirect
 there permanently, preserving existing bookmarks. Browser assets remain under
 `admin/`, and the authenticated API remains `/api/admin`. The route change does
 not change steward authorization or the configured `ADMIN_ORIGIN`, which is an
-origin without a path. Hosted routing must be verified after deployment.
+origin without a path. Hosted routing was verified on 11 November 2026; see the
+[production record](steward-verification.md#production-release).
 
 1. Enter `steward@example.test` and request a code.
 2. Enter `123456`. This is a synthetic fixture code; no email is sent.
@@ -142,9 +143,9 @@ Public signup is enabled at the project level; the dashboard's own requests use
 `shouldCreateUser: false`, and database access independently requires an active
 steward role and session. Project-wide signup-policy changes require a separate
 decision. The 29 October pilot used a disposable, loopback-only Auth probe while
-the published website returned 404 for `/admin`. On 11 November, public HTTP
-checks returned 200 for `/admin` and 404 for `/council`; the new route still needs
-deployment. The default fixture server remains isolated from hosted Supabase.
+the published website returned 404 for `/admin`. On 11 November, the council
+route release went live: `/council` returns 200 and `/admin` redirects there.
+The default fixture server remains isolated from hosted Supabase.
 
 Before a separately authorized hosted pilot:
 
