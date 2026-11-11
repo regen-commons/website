@@ -14,6 +14,12 @@ try {
     assert.equal(response.headers.get("x-regen-data"), "fixture");
     await response.text();
   }
+  assert.equal((await fetch(`${base}/council`)).status, 200);
+  for (const path of ["/admin", "/admin.html"]) {
+    const response = await fetch(`${base}${path}`, { redirect: "manual" });
+    assert.equal(response.status, 308, path);
+    assert.equal(response.headers.get("location"), "/council", path);
+  }
   for (const name of ["members", "contributions", "seeds"]) {
     const response = await fetch(`${base}/api/${name}`);
     assert.equal(response.status, 200, name);
