@@ -39,7 +39,7 @@ for seed and application writes remains follow-up work in item 3.
 
 ## 2. Establish a verified integration environment — parallel ownership work
 
-**Updated direction:** Supabase and `/admin` email-code access are confirmed;
+**Updated direction:** Supabase and `/council` email-code access are confirmed;
 Directus is not part of the plan. The [read-only dashboard slice](steward-dashboard.md)
 was merged in [PR #3](https://github.com/regen-commons/website/pull/3), after the
 foundation PRs. Its schema and PostgreSQL access
@@ -59,6 +59,30 @@ acceptance/publication authority and migration scope. The remaining
 Notion work below is source inventory/export and reconciliation, not investment
 in a lasting replacement development database. Preserve separate acceptance and
 publication until council policy is agreed.
+
+**Council access and route (11 November 2026):** make `/council` the canonical
+dashboard URL, redirect `/admin` and `/admin.html`, and retain the existing
+user-scoped API and role/session checks. Provision the four user-confirmed
+council addresses in hosted Auth and grant their active steward roles without
+committing the roster. Completion requires account/role readback, route checks,
+the repository suites, and rendered fixture sign-in/denial at desktop/mobile
+widths. Account provisioning, local verification, and hosted deployment are
+separate evidence; the production route is now deployed and verified.
+The route implementation, `check`, all 30 tests, smoke, and rendered Brave
+fixtures passed; see [verification](steward-verification.md#council-route--11-november-2026).
+The four user-confirmed council accounts were created through the explicitly
+authorized Auth admin API and granted active steward roles. Committed database
+readback verified four confirmed email identities with active roles, plus the
+existing steward. The temporary credential copy was removed. No invitations
+were sent; the project's default invitation URL still points to localhost.
+Recipients still need to complete their own code sign-in. `/council` is live,
+and the legacy entry points redirect there. Release `b3a8a6b` on the published
+`codex/council-route` branch is Vercel production READY. Source integration into
+`main` preserves the deployed route and redirects for subsequent deployments.
+The production-based release passed all 81 tests, check, and smoke; live HTTP and
+desktop/mobile browser checks passed. See the
+[production record](steward-verification.md#production-release).
+
 
 **Scope:** account inventory and development configuration, followed by an
 explicitly authorized live smoke. No production migration is implied.

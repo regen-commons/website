@@ -1,5 +1,66 @@
 # Steward dashboard verification
 
+## Council route — 11 November 2026
+
+The dashboard shell is now `council.html`, served at `/council`. Legacy `/admin`
+and `/admin.html` links redirect permanently; browser assets and `/api/admin`
+retain their existing paths. Vercel's dashboard security headers now target
+`/council`. Initial public HTTP checks returned 200 for `/admin` and 404 for
+`/council`; the production release below completed the route cutover.
+
+`npm run check`, all 30 tests, and `npm run smoke` passed on Node 22.22.1.
+The route regression covers direct clean/HTML paths, legacy redirects with a
+query string, fixture guidance, and unchanged asset URLs. Tests and smoke used
+temporary loopback fixture servers; no external submissions were made.
+
+Rendered local fixtures in Brave at 1460×780 and 390×844 verified the redirected
+URL, keyboard submission, invalid-code feedback, authorized Applications and
+Members, sign-out, and non-steward denial. Both widths had no horizontal overflow.
+No site-script console errors were observed; a browser extension logged click
+handler errors. Screenshots are ignored local artifacts under
+`artifacts/council-route/`. This evidence does not prove hosted code delivery or
+the council recipients' completed sign-ins.
+
+The four user-confirmed council accounts were created in Regen Commons /
+Platform (the same `ztygpuzldujfsqrubxic` project formerly named Website) through
+the Auth admin API, with confirmed emails and no assigned passwords or invitation
+emails. Administrator SQL granted their active `private.steward_roles` rows.
+Post-commit readback verified all four email identities and active roles, with
+five active stewards in total. The roster and credential are not committed; the
+temporary credential copy was removed. Recipients' own code delivery and sign-in
+remain unverified. The existing dashboard still checks each user's active
+role and session; no schema, grants, or policies changed.
+
+### Production release
+
+Release commit `b3a8a6b2c60426b6f6935549ff1f366c6b49517d` on
+`codex/council-route` preserves production baseline `f019023` and adds the council
+route. It was deployed to Regen Commons / website as
+`dpl_hjisD8XWnXkL3ggSjznt9Jr1qKVj` (production, READY, static HTML, about 16 seconds
+to build). The route and redirect rules are versioned for subsequent builds;
+this source change brings the published release into `main`.
+
+The exact release passed `npm run check` (75 JavaScript files/inline scripts),
+all 81 tests, and `npm run smoke` (seven pages) inside the isolated development
+machine on Node 22.23.4. No schema or provider configuration changed.
+
+Live HTTP verified `https://regencommons.com/council` returns 200 with no-store,
+frame denial, no-referrer, and noindex headers. `/admin` returns 308 to `/council`;
+Vercel first normalizes `/admin.html` and `/admin/` to `/admin`, then redirects to
+`/council`. Query strings survive. Existing dashboard JS paths return 200, and
+an anonymous session request returns 401 with private/no-store caching.
+
+Brave loaded the live sign-in page at 1460×837 and 390×844 without horizontal
+overflow or console errors. The old URL preserved both a query string and the
+`#members` fragment. Keyboard focus moves from email to the submit button. No
+live sign-in codes or form submissions were sent. Ignored screenshots are under
+`artifacts/council-route/live-*.jpg`. An immediate deployment-scoped runtime-log
+scan found no error or fatal entries; this is a short observation window.
+
+Vercel's normal ignored-build rule canceled the first attempt because the release
+was outside `main`/`develop`. The successful deployment used a scoped build
+command override for this user-authorized release.
+
 Evidence collected on 29 October 2026 on `codex/steward-dashboard`, above
 foundation commit `b552d9a`. Dashboard implementation is scoped separately from
 the foundation PRs. The PR records CI results for the published commit; the

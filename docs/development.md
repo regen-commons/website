@@ -29,7 +29,7 @@ member is excluded. A new application succeeds locally but stays off the public
 map. A new seed appears in `/api/seeds`. All submitted data disappears on restart.
 Use `example.test` addresses and invented content.
 
-The `/admin` dashboard has a separate synthetic steward provider. Request a code
+The `/council` dashboard has a separate synthetic steward provider. Request a code
 for `steward@example.test`, then enter `123456`; no mail is sent. Its applications
 and curated profiles are independent of the public Notion fixtures. See
 [steward setup](steward-dashboard.md) for access-denial examples, the actual
