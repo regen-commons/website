@@ -9,7 +9,7 @@ exports, not to infer current production or branch deployment status.
 ## Legacy Notion contract and export mapping
 
 Before this migration, the public browser called four Vercel handlers backed by
-Notion, Resend, and the separate Telegram agent. The separate `/admin` browser
+Notion, Resend, and the separate Telegram agent. The separate `/council` browser
 calls `/api/admin`, whose Supabase client carries the authenticated user's token
 and remains subject to row policies. There is no frontend framework or bundler.
 The [steward contract](steward-dashboard.md) owns dashboard schema, access,

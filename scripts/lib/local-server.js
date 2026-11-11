@@ -81,13 +81,17 @@ export function createLocalServer({ stewardProvider = createStewardFixtures() } 
         res.setHeader("Allow", "GET, HEAD");
         return json(res, 405, { error: "method_not_allowed" });
       }
+      if (["/admin", "/admin/", "/admin.html"].includes(path)) {
+        res.writeHead(308, { Location: `/council${url.search}` });
+        return res.end();
+      }
       const file = resolvePublicFile(path);
       if (!file) return json(res, 404, { error: "not_found" });
       const type = file.split(".").at(-1);
       let content = await readFile(new URL(file, root));
       if (type === "html") content = content.toString("utf8");
-      if (file === "admin.html") content = content.replace('id="demo-help" hidden', 'id="demo-help"');
-      if (type === "html") content = content.replace("</body>", `${file === "admin.html" ? '<aside class="dev-banner">Local demo · synthetic data · no email is sent · restart to reset</aside>' : banner}</body>`);
+      if (file === "council.html") content = content.replace('id="demo-help" hidden', 'id="demo-help"');
+      if (type === "html") content = content.replace("</body>", `${file === "council.html" ? '<aside class="dev-banner">Local demo · synthetic data · no email is sent · restart to reset</aside>' : banner}</body>`);
       // Match the text compression used by the deployment CDN. Fonts are
       // already compressed and must remain byte-for-byte intact.
       if (["html", "css", "js", "svg"].includes(type)) {
