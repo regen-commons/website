@@ -74,6 +74,25 @@ test("self-hosted font files retain their binary content and font MIME type", as
   assert.deepEqual(Buffer.from(await response.arrayBuffer()), await readFile(new URL(`..${path}`, import.meta.url)));
 });
 
+test("the council dashboard loads directly and legacy admin links redirect without breaking assets", async () => {
+  for (const path of ["/council", "/council/", "/council.html"]) {
+    const response = await request(path);
+    assert.equal(response.status, 200, path);
+    const html = await response.text();
+    assert.match(html, /action="\/council"/);
+    assert.match(html, /Local demo · synthetic data · no email is sent/);
+    assert.doesNotMatch(html, /id="demo-help" hidden/);
+  }
+  for (const path of ["/admin", "/admin/", "/admin.html"]) {
+    const response = await request(`${path}?search=River`, { redirect: "manual" });
+    assert.equal(response.status, 308, path);
+    assert.equal(response.headers.get("location"), "/council?search=River");
+  }
+  for (const path of ["/admin/app.js", "/admin/style.css", "/admin/theme.js"]) {
+    assert.equal((await request(path, { redirect: "manual" })).status, 200, path);
+  }
+});
+
 test("actual read handlers exclude pending members and private fields, and resolve contributors", async () => {
   const response = await request("/api/members");
   assert.equal(response.headers.get("cache-control"), "no-store");

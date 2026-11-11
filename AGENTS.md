@@ -14,11 +14,11 @@ layers, read each owning guide; keep shared rules here and layer rules there.
 
 | Surface | Guide |
 | --- | --- |
-| `admin.html` and `admin/` browser assets | [Admin UI](admin/AGENTS.md) |
+| `council.html` and `admin/` browser assets | [Admin UI](admin/AGENTS.md) |
 | `api/` handlers and provider adapters | [API and data access](api/AGENTS.md) |
 | `supabase/` schema, policies, and database checks | [Database](supabase/AGENTS.md) |
 
-The admin guide also applies to root-level `admin.html`, which is outside its
+The admin guide also applies to root-level `council.html`, which is outside its
 directory. `CLAUDE.md` imports this guide; keep repository policy in `AGENTS.md`.
 
 ## Structure and boundaries

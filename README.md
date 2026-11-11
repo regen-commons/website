@@ -1,6 +1,6 @@
 # Regen Commons website
 
-Five public HTML pages and a separate `/admin` steward dashboard, with Vercel
+Five public HTML pages and a separate `/council` steward dashboard, with Vercel
 functions for data access. Public intake, the commons library, and shared visions
 still use Notion. The read-only steward pilot uses Supabase PostgreSQL and Auth.
 Optional public-intake notifications use Resend and the separate Telegram agent.
@@ -48,7 +48,7 @@ checks; provider delivery needs a separately configured integration environment.
 | Member graph and contributions library | `map.html` |
 | Seed planting experience | `seeds.html` |
 | Six-step membership application | `join.html` |
-| Steward login, applications, and member review | `admin.html`, `admin/`, `api/admin.js` |
+| Steward login, applications, and member review | `council.html`, `admin/`, `api/admin.js` |
 | Shared interactions and styling | `script.js`, `style.css` |
 | Canvas animations | `canvas.js`, `logo-canvas.js` |
 | Server handlers and provider helpers | `api/`, `api/_lib/` |

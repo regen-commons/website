@@ -2,9 +2,13 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
   "trailingSlash": false,
+  "redirects": [
+    { "source": "/admin", "destination": "/council", "permanent": true },
+    { "source": "/admin.html", "destination": "/council", "permanent": true }
+  ],
   "headers": [
     {
-      "source": "/admin",
+      "source": "/council",
       "headers": [
         { "key": "Cache-Control", "value": "no-store" },
         { "key": "X-Frame-Options", "value": "DENY" },

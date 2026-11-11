@@ -1,7 +1,7 @@
 # Steward dashboard UI
 
 Use the [root guide](../AGENTS.md) for shared workflow. This guide covers this
-directory and root-level `admin.html`, as routed by the root guide. When the
+directory and root-level `council.html`, as routed by the root guide. When the
 dashboard implementation is present, inspect the page, `admin/app.js`, and
 `admin/style.css` together. If a checkout contains only this guidance, treat the
 missing implementation as pending rather than claiming a runnable dashboard.
@@ -9,7 +9,9 @@ For request or session changes, also read the [API guide](../api/AGENTS.md).
 
 ## Boundaries
 
-- Keep `/admin` as the steward surface with email sign-in codes. The HTML shell
+- Keep `/council` as the steward surface with email sign-in codes. Redirect legacy
+  `/admin` entry points without redirecting the `admin/` browser assets.
+  The HTML shell
   contains no private records; authenticated requests load them through
   `/api/admin`. UI visibility is not an authorization check.
 - Keep original application answers visibly separate from a curated profile

@@ -1,5 +1,36 @@
 # Steward dashboard verification
 
+## Council route — 11 November 2026
+
+The dashboard shell is now `council.html`, served at `/council`. Legacy `/admin`
+and `/admin.html` links redirect permanently; browser assets and `/api/admin`
+retain their existing paths. Vercel's dashboard security headers now target
+`/council`. Hosted routing remains pending deployment: read-only public HTTP
+checks returned 200 for `/admin` and 404 for `/council` on this date.
+
+`npm run check`, all 30 tests, and `npm run smoke` passed on Node 22.22.1.
+The route regression covers direct clean/HTML paths, legacy redirects with a
+query string, fixture guidance, and unchanged asset URLs. Tests and smoke used
+temporary loopback fixture servers; no external submissions were made.
+
+Rendered local fixtures in Brave at 1460×780 and 390×844 verified the redirected
+URL, keyboard submission, invalid-code feedback, authorized Applications and
+Members, sign-out, and non-steward denial. Both widths had no horizontal overflow.
+No site-script console errors were observed; a browser extension logged click
+handler errors. Screenshots are ignored local artifacts under
+`artifacts/council-route/`. This evidence does not prove hosted code delivery or
+the council recipients' completed sign-ins.
+
+The four user-confirmed council accounts were created in Regen Commons /
+Platform (the same `ztygpuzldujfsqrubxic` project formerly named Website) through
+the Auth admin API, with confirmed emails and no assigned passwords or invitation
+emails. Administrator SQL granted their active `private.steward_roles` rows.
+Post-commit readback verified all four email identities and active roles, with
+five active stewards in total. The roster and credential are not committed; the
+temporary credential copy was removed. Recipients' own code delivery and sign-in
+remain unverified. The existing dashboard still checks each user's active
+role and session; no schema, grants, or policies changed.
+
 Evidence collected on 29 October 2026 on `codex/steward-dashboard`, above
 foundation commit `b552d9a`. Dashboard implementation is scoped separately from
 the foundation PRs. The PR records CI results for the published commit; the

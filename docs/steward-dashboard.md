@@ -1,6 +1,6 @@
 # Steward dashboard pilot
 
-The first `/admin` slice supports email-code sign-in, explicitly authorized
+The `/council` dashboard supports email-code sign-in, explicitly authorized
 steward reads, application search and filters, private application detail, a
 curated profile preview, and a member view with affiliations and contributions.
 It is read-only. It does not accept applications, publish profiles, grant roles,
@@ -9,9 +9,15 @@ or replace the public site's Notion readers and intake.
 ## Run the local demo
 
 Use Node 22, `npm ci`, and `npm run dev`. Open
-[the steward desk](http://127.0.0.1:3501/admin). If another session owns port 3501,
+[the steward desk](http://127.0.0.1:3501/council). If another session owns port 3501,
 use `PORT=3503 npm run dev` and open the same path on port 3503. Do not replace
 another session's server. The implementation session uses port 3503.
+
+The canonical dashboard path is `/council`. `/admin` and `/admin.html` redirect
+there permanently, preserving existing bookmarks. Browser assets remain under
+`admin/`, and the authenticated API remains `/api/admin`. The route change does
+not change steward authorization or the configured `ADMIN_ORIGIN`, which is an
+origin without a path. Hosted routing must be verified after deployment.
 
 1. Enter `steward@example.test` and request a code.
 2. Enter `123456`. This is a synthetic fixture code; no email is sent.
@@ -130,9 +136,10 @@ The email provider currently uses eight-digit OTPs with a 3,600-second expiry.
 Public signup is enabled at the project level; the dashboard's own requests use
 `shouldCreateUser: false`, and database access independently requires an active
 steward role and session. Project-wide signup-policy changes require a separate
-decision. The published website currently returns 404 for `/admin`; a disposable,
-loopback-only Auth probe can exercise the actual handler and hosted Supabase
-without changing the default fixture server or deploying the site.
+decision. The 29 October pilot used a disposable, loopback-only Auth probe while
+the published website returned 404 for `/admin`. On 11 November, public HTTP
+checks returned 200 for `/admin` and 404 for `/council`; the new route still needs
+deployment. The default fixture server remains isolated from hosted Supabase.
 
 Before a separately authorized hosted pilot:
 
