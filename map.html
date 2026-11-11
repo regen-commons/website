@@ -3,10 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Regen Commons — Inside the Commons</title>
-  <meta name="description" content="Explore the people, organizations, relationships, and contributions that make up the Regen Commons." />
+  <title>Explore the Commons · Regen Commons</title>
+  <meta name="description" content="Meet the people and organizations of the Regen Commons and explore the knowledge, tools and experiments they share." />
   <link rel="canonical" href="https://regencommons.com/map" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Regen Commons" />
+  <meta property="og:title" content="Explore the Regen Commons" />
+  <meta property="og:description" content="Meet the people and organizations of the Regen Commons and explore the knowledge, tools and experiments they share." />
+  <meta property="og:url" content="https://regencommons.com/map" />
+  <meta property="og:image" content="https://regencommons.com/assets/share/map.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Explore the Commons. Regen Commons." />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="theme-color" content="#0D100A" />
+  <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="preload" href="/assets/fonts/fraunces-latin.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="/fonts.css" />
   <link rel="stylesheet" href="/style.css" />
@@ -83,27 +96,62 @@
   padding: 1.5rem;
 }
 
-/* Ecosystem tooltip — follows cursor, not bottom-left */
+/* Ecosystem hover card: a set width keeps long member details readable;
+   the script keeps it inside the map on every side. */
 .ecosystem-tooltip {
   position: absolute;
+  width: max-content;
+  max-width: 280px;
   background: var(--parchment);
-  border: 1px solid rgba(var(--copper-rgb), 0.2);
-  padding: 0.6rem 1rem;
+  border: 1px solid rgba(var(--copper-rgb), 0.25);
+  box-shadow: 0 14px 32px -18px rgba(0, 0, 0, 0.7);
+  padding: 0.75rem 0.9rem;
   pointer-events: none;
   z-index: 10;
-  white-space: nowrap;
 }
 .eco-tooltip-name {
-  font-family: 'Fraunces', Georgia, serif;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--ink);
   display: block;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--ink);
 }
-.eco-tooltip-role {
-  font-family: 'Source Serif 4', Georgia, serif;
-  font-size: 0.75rem;
+.eco-tooltip-meta {
+  display: block;
+  margin-top: 0.3rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+.eco-tooltip-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.6rem;
+}
+.eco-tooltip-tags[hidden] { display: none; }
+.eco-tooltip-tag {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.66rem;
   color: var(--ink-mid);
+  border: 1px solid rgba(var(--copper-rgb), 0.25);
+  border-radius: 999px;
+  padding: 0.15rem 0.5rem;
+}
+.eco-tooltip-hint {
+  display: block;
+  margin-top: 0.6rem;
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-style: italic;
+  font-size: 0.72rem;
+  color: var(--ink-dim);
 }
 
 /* Knowledge query */
@@ -782,7 +830,7 @@ body.rc-modal-locked { overflow: hidden; }
     <a href="/learn#plant" class="page-nav-dot" data-label="Plant" aria-label="Plant"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 22V8"/><path d="M5 12H2a10 10 0 0 0 10-10v3a7 7 0 0 1-7 7z"/><path d="M19 12h3a10 10 0 0 1-10-10v3a7 7 0 0 0 7 7z"/></svg></a>
     <a href="/map" class="page-nav-dot active" data-label="Map" aria-label="Map" aria-current="page"><svg aria-hidden="true" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></a>
     <a href="/join" class="page-nav-dot" data-label="Join" aria-label="Join"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg></a>
-    <a href="mailto:regencommons@gmail.com" class="page-nav-dot" data-label="Email" aria-label="Email"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3,7 12,13 21,7"/></svg></a>
+    <a href="/about" class="page-nav-dot" data-label="About" aria-label="About"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></a>
   </nav>
 
   <canvas aria-hidden="true" id="mycelium-canvas"></canvas>
@@ -794,7 +842,7 @@ body.rc-modal-locked { overflow: hidden; }
     <section class="map-hero">
       <span class="mono" style="display:block;margin-bottom:1.4rem;letter-spacing:0.22em;">Map of our shared works</span>
       <h1 class="map-hero-title">Explore the Commons</h1>
-      <p class="map-hero-body">Welcome to Regen Commons — the shared ground of the relationships, knowledge, assets and experiments of the regenerative movement.</p>
+      <p class="map-hero-body">Welcome to Regen Commons, the shared ground of the regenerative movement&rsquo;s relationships, knowledge, assets and experiments.</p>
       <div class="map-hero-cta">
         <a href="/join" class="btn btn--large btn--primary"><span class="btn-label">Become a member</span> &rarr;</a>
       </div>
@@ -812,9 +860,11 @@ body.rc-modal-locked { overflow: hidden; }
       </div>
       <div class="ecosystem-map-wrap" hidden>
         <canvas id="ecosystem-canvas" width="900" height="500"></canvas>
-        <div class="ecosystem-tooltip" id="eco-tooltip" style="display:none;">
+        <div class="ecosystem-tooltip" id="eco-tooltip" hidden>
           <span class="eco-tooltip-name" id="eco-tooltip-name"></span>
-          <span class="eco-tooltip-role" id="eco-tooltip-role"></span>
+          <span class="eco-tooltip-meta" id="eco-tooltip-meta"></span>
+          <span class="eco-tooltip-tags" id="eco-tooltip-tags"></span>
+          <span class="eco-tooltip-hint">Click to open the profile</span>
         </div>
       </div>
     </section>
@@ -933,7 +983,7 @@ body.rc-modal-locked { overflow: hidden; }
             <span class="tier-num">Tier 2</span>
             <div>
               <span class="tier-name">Member-Privileged</span>
-              <span class="tier-desc">Members get preferential access &mdash; previews, queries, light usage rights.</span>
+              <span class="tier-desc">Members get preferential access: previews, queries, light usage rights.</span>
             </div>
           </div>
         </div>
@@ -950,7 +1000,7 @@ body.rc-modal-locked { overflow: hidden; }
             <span class="tier-num">Tier 4</span>
             <div>
               <span class="tier-name">Fully Contributed</span>
-              <span class="tier-desc">Held by the commons itself &mdash; freely usable and stewarded collectively.</span>
+              <span class="tier-desc">Held by the commons itself, freely usable and stewarded collectively.</span>
             </div>
           </div>
         </div>
@@ -1031,7 +1081,7 @@ body.rc-modal-locked { overflow: hidden; }
             return '<button type="button" class="contributor-link" data-name="' +
               escapeHtml(p.name) + '">' + escapeHtml(p.name) + "</button>";
           })
-          .join(", ") || "—";
+          .join(", ") || "None listed";
 
         var capitalArr = Array.isArray(c.capitalForm) ? c.capitalForm : (c.capitalForm ? [c.capitalForm] : []);
         var capitalHtml = capitalArr.map(function (k) {
@@ -1117,6 +1167,7 @@ body.rc-modal-locked { overflow: hidden; }
         signal:  { r: 90,  g: 172, b: 204 },
         text:    "rgba(237,229,212,0.85)",
         textDim: "rgba(237,229,212,0.45)",
+        halo:    "rgba(20,24,16,0.9)",
         edge:    0.12
       },
       light: {
@@ -1129,6 +1180,7 @@ body.rc-modal-locked { overflow: hidden; }
         signal:  { r: 42,  g: 104, b: 136 },
         text:    "rgba(30,36,24,0.85)",
         textDim: "rgba(30,36,24,0.45)",
+        halo:    "rgba(224,214,192,0.9)",
         edge:    0.18
       }
     };
@@ -1150,7 +1202,8 @@ body.rc-modal-locked { overflow: hidden; }
     var wrap = canvas.parentElement;
     var tooltip = document.getElementById("eco-tooltip");
     var tooltipName = document.getElementById("eco-tooltip-name");
-    var tooltipRole = document.getElementById("eco-tooltip-role");
+    var tooltipMeta = document.getElementById("eco-tooltip-meta");
+    var tooltipTags = document.getElementById("eco-tooltip-tags");
 
     var W, H, dpr;
     function resize() {
@@ -1197,12 +1250,15 @@ body.rc-modal-locked { overflow: hidden; }
     function buildGraphFromMembers(members) {
       var nodes = members.map(function (m) {
         var primaryFocus = (m.focusAreas && m.focusAreas[0]) || "";
+        var tags = (m.contributionAreas && m.contributionAreas.length) ? m.contributionAreas : (m.focusAreas || []);
         return {
           id: m.id,
-          label: m.name || "Unnamed",
+          label: (m.name || "").trim() || "Unnamed",
           type: m.type === "Organization" ? "org" : "person",
           color: FOCUS_TO_COLOR[primaryFocus] || "forest",
-          role: (m.contributionAreas || []).join(", ") || (m.focusAreas || []).join(", ")
+          role: tags.join(", "),
+          tags: tags,
+          location: (m.location || "").trim()
         };
       });
       var ids = new Set(nodes.map(function (n) { return n.id; }));
@@ -1236,6 +1292,8 @@ body.rc-modal-locked { overflow: hidden; }
           type: d.type,
           colorKey: d.color,
           role: d.role,
+          tags: d.tags,
+          location: d.location,
           r: r,
           x: cx + Math.cos(angle) * spread + (Math.random() - 0.5) * 60,
           y: cy + Math.sin(angle) * spread + (Math.random() - 0.5) * 40,
@@ -1274,9 +1332,9 @@ body.rc-modal-locked { overflow: hidden; }
     loadGraph();
 
     // ─── Force simulation ─────────────────────────────────────────────────
-    var REPULSION = 3200;
+    var REPULSION = 4200; // room for a name under every node
     var SPRING_K = 0.008;
-    var SPRING_LEN = 120;
+    var SPRING_LEN = 140;
     var DAMPING = 0.85;
     var GRAVITY = 0.002;
     var settled = false;
@@ -1403,6 +1461,41 @@ body.rc-modal-locked { overflow: hidden; }
       return set;
     }
 
+    function fillTooltip(node) {
+      tooltipName.textContent = node.label;
+      tooltipMeta.textContent = [node.type === "org" ? "Organization" : "Individual", node.location]
+        .filter(Boolean).join(" · ");
+      var shown = node.tags.slice(0, 3);
+      var chips = shown.map(function (tag) {
+        var chip = document.createElement("span");
+        chip.className = "eco-tooltip-tag";
+        chip.textContent = tag;
+        return chip;
+      });
+      if (node.tags.length > shown.length) {
+        var more = document.createElement("span");
+        more.className = "eco-tooltip-tag";
+        more.textContent = "+" + (node.tags.length - shown.length) + " more";
+        chips.push(more);
+      }
+      tooltipTags.replaceChildren.apply(tooltipTags, chips);
+      tooltipTags.hidden = !chips.length;
+    }
+
+    // Beside the pointer, flipped and clamped so every edge stays in the map.
+    function placeTooltip(clientX, clientY) {
+      var rect = wrap.getBoundingClientRect();
+      var x = clientX - rect.left - wrap.clientLeft;
+      var y = clientY - rect.top - wrap.clientTop;
+      var w = tooltip.offsetWidth, h = tooltip.offsetHeight, edge = 8;
+      var maxLeft = wrap.clientWidth - w - edge;
+      var maxTop = wrap.clientHeight - h - edge;
+      var left = x + 16 <= maxLeft ? x + 16 : x - w - 16;
+      var top = y - 10 <= maxTop ? y - 10 : y - h - 10;
+      tooltip.style.left = Math.max(edge, Math.min(left, maxLeft)) + "px";
+      tooltip.style.top = Math.max(edge, Math.min(top, maxTop)) + "px";
+    }
+
     canvas.addEventListener("mousemove", function (e) {
       var rect = canvas.getBoundingClientRect();
       var mx = e.clientX - rect.left;
@@ -1411,34 +1504,17 @@ body.rc-modal-locked { overflow: hidden; }
       if (hit !== hoveredNode) {
         hoveredNode = hit;
         hoveredEdges = hit ? getEdgesFor(hit) : [];
-        if (hit && tooltip) {
-          tooltipName.textContent = hit.label;
-          tooltipRole.textContent = hit.role;
-          tooltip.style.display = "block";
-        } else if (tooltip) {
-          tooltip.style.display = "none";
-        }
+        if (hit && tooltip) fillTooltip(hit);
+        if (tooltip) tooltip.hidden = !hit;
       }
-      if (hit && tooltip) {
-        tooltip.style.left = (mx + 16) + "px";
-        tooltip.style.top = (my - 10) + "px";
-        // keep tooltip within wrap bounds
-        var wrapRect = wrap.getBoundingClientRect();
-        var tipRect = tooltip.getBoundingClientRect();
-        if (tipRect.right > wrapRect.right - 8) {
-          tooltip.style.left = (mx - tipRect.width - 10) + "px";
-        }
-        if (tipRect.bottom > wrapRect.bottom - 8) {
-          tooltip.style.top = (my - tipRect.height - 10) + "px";
-        }
-      }
+      if (hit && tooltip) placeTooltip(e.clientX, e.clientY);
       canvas.style.cursor = hit ? "pointer" : "default";
     });
 
     canvas.addEventListener("mouseleave", function () {
       hoveredNode = null;
       hoveredEdges = [];
-      if (tooltip) tooltip.style.display = "none";
+      if (tooltip) tooltip.hidden = true;
       canvas.style.cursor = "default";
     });
 
@@ -1507,18 +1583,55 @@ body.rc-modal-locked { overflow: hidden; }
         ctx.arc(n.x, n.y, nodeR * 0.35, 0, Math.PI * 2);
         ctx.fillStyle = rgb(c2, nodeAlpha * 0.8);
         ctx.fill();
-
-        // Label (orgs always, persons only when not dimmed or when hovered/connected)
-        if (n.type === "org" || isHovered || (isConnected && hoveredNode)) {
-          var labelAlpha = isDim ? 0.15 : (isHovered ? 1 : 0.7);
-          ctx.font = (n.type === "org" ? "500 11px" : "400 10px") + " 'Space Grotesk', sans-serif";
-          ctx.fillStyle = isDim ? P.textDim : P.text;
-          ctx.globalAlpha = labelAlpha;
-          ctx.textAlign = "center";
-          ctx.fillText(n.label, n.x, n.y + nodeR + 14);
-          ctx.globalAlpha = 1;
-        }
       }
+
+      drawLabels(connectedSet);
+    }
+
+    // ─── Labels ───────────────────────────────────────────────────────────
+    // Every node is named. Labels are placed in priority order (hovered,
+    // its connections, organizations, people); one that would overlap an
+    // already placed label is skipped, and hovering always shows the full name.
+    var LABEL_MAX = 22;
+    function labelRank(n, connectedSet) {
+      if (hoveredNode === n) return 3;
+      if (connectedSet && connectedSet[n.id]) return 2;
+      return n.type === "org" ? 1 : 0;
+    }
+    function drawLabels(connectedSet) {
+      var placed = [];
+      var ranked = nodes.slice().sort(function (a, b) {
+        return labelRank(b, connectedSet) - labelRank(a, connectedSet);
+      });
+      ctx.textAlign = "center";
+      ctx.lineJoin = "round";
+      ctx.lineWidth = 3;
+      for (var i = 0; i < ranked.length; i++) {
+        var n = ranked[i];
+        var isHovered = hoveredNode === n;
+        var isDim = hoveredNode && !(connectedSet && connectedSet[n.id]);
+        var text = !isHovered && n.label.length > LABEL_MAX
+          ? n.label.slice(0, LABEL_MAX - 1).trimEnd() + "…"
+          : n.label;
+        ctx.font = (n.type === "org" ? "500 13px" : "400 12px") + " 'Space Grotesk', sans-serif";
+        var half = ctx.measureText(text).width / 2;
+        var nodeR = isHovered ? n.r * 1.2 : n.r;
+        var x = Math.max(half + 4, Math.min(W - half - 4, n.x));
+        var y = n.y + nodeR + 16;
+        if (y > H - 6) y = n.y - nodeR - 8;
+        var box = { left: x - half - 3, right: x + half + 3, top: y - 13, bottom: y + 4 };
+        var collides = placed.some(function (b) {
+          return box.left < b.right && box.right > b.left && box.top < b.bottom && box.bottom > b.top;
+        });
+        if (collides && !isHovered) continue;
+        placed.push(box);
+        ctx.globalAlpha = isDim ? 0.25 : (isHovered ? 1 : 0.85);
+        ctx.strokeStyle = P.halo;
+        ctx.strokeText(text, x, y);
+        ctx.fillStyle = isDim ? P.textDim : P.text;
+        ctx.fillText(text, x, y);
+      }
+      ctx.globalAlpha = 1;
     }
 
     // ─── Animation loop ───────────────────────────────────────────────────

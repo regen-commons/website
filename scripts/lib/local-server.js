@@ -9,7 +9,8 @@ import { createStewardFixtures } from "./steward-fixtures.js";
 
 const root = new URL("../../", import.meta.url);
 const banner = '<aside aria-label="Local development" style="position:fixed;bottom:0;left:0;right:0;z-index:2147483647;background:#173c2c;color:white;padding:6px 12px;font:13px system-ui;text-align:center">Local demo · synthetic data · submissions stay in memory · restart to reset</aside>';
-const types = { html: "text/html; charset=utf-8", css: "text/css; charset=utf-8", js: "text/javascript; charset=utf-8", svg: "image/svg+xml", woff2: "font/woff2" };
+const types = { html: "text/html; charset=utf-8", css: "text/css; charset=utf-8", js: "text/javascript; charset=utf-8", svg: "image/svg+xml", woff2: "font/woff2",
+  png: "image/png", webp: "image/webp", txt: "text/plain; charset=utf-8", xml: "application/xml; charset=utf-8" };
 
 function json(res, status, body) {
   res.writeHead(status, { "Content-Type": "application/json; charset=utf-8" });

@@ -36,6 +36,12 @@ for (const file of pages) {
     if (!filePath) throw new Error(`${file}: public link is not served: ${target}`);
     await access(new URL(filePath, root));
   }
+  // Link previews name absolute URLs; the image must ship with the site.
+  for (const match of html.matchAll(/<meta property="og:image" content="https:\/\/regencommons\.com(\/[^"]+)"/g)) {
+    const filePath = resolvePublicFile(match[1]);
+    if (!filePath) throw new Error(`${file}: share image is not served: ${match[1]}`);
+    await access(new URL(filePath, root));
+  }
 }
 for (const file of ["package.json", "package-lock.json", "vercel.json"]) {
   JSON.parse(await readFile(new URL(file, root), "utf8"));

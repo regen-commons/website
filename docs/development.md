@@ -60,6 +60,19 @@ regression, and live-provider testing remain separate work. The seed/map
 [verification record](local-flow-verification.md) includes the current browser
 results and steps to reproduce failures.
 
+## Share images
+
+Link previews use the 1200×630 images in `assets/share/`, named by each page's
+`og:image` tag; `npm run check` fails if a named image is missing. To change a
+headline or the design, edit `scripts/share-images/template.html`, then run
+`sh scripts/share-images/render.sh` from the repository root. It needs Chrome or
+Brave for the images and `rsvg-convert` (`brew install librsvg`) for the PNG
+icons. It runs on the Mac rather than the dev machine because it drives a desktop
+browser; it runs no repository dependencies. The template draws on a canvas, so
+it can also be opened through a local server and the canvas saved from the
+browser. Platforms cache previews: after deploying, refresh them with LinkedIn's
+Post Inspector and the other platforms' sharing debuggers.
+
 ## Reproduce loading and failure states
 
 Open http://127.0.0.1:3501/__dev/scenarios while the local server is running.

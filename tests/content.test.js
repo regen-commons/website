@@ -238,6 +238,9 @@ test("membership requests remain private and arrive in the same Supabase fixture
     "full-name": "Synthetic new organization",
     email: "org@example.test",
     "applicant-type": "organization",
+    "org-rep": "Synthetic representative, coordinator",
+    "regen-relationship": "Synthetic answer: I tend a community seed library and teach neighbours how to save, swap and replant local varieties each season.",
+    "capital-contribution": "Synthetic answer: seed-saving guides, a lending shelf of tools, and time to host monthly swaps for anyone in the network.",
     "closing-notes": "Private original answer",
   };
   const headers = { "Idempotency-Key": randomUUID() };
