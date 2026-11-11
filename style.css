@@ -1761,53 +1761,19 @@ p:last-child { margin-bottom: 0; }
 }
 
 /* ── Fields ──
-   Hierarchy, strongest first: question, typed answer, context hint. */
+   Each question reads first: full colour and larger than its context hint. */
 .join-field {
-  margin: 0 0 1.6rem;
+  margin-bottom: 1.6rem;
 }
-fieldset.join-field,
-.join-org-fields {
-  border: 0;
-  padding: 0;
-  min-width: 0;
-}
-.join-field legend,
-.join-org-fields legend {
-  padding: 0;
-}
-/* Short single-line fields (name, email, links). */
 .join-label {
   display: block;
-  font-family: var(--font-sans);
-  font-size: 0.8rem;
-  font-weight: 500;
-  letter-spacing: 0.01em;
-  color: var(--ink);
-  margin-bottom: 0.4rem;
-}
-/* Written and multiple-choice questions. */
-.join-question {
-  display: block;
   font-family: var(--font-display);
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 400;
   line-height: 1.4;
   color: var(--ink);
-  margin-bottom: 0.45rem;
+  margin-bottom: 0.5rem;
   text-wrap: pretty;
-}
-.join-subhead {
-  font-family: var(--font-sans);
-  font-size: 0.62rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--accent, var(--copper));
-  margin-bottom: 1rem;
-}
-.join-org-fields {
-  margin: 0.4rem 0 0;
-  padding-top: 1.2rem;
-  border-top: 1px solid rgba(var(--copper-rgb), 0.12);
 }
 .join-hint {
   font-size: 0.8rem;
@@ -1815,22 +1781,6 @@ fieldset.join-field,
   margin: 0 0 0.7rem;
   line-height: 1.55;
   max-width: 62ch;
-}
-.join-counter {
-  font-family: var(--font-sans);
-  font-size: 0.68rem;
-  letter-spacing: 0.02em;
-  color: var(--ink-dim);
-  margin: 0.45rem 0 0;
-}
-.join-counter.is-met { color: var(--ink-mid); }
-/* Short fields pair up once the form card is wide enough. */
-.join-row {
-  display: grid;
-  column-gap: 1.5rem;
-}
-@container (min-width: 34rem) {
-  .join-row { grid-template-columns: 1fr 1fr; }
 }
 /* 16px is the standard control size and the smallest that keeps iOS Safari
    from zooming into a field on focus. */

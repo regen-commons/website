@@ -4,10 +4,6 @@ import { AdminError } from "./steward-data.js";
 import { drainNotifications } from "./intake-notifications.js";
 import { uuid } from "./content-contract.js";
 import { feedbackPayload } from "../../feedback-contract.js";
-import {
-  applicationPayload,
-  InvalidApplication,
-} from "../../application-contract.js";
 
 export function createPublicProvider({
   url,
@@ -184,13 +180,41 @@ export function createWebsiteHandler(resource, { provider }) {
           throw new AdminError(400, "invalid_feedback");
         }
       } else {
-        try {
-          payload = applicationPayload(body);
-        } catch (error) {
-          if (error instanceof InvalidApplication)
-            throw new AdminError(400, error.message);
-          throw error;
-        }
+        if (
+          typeof body["full-name"] !== "string" ||
+          !body["full-name"].trim() ||
+          body["full-name"].length > 200
+        )
+          throw new AdminError(400, "missing_required_fields");
+        if (
+          typeof body.email !== "string" ||
+          body.email.length > 254 ||
+          !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)
+        )
+          throw new AdminError(400, "invalid_email");
+        if (
+          body["applicant-type"] !== undefined &&
+          !["individual", "organization"].includes(body["applicant-type"])
+        )
+          throw new AdminError(400, "invalid_member_type");
+        const { website_confirm, ...answers } = body;
+        if (
+          Object.values(answers).some(
+            (v) =>
+              typeof v !== "string" &&
+              !(
+                Array.isArray(v) &&
+                v.length <= 30 &&
+                v.every((x) => typeof x === "string")
+              ),
+          )
+        )
+          throw new AdminError(400, "invalid_request");
+        payload = {
+          ...answers,
+          "full-name": body["full-name"].trim(),
+          email: body.email.trim().toLowerCase(),
+        };
       }
       const forwarded = req.headers["x-forwarded-for"];
       const ip =

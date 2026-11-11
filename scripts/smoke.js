@@ -34,12 +34,7 @@ try {
   assert.ok(seeds.seeds.some((item) => item.text === seed));
   const application = await fetch(`${base}/api/apply`, {
     method: "POST", headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      "full-name": "Smoke Applicant",
-      email: "smoke@example.test",
-      "regen-relationship": "Synthetic answer: I tend a community seed library and teach neighbours how to save, swap and replant local varieties each season.",
-      "capital-contribution": "Synthetic answer: seed-saving guides, a lending shelf of tools, and time to host monthly swaps for anyone in the network.",
-    }),
+    body: JSON.stringify({ "full-name": "Smoke Applicant", email: "smoke@example.test" }),
   });
   assert.equal(application.status, 200);
   const members = await (await fetch(`${base}/api/members`)).json();

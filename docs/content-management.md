@@ -50,20 +50,6 @@ user-scoped client; no service-role key is required. Exposed RPC wrappers run as
 the caller. Their narrowly scoped private implementations validate either the
 steward/session or the intake capability before accessing protected tables.
 
-The `apply` handler validates membership applications before the intake call,
-using [application-contract.js](../application-contract.js):
-
-- name and email checks, as before
-- written answers to `regen-relationship` and `capital-contribution` of 120 to
-  2,000 characters after trimming
-- a named representative (`org-rep`) for organizations, which the Membership
-  Agreement requires at application
-- at most three of the seven values
-
-The database function still checks only name, email and applicant type, and
-stored answers are unchanged. `join.html` repeats the limits to guide
-applicants; `tests/application-contract.test.js` keeps the two in step.
-
 Keep the secret in encrypted server configuration and never in browser assets,
 chat, source, or a URL. Provision a cryptographically random secret and its digest
 together through an authorized operator. The migration deliberately creates no
