@@ -77,7 +77,8 @@ existing steward. The temporary credential copy was removed. No invitations
 were sent; the project's default invitation URL still points to localhost.
 Recipients still need to complete their own code sign-in. `/council` is live,
 and the legacy entry points redirect there. Release `b3a8a6b` on the published
-`codex/council-route` branch is Vercel production READY; `main` remains unchanged.
+`codex/council-route` branch is Vercel production READY. Source integration into
+`main` preserves the deployed route and redirects for subsequent deployments.
 The production-based release passed all 81 tests, check, and smoke; live HTTP and
 desktop/mobile browser checks passed. See the
 [production record](steward-verification.md#production-release).

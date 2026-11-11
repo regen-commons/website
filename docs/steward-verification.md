@@ -37,7 +37,8 @@ Release commit `b3a8a6b2c60426b6f6935549ff1f366c6b49517d` on
 `codex/council-route` preserves production baseline `f019023` and adds the council
 route. It was deployed to Regen Commons / website as
 `dpl_hjisD8XWnXkL3ggSjznt9Jr1qKVj` (production, READY, static HTML, about 16 seconds
-to build). The release branch is published; `main` was not merged or changed.
+to build). The route and redirect rules are versioned for subsequent builds;
+this source change brings the published release into `main`.
 
 The exact release passed `npm run check` (75 JavaScript files/inline scripts),
 all 81 tests, and `npm run smoke` (seven pages) inside the isolated development
