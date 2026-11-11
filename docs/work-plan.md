@@ -67,7 +67,7 @@ council addresses in hosted Auth and grant their active steward roles without
 committing the roster. Completion requires account/role readback, route checks,
 the repository suites, and rendered fixture sign-in/denial at desktop/mobile
 widths. Account provisioning, local verification, and hosted deployment are
-separate evidence; the route change is not yet deployed.
+separate evidence; the production route is now deployed and verified.
 The route implementation, `check`, all 30 tests, smoke, and rendered Brave
 fixtures passed; see [verification](steward-verification.md#council-route--11-november-2026).
 The four user-confirmed council accounts were created through the explicitly
@@ -75,9 +75,12 @@ authorized Auth admin API and granted active steward roles. Committed database
 readback verified four confirmed email identities with active roles, plus the
 existing steward. The temporary credential copy was removed. No invitations
 were sent; the project's default invitation URL still points to localhost.
-Recipients still need to complete their own code sign-in; `/admin` is currently
-live, while the `/council` cutover awaits deployment.
-
+Recipients still need to complete their own code sign-in. `/council` is live,
+and the legacy entry points redirect there. Release `b3a8a6b` on the published
+`codex/council-route` branch is Vercel production READY; `main` remains unchanged.
+The production-based release passed all 81 tests, check, and smoke; live HTTP and
+desktop/mobile browser checks passed. See the
+[production record](steward-verification.md#production-release).
 
 **Scope:** account inventory and development configuration, followed by an
 explicitly authorized live smoke. No production migration is implied.
