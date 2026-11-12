@@ -476,4 +476,3 @@ release; save/retry checks used isolated synthetic fixtures.
 
 Rollback target: `dpl_HpzZQDJB1D6zBbQfuLK45xL6GLDN`. This release remains on
 `codex/about-contact`; main is unchanged. No PR or CI run exists for this revision.
-
