@@ -555,4 +555,12 @@ overflow, and the heading order Intro → Our origins → The steward council �
 Governance → Contact. Origins immediately precedes the council in the document
 and accessibility tree. Console checks are clean. Check, all 88 tests and HTTP
 smoke pass. No new interactions, provider operations or dependencies were added.
-Production publication is pending.
+**Released:** website `03e80134ed3a60e5fa924c67497138531a554028` is production
+READY as `dpl_HPCcJDbCBqssFqTRwEVWz1Nsu6eS`, aliased to `regencommons.com`.
+The hosted About page matches the tested source byte for byte. Live in-app
+Chromium at 1280px and 390px confirms the three paragraphs and placement before
+the council, with no horizontal overflow or console errors. Runtime error/fatal
+scan is empty. No provider writes or live submissions were needed.
+
+Rollback target: `dpl_EsLh55P3iBxeitAMqHnY5MuYTsiq`. The task branch remains
+`codex/about-contact`; main is unchanged. No PR or CI run exists for this revision.
