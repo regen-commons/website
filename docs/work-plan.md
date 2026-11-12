@@ -522,3 +522,37 @@ submissions were made for this layout release.
 
 Rollback target: `dpl_7kMCaa2itHbKwKzKGtPkEW3Kcn2x`. The release remains on
 `codex/about-contact`; main is unchanged. No PR or CI run exists for this revision.
+
+## About origins — 11 November 2026
+
+Add a short origins section immediately before the steward council. Describe the
+2025 shared-identity invitation, July–September participatory design process,
+and connection to the present foundation period. Use the existing prose-section
+layout. Avoid a precise founding day or turning proposed legal/funding structures
+into completed events; use organizational credits rather than private reflections
+or individual attribution.
+
+Source basis checked through connected Drive and public primary material:
+
+- [Early ETHDenver invitation](https://docs.google.com/document/d/1sPE3LtLtSPrSODFFQUaPHeoP8bGXvlACLyZC4Vi1bEg/edit):
+  documents the 2025 invitation and shared identity/IP commons purpose; its
+  prospective partnerships, legal structures and funding asks are not outcomes.
+- [Governance Activation Public Summary](https://drive.google.com/file/d/1fSNrk_kckPUnTCOpgly8Ot4puYH7slnR/view):
+  labeled Public; records July–September 2025, OpenCivics Labs/Greater Than
+  facilitation, workshops/feedback and constitutional work. The archive’s 2026
+  import/edit metadata does not date these events. Its legal-status and funding
+  assertions are not used.
+- [OpenCivics June 2025 report](https://broadcast.opencivics.co/p/opencivics-monthly-report-june-2025):
+  public contemporary corroboration that OpenCivics Labs and Greater Than were
+  preparing to co-lead the process. It does not establish later outcomes alone.
+
+The current foundation-period language matches the existing About page. Private
+coordination notes and raw retrieved files are not copied into this repository.
+**Verification:** source-to-copy review confirms the invitation/design chronology
+and organizational credits; the exact founding day remains unspecified. In-app
+Chromium at 1280px and 390px confirms readable prose in both themes, no horizontal
+overflow, and the heading order Intro → Our origins → The steward council →
+Governance → Contact. Origins immediately precedes the council in the document
+and accessibility tree. Console checks are clean. Check, all 88 tests and HTTP
+smoke pass. No new interactions, provider operations or dependencies were added.
+Production publication is pending.
