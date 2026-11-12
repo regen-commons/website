@@ -258,11 +258,20 @@ print styles. The nav's Email link became About; the address now sits on About a
 the Join error messages. Rendered locally at desktop and 375px widths.
 
 **Pending, needs council input:** approval of the photos, affiliations and
-LinkedIn links (supplied by the maintainer) and of the constitution summary; which values list the site uses (the constitution lists
-six, the Membership Agreement seven). For the next council sync: a monthly
-community onboarding call, and the Membership Agreement's quarterly cohort and
-onboarding wording, which no longer matches practice. The team brief lives in a
-shared doc outside the repository.
+LinkedIn links (supplied by the maintainer) and of the constitution summary. For
+the next council sync: a monthly community onboarding call, and the Membership
+Agreement's quarterly cohort and onboarding wording, which no longer matches
+practice. The team brief lives in a shared doc outside the repository.
+
+**Constitution synced to the current text (11 November):** `/constitution` now
+carries the Notion page "Regen Commons Constitution - MVP" instead of the v2 text,
+which Notion lists as legacy. Its seven values and its worldview now match the
+Membership Agreement, so the earlier six-or-seven values question is settled. The
+page was checked word for word against the maintainer's Notion export (markdown
+and PDF). Metadata tables are collapsed, as in Notion. Left out on purpose: the
+"Temporary Archive" drafts in three protocols, the empty Principles metadata table
+and the Steward Protocol's unfinished "Evolution" sentence. The plain-words
+summary was rewritten for the new text and needs the same council review.
 
 ## 6. Refine the development loop once the first changes land
 
