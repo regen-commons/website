@@ -612,3 +612,17 @@ byte-for-byte. Browser warnings/errors and deployment error/fatal logs are empty
 Rollback target: `dpl_E6TmrMZXZ9htQyVik9Gjnm6igsQh`. No CI run exists for this
 revision; local required checks passed. Branch is `codex/about-contact`; main is
 unchanged.
+
+## Contact forum link in a new tab — 11 November 2026
+
+Make the Regen Commons forum link inside Get in touch open in a new tab using
+native `target="_blank"`, `rel="noopener"` and an accessible new-tab label,
+matching the other external About links. Verify keyboard activation, the loaded
+forum destination and preservation of the About page, rendered desktop/mobile
+layout, required checks and production delivery.
+
+Rendered fixture checks at 1280px and 390px confirm correct contact text wrapping
+and no mobile overflow. Enter opens a separate tab with the correct forum category
+and About preserved. The link has `noopener` and the accessible new-tab label.
+Browser warnings/errors are empty. `npm run check`, all 88 tests and
+`npm run smoke` pass. Production delivery is pending.
