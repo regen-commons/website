@@ -653,4 +653,13 @@ with visible outlines; Become a member opens `/join`, Read the constitution open
 viewport top. Browser warnings/errors are empty. `npm run check`, all 88 tests and
 `npm run smoke` pass; the final prose adjustment was rechecked. Local guidance
 retrieval is still unavailable (missing dev-surfaces entrypoint); this uses native
-flex/grid and anchors. Production delivery is pending.
+flex/grid and anchors.
+
+Production is READY on `regencommons.com`, deployment
+`dpl_9qYgbYV5iNgeFjzabCBMsAsnhpRB`, runtime commit
+`103fb9b6ff306172f85353e42ce28d8f4d2a37d6`. Live HTML matches the tested file
+byte-for-byte. Live desktop cards are all 282.57px high with identical link positions;
+light/dark visual checks pass. The new council link reaches its heading with 108px
+clearance. Browser warnings/errors are empty. Rollback target:
+`dpl_C8wcHsf7uVKFRWLPcTtr27SV81S5`. No CI run exists for this revision;
+local required checks passed. Branch is `codex/about-contact`; main is unchanged.
