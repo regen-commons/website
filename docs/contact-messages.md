@@ -76,9 +76,8 @@ origin. The configured intake secret’s hash must already exist in
    synthetic correspondence. Confirm a second browser session cannot read it
    without steward access.
 
-The hosted migration, both deployments and real Telegram delivery have not been
-performed in this work. The prior website and agent can continue operating while
-the new code is reviewed.
+The hosted migration, both deployments and real Telegram delivery were completed
+in the authorized release recorded below.
 
 ## Verification — 11 November 2026
 
@@ -101,3 +100,57 @@ standards and rendered checks were used.
 The companion agent review is in its `docs/agent-review.md`, including remaining
 webhook/processing risks and proposed public Weave discovery tools. No private
 Weave integration or matching change is part of this contact feature.
+
+## Hosted release — 11 November 2026
+
+The user authorized the production migration, both deployments and a synthetic
+contact/Telegram test. The release used the Regen Commons account and the
+existing production projects and settings; no credentials or private roster were
+exported or committed.
+
+| Component | Verified release |
+| --- | --- |
+| Agent | Commit `d6f201a1be1c286f94ee1ac4f80fe28a6a67d0d2`, branch `codex/contact-notifications`, production `dpl_C1C4p6xM6bwXse12YbMsHCyB8NS1`, READY |
+| Database | Platform `ztygpuzldujfsqrubxic`, migration `20261112013204_contact_messages.sql`, applied and read back |
+| Website | Commit `e1d25f429b55a4dac1bfda02492ae14c489d3e1b`, branch `codex/about-contact`, production `dpl_C1bw9dXR752zi2F7tYpX8DyDvj5F`, READY |
+
+The agent’s existing `regen-commons-agent.vercel.app` alias and the website’s
+`regencommons.com` alias resolve to these releases. Each deployment used a
+release-scoped ignored-build-command override so the task branch could build;
+the projects’ shared branch settings were not changed. The local migration
+filename was aligned with the version assigned by the hosted migration tool.
+Neither repository’s `main` was merged or changed. Future main-based releases
+need to incorporate these release branches.
+
+At 5:34 p.m. PST, the actual live About form submitted one record named
+`TEST: contact launch 2026-11-11`, using an invented name and an `example.test`
+address. Supabase saved record `35fd97d9-8189-4da9-9c29-a54ca5c10406` at
+01:34:23 UTC on 12 November. Its notification became `sent` at 01:34:25 UTC.
+The production agent requires Telegram’s `{ ok: true }` acknowledgement before
+reporting success, so this proves API-acknowledged Telegram delivery. The
+Telegram group UI was not separately inspected.
+
+The user signed in directly to the live council browser. After reloading the
+new release, the inbox showed the single test record and `Telegram: Sent`. Its
+detail displayed the full synthetic message and Reply by email. No live sign-in
+code or session token was captured. The test is retained for the user’s review:
+[open the test message](https://regencommons.com/council#messages/35fd97d9-8189-4da9-9c29-a54ca5c10406).
+The screenshot is a local, uncommitted synthetic-data artifact.
+
+Hosted readback confirmed RLS is enabled, anonymous SELECT is denied, clients
+cannot INSERT, and the worker lease is excluded from authenticated column
+grants. The active-steward policy uses the existing role/session check. Live
+anonymous HTTP returned 401 with private/no-store caching for the inbox, 405 for
+a contact listing, and 401 for an unauthenticated agent notification. The
+rendered council browser had no warnings/errors. Deployment-scoped error/fatal
+log counts were empty during the immediate verification window.
+
+Supabase advisors reported no contact-table finding. They also reported internal
+tables with RLS and no client policies, plus the project’s
+[disabled leaked-password protection](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection).
+Those are outside this contact migration; no Auth settings were changed.
+
+If an application rollback is needed, the prior website deployment is
+`dpl_ELNk2mmzUvBGF4VFsx5uxtWhkPqc` and prior agent deployment is
+`dpl_79m6J3G2J9wKGaqMoE8LJS2TWAfr`. Retain the contact table and saved
+correspondence rather than dropping data to roll back an application release.

@@ -355,7 +355,7 @@ is unapplied and automatic production dispatch remains a release verification st
 
 Contract and release limits: [membership decision emails](membership-decision-emails.md).
 
-## About and contact messages — implemented locally, 11 November 2026
+## About and contact messages — live, 11 November 2026
 
 Scope: one organization per line with verified links; a private contact form on
 About; Supabase persistence and retry identities; an authorized Messages inbox in
@@ -378,3 +378,12 @@ The companion agent adds accurate dashboard labels and contact alerts, fixes
 two installed-SDK failures, and records a review and Weave recommendations in
 its `docs/agent-review.md`. Hosted migration, publication and real Telegram
 delivery remain pending; local checks do not establish those outcomes.
+
+**Authorized production release:** the contact migration is applied to Platform,
+and both the agent and website are production READY. A real About-form test is
+saved and visible in the authenticated council inbox; the agent acknowledged
+Telegram delivery and the dashboard shows Sent. Anonymous access checks passed.
+The clearly marked synthetic record is retained for user review. See the
+[hosted release record](contact-messages.md#hosted-release--11-november-2026) for
+commits, deployments, migration, evidence and rollback targets. Releases use the
+published task branches; neither main branch has been merged.
