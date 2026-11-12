@@ -228,3 +228,22 @@ retry. Dark mobile and light desktop show padded arrows and no horizontal
 overflow. Local scenarios were reset to normal. The shared cached Modern Web
 Guidance entrypoint remains unavailable inside this machine; repository standards
 and rendered checks supplied the browser proof.
+
+### Hosted usability release
+
+Commit `5dd6b20baccfb629eeeaf0fbadadfcf94d4d01bc` on `codex/about-contact` is
+production READY as `dpl_M7scijv6VWicdTpBhTToAtfz4ehj`, with the existing
+`regencommons.com` alias. This is a website-only follow-up to the authorized
+release; no agent, schema or provider settings changed. The production HTML,
+`admin/app.js` and `admin/style.css` each returned 200 and matched the tested
+release bytes.
+
+After reloading the authenticated live dashboard, a deliberately unmatched search
+automatically showed the filtered-empty state, retained focus in Search and
+showed no Apply filters button. The dropdown end padding read back as 40px.
+Clearing search restored the existing full queue and kept focus in the field.
+The temporary verification search was removed. The live browser reported no
+warnings/errors, and its signed-in state was preserved. Existing tabs need one
+reload to replace their already-loaded script and stylesheet. Local geometry
+checks above establish the multi-step sign-in behavior; no further real sign-in
+codes or membership submissions were sent for this UI follow-up.

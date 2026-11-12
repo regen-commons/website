@@ -388,7 +388,7 @@ The clearly marked synthetic record is retained for user review. See the
 commits, deployments, migration, evidence and rollback targets. Releases use the
 published task branches; neither main branch has been merged.
 
-## Council sign-in and filtering polish — verified locally, 11 November 2026
+## Council sign-in and filtering polish — live, 11 November 2026
 
 Keep the sign-in card steady across email, code, loading and ordinary error
 states by reserving the forms’ natural height and feedback space. Retain native
@@ -404,3 +404,9 @@ and invalid-code states, automatic type/state filtering, search after a typing
 pause and Enter, focus retention, filtered-empty feedback, and failed-read retry.
 Both themes show inset dropdown arrows without horizontal overflow. See the
 [council usability record](steward-verification.md#council-usability--11-november-2026).
+
+**Released:** website `5dd6b20` is production READY. Live asset bytes match the
+verified source, and the authenticated dashboard confirmed automatic search,
+focus retention, the removed button, padded arrows and recovery to the full
+queue after clearing the verification search. The existing session was retained.
+See the [hosted usability release](steward-verification.md#hosted-usability-release).
