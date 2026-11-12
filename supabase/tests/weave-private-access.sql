@@ -8,6 +8,12 @@ insert into auth.users(id,email,raw_user_meta_data) values
 ('b1000000-0000-4000-8000-000000000002','weave-other@example.test','{"owner":true,"steward":true}'),
 ('b1000000-0000-4000-8000-000000000003','weave-steward@example.test','{}');
 update auth.users set email_confirmed_at=now();
+-- Trusted Certified identity, including an account with no email address.
+insert into auth.identities(user_id,provider,provider_id) values
+('b1000000-0000-4000-8000-000000000001','custom:certified','https://certified.one|did:plc:aaaaaaaaaaaaaaaaaaaaaaaa'),
+('b1000000-0000-4000-8000-000000000002','custom:certified','https://certified.one|did:plc:bbbbbbbbbbbbbbbbbbbbbbbb'),
+('b1000000-0000-4000-8000-000000000003','custom:certified','https://certified.one|did:plc:cccccccccccccccccccccccc');
+update auth.users set email=null,email_confirmed_at=null where id='b1000000-0000-4000-8000-000000000001';
 insert into auth.sessions(id,user_id,not_after) values
 ('b2000000-0000-4000-8000-000000000001','b1000000-0000-4000-8000-000000000001',now()+interval '1 hour'),
 ('b2000000-0000-4000-8000-000000000002','b1000000-0000-4000-8000-000000000002',now()+interval '1 hour'),
@@ -19,7 +25,7 @@ select pg_temp.expect_error($q$select * from weave.initiatives$q$,'42501');
 select pg_temp.expect_error($q$select * from weave.needs$q$,'42501');
 select pg_temp.expect_error($q$select weave.save_initiative(gen_random_uuid(),0,gen_random_uuid(),pg_temp.document())$q$,'42501');
 reset role;
-set local request.jwt.claims='{"sub":"b1000000-0000-4000-8000-000000000001","session_id":"b2000000-0000-4000-8000-000000000001","role":"authenticated"}';
+select set_config('request.jwt.claims', ('{"sub":"b1000000-0000-4000-8000-000000000001","session_id":"b2000000-0000-4000-8000-000000000001","role":"authenticated"}'::jsonb || jsonb_build_object('exp',extract(epoch from now())+3600))::text,true);
 set local role authenticated;
 select pg_temp.assert_true(weave.account_access(),'owner session denied');
 select pg_temp.assert_true((weave.save_initiative('b3000000-0000-4000-8000-000000000001',0,'b5000000-0000-4000-8000-000000000001',pg_temp.document())->>'revision')::int=1,'initial revision wrong');
@@ -48,7 +54,7 @@ select pg_temp.expect_error($q$select weave.save_initiative('b3000000-0000-4000-
 select weave.save_initiative('b3000000-0000-4000-8000-000000000001',0,'b5000000-0000-4000-8000-000000000001',pg_temp.document());
 select pg_temp.assert_true(weave.load_initiative('b3000000-0000-4000-8000-000000000001')->'document'->'initiative'->>'name'='Updated circle','replayed old command rewrote newer data');
 reset role;
-set local request.jwt.claims='{"sub":"b1000000-0000-4000-8000-000000000002","session_id":"b2000000-0000-4000-8000-000000000002","role":"authenticated","user_metadata":{"steward":true,"owner_id":"b1000000-0000-4000-8000-000000000001"}}';
+select set_config('request.jwt.claims', ('{"sub":"b1000000-0000-4000-8000-000000000002","session_id":"b2000000-0000-4000-8000-000000000002","role":"authenticated","user_metadata":{"steward":true,"owner_id":"b1000000-0000-4000-8000-000000000001"}}'::jsonb || jsonb_build_object('exp',extract(epoch from now())+3600))::text,true);
 set local role authenticated;
 select pg_temp.assert_true((select count(*)=0 from weave.initiatives),'another account read a private initiative');
 select pg_temp.assert_true((select count(*)=0 from weave.needs),'another account read private needs');
@@ -56,19 +62,19 @@ select pg_temp.assert_true(jsonb_array_length(weave.list_initiatives())=0,'anoth
 select pg_temp.expect_error($q$select weave.load_initiative('b3000000-0000-4000-8000-000000000001')$q$,'PT404');
 select pg_temp.expect_error($q$select weave.save_initiative('b3000000-0000-4000-8000-000000000001',2,gen_random_uuid(),pg_temp.document())$q$,'PT404');
 reset role;
-set local request.jwt.claims='{"sub":"b1000000-0000-4000-8000-000000000003","session_id":"b2000000-0000-4000-8000-000000000003","role":"authenticated"}';
+select set_config('request.jwt.claims', ('{"sub":"b1000000-0000-4000-8000-000000000003","session_id":"b2000000-0000-4000-8000-000000000003","role":"authenticated"}'::jsonb || jsonb_build_object('exp',extract(epoch from now())+3600))::text,true);
 set local role authenticated;
 select pg_temp.assert_true(public.steward_access(),'fixture steward is not active');
 select pg_temp.assert_true((select count(*)=0 from weave.initiatives),'active steward read a private initiative');
 select pg_temp.expect_error($q$select weave.load_initiative('b3000000-0000-4000-8000-000000000001')$q$,'PT404');
 reset role;
-set local request.jwt.claims='{"sub":"b1000000-0000-4000-8000-000000000001","session_id":"b2000000-0000-4000-8000-000000000001","role":"authenticated","is_anonymous":true}';
+select set_config('request.jwt.claims', ('{"sub":"b1000000-0000-4000-8000-000000000001","session_id":"b2000000-0000-4000-8000-000000000001","role":"authenticated","is_anonymous":true}'::jsonb || jsonb_build_object('exp',extract(epoch from now())+3600))::text,true);
 set local role authenticated;
 select pg_temp.assert_true(not weave.account_access(),'anonymous Auth session accepted');
 select pg_temp.expect_error($q$select weave.list_initiatives()$q$,'PT401');
 reset role;
 update auth.sessions set not_after=now()-interval '1 minute' where id='b2000000-0000-4000-8000-000000000001';
-set local request.jwt.claims='{"sub":"b1000000-0000-4000-8000-000000000001","session_id":"b2000000-0000-4000-8000-000000000001","role":"authenticated"}';
+select set_config('request.jwt.claims', ('{"sub":"b1000000-0000-4000-8000-000000000001","session_id":"b2000000-0000-4000-8000-000000000001","role":"authenticated"}'::jsonb || jsonb_build_object('exp',extract(epoch from now())+3600))::text,true);
 set local role authenticated;
 select pg_temp.assert_true(not weave.account_access(),'expired session accepted');
 select pg_temp.assert_true((select count(*)=0 from weave.initiatives),'expired session read rows');
@@ -83,21 +89,43 @@ select pg_temp.assert_true((select bool_and(relrowsecurity) from pg_class where 
 select pg_temp.assert_true(not exists(select 1 from pg_proc where pronamespace='weave'::regnamespace and prosecdef),'exposed definer function');
 select pg_temp.assert_true(not has_function_privilege('anon','weave.save_initiative(uuid,integer,uuid,jsonb)','execute'),'anonymous command grant');
 select pg_temp.assert_true((select count(*)=0 from public.members),'saving promoted membership');
--- An authenticated session with an unconfirmed email cannot use the account API.
-update auth.users set email_confirmed_at=null where id='b1000000-0000-4000-8000-000000000002';
-set local request.jwt.claims='{"sub":"b1000000-0000-4000-8000-000000000002","role":"authenticated","session_id":"b2000000-0000-4000-8000-000000000002"}';
+-- Confirmed email and editable metadata cannot replace a trusted identity.
+delete from auth.identities where user_id='b1000000-0000-4000-8000-000000000002';
+update auth.users set raw_user_meta_data='{"provider":"custom:certified","did":"did:plc:bbbbbbbbbbbbbbbbbbbbbbbb"}'
+where id='b1000000-0000-4000-8000-000000000002';
+select set_config('request.jwt.claims', ('{"sub":"b1000000-0000-4000-8000-000000000002","role":"authenticated","session_id":"b2000000-0000-4000-8000-000000000002"}'::jsonb || jsonb_build_object('exp',extract(epoch from now())+3600))::text,true);
 set local role authenticated;
-select pg_temp.assert_true(not weave.account_access(),'unconfirmed email accepted');
+select pg_temp.assert_true(not weave.account_access(),'email or editable metadata substituted for Certified identity');
 reset role;
+-- The shared schema adds no direct workspace command capability to clients.
+select pg_temp.assert_true(not has_function_privilege('authenticated','weave_workspace.command(uuid,uuid,text,text,jsonb)','execute'),'authenticated workspace bypass');
+select pg_temp.assert_true(not has_function_privilege('anon','weave_workspace.content_command(uuid,uuid,text,uuid,text,text,text,jsonb)','execute'),'anonymous team content bypass');
+select pg_temp.assert_true(not has_table_privilege('weave_platform_bridge','weave.initiatives','select'),'bridge reads private initiatives');
+select pg_temp.assert_true(not has_table_privilege('weave_platform_app','weave.initiatives','select'),'app-auth login reads initiatives');
+select pg_temp.assert_true((select not hybrid_enabled from private.weave_matching_retrieval_settings where singleton),'hybrid retrieval enabled');
 -- Quota is charged only for new acknowledged commands. Replays remain free.
 reset role;
 update private.weave_save_limits set total=30;
 set local role authenticated;
-select set_config('request.jwt.claims','{"sub":"b1000000-0000-4000-8000-000000000001","role":"authenticated","session_id":"b2000000-0000-4000-8000-000000000001"}',true);
+select set_config('request.jwt.claims', ('{"sub":"b1000000-0000-4000-8000-000000000001","role":"authenticated","session_id":"b2000000-0000-4000-8000-000000000001"}'::jsonb || jsonb_build_object('exp',extract(epoch from now())+3600))::text,true);
 -- The earlier owner session was revoked in this suite; restore a synthetic session below.
 reset role;
 insert into auth.sessions(id,user_id) values('b2000000-0000-4000-8000-000000000001','b1000000-0000-4000-8000-000000000001');
 set local role authenticated;
 select pg_temp.expect_error($q$select weave.save_initiative('b3000000-0000-4000-8000-000000000001',2,'b5000000-0000-4000-8000-000000000099',pg_temp.document())$q$,'PT429');
 select pg_temp.assert_true((weave.save_initiative('b3000000-0000-4000-8000-000000000001',0,'b5000000-0000-4000-8000-000000000001',pg_temp.document())->>'revision')::int=1,'retry charged quota');
+reset role;
+select set_config('request.jwt.claims', '{"sub":"b1000000-0000-4000-8000-000000000001","role":"authenticated","session_id":"b2000000-0000-4000-8000-000000000001","exp":1}',true);
+set local role authenticated;
+select pg_temp.assert_true(not weave.account_access(),'expired JWT accepted');
+reset role;
+select set_config('request.jwt.claims', ('{"sub":"b1000000-0000-4000-8000-000000000001","role":"authenticated","session_id":"b2000000-0000-4000-8000-000000000001"}'::jsonb || jsonb_build_object('exp',extract(epoch from now())+3600))::text,true);
+update auth.users set banned_until=now()+interval '1 hour' where id='b1000000-0000-4000-8000-000000000001';
+set local role authenticated;
+select pg_temp.assert_true(not weave.account_access(),'banned account accepted');
+reset role;
+update auth.users set banned_until=null,is_anonymous=true where id='b1000000-0000-4000-8000-000000000001';
+set local role authenticated;
+select pg_temp.assert_true(not weave.account_access(),'anonymous stored user accepted');
+reset role;
 rollback;

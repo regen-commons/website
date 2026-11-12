@@ -22,24 +22,25 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:17
+        image: public.ecr.aws/supabase/postgres:17.11.0.011
         env:
           POSTGRES_PASSWORD: synthetic-local-test
-          POSTGRES_DB: regen_test
+          POSTGRES_DB: postgres
         ports: [5432:5432]
         options: >-
-          --health-cmd "pg_isready -U postgres -d regen_test"
+          --health-cmd "pg_isready -U supabase_admin -d postgres"
           --health-interval 5s --health-timeout 5s --health-retries 10
     env:
       PGHOST: 127.0.0.1
       PGPORT: 5432
-      PGUSER: postgres
+      PGUSER: supabase_admin
       PGDATABASE: regen_test
       PGPASSWORD: synthetic-local-test
     steps:
       - uses: actions/checkout@v4
       - name: Apply migrations to disposable Postgres
         run: |
+          PGDATABASE=postgres psql -v ON_ERROR_STOP=1 -c 'create database regen_test template template0'
           psql -v ON_ERROR_STOP=1 -f supabase/tests/local-auth.sql
           for migration in supabase/migrations/*.sql; do
             psql -v ON_ERROR_STOP=1 -1 -f "$migration"

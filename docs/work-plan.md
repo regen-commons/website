@@ -1,5 +1,14 @@
 # Initial development work
 
+## Weave production schema release — 12 November 2026
+
+The user approved reconciling Platform's already-applied Weave migration history
+and applying six later candidates through this repository's reviewed migration
+path. The [release record](weave-production-migrations.md) owns the exact versions,
+dependency order, proof, credential-free runtime-role replay and recovery steps.
+Local combined migration and authorization checks passed. Hosted application and
+real Certified/website steward acceptance remain separate, pending operator steps.
+
 Ordered after the 29 October 2026 [assessment](assessment-2026-10-29.md).
 These are repository-local work items, not tickets created in an external system.
 Each item can become a bounded PR; product/account decisions are explicit.
