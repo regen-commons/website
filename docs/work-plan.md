@@ -564,3 +564,16 @@ scan is empty. No provider writes or live submissions were needed.
 
 Rollback target: `dpl_EsLh55P3iBxeitAMqHnY5MuYTsiq`. The task branch remains
 `codex/about-contact`; main is unchanged. No PR or CI run exists for this revision.
+
+## About origins links — 11 November 2026
+
+Link OpenCivics Labs to its official homepage (`www.opencivics.co`), which lists
+Labs, and Greater Than to `greaterthan.works`, which redirects to the collective’s
+legacy site. Both destinations return HTTP 200 after redirects. Link the three
+prose mentions of the constitution on About to the existing `/constitution`
+route (also HTTP 200). Reuse About’s theme-aware inline link treatment and native
+keyboard focus. Desktop (1280px) and mobile (390px) rendering are verified in
+light/dark themes, with no horizontal overflow or browser warnings/errors.
+Keyboard focus moves through the partner links to the constitution, which opens
+the correct page. `npm run check`, all 88 tests, and `npm run smoke` pass.
+Production delivery is pending.
