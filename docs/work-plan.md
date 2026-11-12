@@ -6,8 +6,11 @@ The user approved reconciling Platform's already-applied Weave migration history
 and applying six later candidates through this repository's reviewed migration
 path. The [release record](weave-production-migrations.md) owns the exact versions,
 dependency order, proof, credential-free runtime-role replay and recovery steps.
-Local combined migration and authorization checks passed. Hosted application and
-real Certified/website steward acceptance remain separate, pending operator steps.
+The original owner PR #21 merged. Hosted application failed on the first new
+migration and rolled back completely; Platform still records 16 migrations.
+A reviewed JWT-context repair and non-superuser replay checks pass locally.
+The user separately approved the repair's publication, merge and hosted retry.
+Real Certified and website steward acceptance remain unverified.
 
 Ordered after the 29 October 2026 [assessment](assessment-2026-10-29.md).
 These are repository-local work items, not tickets created in an external system.
