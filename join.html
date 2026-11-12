@@ -57,14 +57,14 @@
       font-size: 1.3rem;
       font-weight: 300;
       color: var(--ink);
-      margin: 0 0 1.2rem;
+      margin: 0 0 0.8rem;
     }
     .join-intro-copy p {
       font-family: 'Source Serif 4', Georgia, serif;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: var(--ink-mid);
-      line-height: 1.75;
-      margin: 0 0 1rem;
+      line-height: 1.55;
+      margin: 0 0 0.7rem;
     }
     .join-intro-copy p.join-intro-meta {
       font-family: 'Space Grotesk', sans-serif;
@@ -73,15 +73,14 @@
       color: var(--ink-dim);
       line-height: 1.7;
       font-style: italic;
-      margin-top: 1.6rem;
-      padding-top: 1.2rem;
+      margin-top: 0.9rem;
+      padding-top: 0.8rem;
       border-top: 1px solid rgba(var(--copper-rgb), 0.10);
     }
     .join-form-card {
       background: var(--parchment);
       border: 1px solid rgba(var(--copper-rgb), 0.12);
       padding: 2rem 2.5rem;
-      container-type: inline-size;
     }
     @media (max-width: 768px) {
       .join-layout {
@@ -121,19 +120,21 @@
   <h1 class="join-page-title">Become a Member</h1>
 
   <main class="join-layout" id="main-content" tabindex="-1">
-    <aside class="join-sidebar" aria-labelledby="join-sidebar-title">
-      <h2 id="join-sidebar-title">Joining the commons</h2>
+    <aside class="join-sidebar">
+      <h2>Membership Application</h2>
       <div class="join-intro-copy">
-        <p>Members are people and organizations who tend the Regen Commons together: sharing knowledge and tools, offering what they can, and taking part in how it&rsquo;s run.</p>
-        <p>These questions help the steward council get to know you. There are no trick questions. Plain answers in your own words work best, so please don&rsquo;t hand the writing to AI.</p>
-        <p class="join-intro-meta">Your full answers go only to the steward council. If you&rsquo;re accepted, a short public profile with your name, location and areas of work appears on the map, and other members may receive your contact details.</p>
+        <p>Thank you for your interest in joining the Regen Commons. As we begin to open membership, we're onboarding the initial participants who contributed to the Regen Commons governance design process, alongside a close-knit cohort of Steward-attested peers to seed the commons and initialize self-governance. Together, you will make up the first cohort of Regen Commons Members.</p>
+        <p>If you're not part of one of those two groups, you're still able to apply, but your application will not be considered until we open the second cohort.</p>
+        <p>However you ended up here, your responses to the following questions will help the steward council understand who you are, what you care about, and how you might contribute to our shared commons.</p>
+        <p>There are no trick questions. We're looking for honesty, alignment, and genuine interest, not perfect answers. Please write in your own voice without over-reliance on generative AI.</p>
+        <p class="join-intro-meta">Your full responses will be shared with the steward council. Basic details (name, role, organization) will be displayed publicly on the Regen Commons website. Some contact details will be shared with other Commons Members.</p>
       </div>
     </aside>
 
     <div class="join-form-card">
 
-    <!-- ── Progress (the step eyebrow carries the same information as text) ── -->
-    <div class="join-progress" aria-hidden="true">
+    <!-- ── Progress ── -->
+    <div class="join-progress">
       <div class="join-step-dot active" data-step="1"></div>
       <div class="join-step-line"></div>
       <div class="join-step-dot" data-step="2"></div>
@@ -143,6 +144,8 @@
       <div class="join-step-dot" data-step="4"></div>
       <div class="join-step-line"></div>
       <div class="join-step-dot" data-step="5"></div>
+      <div class="join-step-line"></div>
+      <div class="join-step-dot" data-step="6"></div>
     </div>
 
     <form class="join-form" id="join-form" novalidate>
@@ -155,11 +158,11 @@
 
       <!-- ══════════ STEP 1: ABOUT YOU ══════════ -->
       <div class="join-step active" data-step="1">
-        <span class="join-eyebrow">Step 1 of 5</span>
+        <span class="join-eyebrow">Step 1 of 6</span>
         <h2 class="join-heading" tabindex="-1">About you</h2>
 
-        <fieldset class="join-field">
-          <legend class="join-label">Are you applying as an individual or for an organization?</legend>
+        <div class="join-field">
+          <label class="join-label">Are you applying as an individual or on behalf of an organization?</label>
           <div class="join-radio-group">
             <label class="join-radio">
               <input type="radio" name="applicant-type" value="individual" checked />
@@ -170,53 +173,49 @@
               <span>Organization</span>
             </label>
           </div>
-        </fieldset>
-
-        <div class="join-field">
-          <label class="join-label" for="full-name">Full name <span class="join-label-hint">(or the organization&rsquo;s name)</span></label>
-          <input type="text" id="full-name" name="full-name" class="join-input" autocomplete="name" maxlength="200" required />
-        </div>
-
-        <div class="join-row">
-          <div class="join-field">
-            <label class="join-label" for="location">Where are you based?</label>
-            <input type="text" id="location" name="location" class="join-input" placeholder="Bioregion, city, or however you describe it" maxlength="300" required />
-          </div>
-          <div class="join-field">
-            <label class="join-label" for="email">Email</label>
-            <input type="email" id="email" name="email" class="join-input" autocomplete="email" maxlength="254" required />
-          </div>
-        </div>
-
-        <div class="join-row">
-          <div class="join-field">
-            <label class="join-label" for="telegram">Telegram <span class="join-label-hint">(optional)</span></label>
-            <input type="text" id="telegram" name="telegram" class="join-input" placeholder="@yourhandle" autocomplete="off" />
-          </div>
-          <div class="join-field">
-            <label class="join-label" for="website">Website or public profile <span class="join-label-hint">(optional)</span></label>
-            <input type="url" id="website" name="website" class="join-input" placeholder="https://" autocomplete="url" maxlength="2048" />
-          </div>
         </div>
 
         <div class="join-field">
-          <label class="join-label" for="nominator">Did someone invite you to apply? <span class="join-label-hint">(optional)</span></label>
-          <input type="text" id="nominator" name="nominator" class="join-input" placeholder="Their name" autocomplete="off" />
+          <label class="join-label" for="full-name">Full name <span class="join-label-hint">(or organization name, if applying as an organization)</span></label>
+          <input type="text" id="full-name" name="full-name" class="join-input" autocomplete="name" placeholder="Your name or organization name" required />
         </div>
 
-        <!-- Disabled while hidden, so individual applicants skip these controls. -->
-        <fieldset class="join-org-fields" hidden disabled>
-          <legend class="join-subhead">Organization details</legend>
+        <div class="join-field">
+          <label class="join-label" for="location">Location <span class="join-label-hint">(bioregion, city, or however you identify your place)</span></label>
+          <input type="text" id="location" name="location" class="join-input" placeholder="e.g. Cascadia, Lisbon, nomadic" required />
+        </div>
+
+        <div class="join-field">
+          <label class="join-label" for="telegram">Telegram <span class="join-label-hint">(personal or organization rep handle)</span></label>
+          <input type="text" id="telegram" name="telegram" class="join-input" placeholder="@yourhandle" required />
+        </div>
+
+        <div class="join-field">
+          <label class="join-label" for="email">Email address <span class="join-label-hint">(your personal or organizational rep email)</span></label>
+          <input type="email" id="email" name="email" class="join-input" autocomplete="email" placeholder="you@example.com" required />
+        </div>
+
+        <div class="join-field">
+          <label class="join-label" for="website">Website, portfolio, or public profile <span class="join-label-hint">(optional)</span></label>
+          <input type="url" id="website" name="website" class="join-input" autocomplete="url" placeholder="https://" />
+        </div>
+
+        <div class="join-field">
+          <label class="join-label" for="nominator">Did someone invite you to apply? <span class="join-label-hint">(optional: name of nominating steward or member)</span></label>
+          <input type="text" id="nominator" name="nominator" class="join-input" placeholder="Their name" />
+        </div>
+
+        <div class="join-org-fields" style="display:none;">
           <div class="join-field">
-            <label class="join-label" for="org-rep">Who will represent the organization?</label>
-            <p class="join-hint" id="org-rep-hint">Name and role. This can be you.</p>
-            <input type="text" id="org-rep" name="org-rep" class="join-input" placeholder="e.g. Jane Doe, Director of Programs" aria-describedby="org-rep-hint" maxlength="200" required />
+            <label class="join-label" for="org-rep">Designated representative name &amp; role <span class="join-label-hint">(optional: the person who will participate on behalf of the organization)</span></label>
+            <input type="text" id="org-rep" name="org-rep" class="join-input" placeholder="e.g. Jane Doe, Director of Programs" />
           </div>
+
           <div class="join-field">
-            <label class="join-label" for="org-description">About the organization <span class="join-label-hint">(optional)</span></label>
-            <textarea id="org-description" name="org-description" class="join-textarea" rows="3" placeholder="What it does, and at what scale" maxlength="2000"></textarea>
+            <label class="join-label" for="org-description">Brief description of the organization <span class="join-label-hint">(optional: mission, size, and primary activities; 2&ndash;3 sentences)</span></label>
+            <textarea id="org-description" name="org-description" class="join-textarea" rows="3" placeholder="What does the organization do, and at what scale?"></textarea>
           </div>
-        </fieldset>
+        </div>
 
         <div class="join-nav">
           <span></span>
@@ -224,35 +223,16 @@
         </div>
       </div>
 
-      <!-- ══════════ STEP 2: YOU AND REGENERATION ══════════ -->
+      <!-- ══════════ STEP 2: RELATIONSHIP WITH REGENERATION ══════════ -->
       <div class="join-step" data-step="2">
-        <span class="join-eyebrow">Step 2 of 5</span>
-        <h2 class="join-heading" tabindex="-1">You and regeneration</h2>
-        <p class="join-intro">We read this broadly: any field, any practice, any language.</p>
+        <span class="join-eyebrow">Step 2 of 6</span>
+        <h2 class="join-heading" tabindex="-1">Your relationship with regeneration</h2>
+        <p class="join-intro">We assess this broadly: through any domain, in any language.</p>
 
         <div class="join-field">
-          <label class="join-question" for="regen-relationship">How would you describe your relationship to regenerative work?</label>
-          <p class="join-hint" id="regen-relationship-hint">It might show up in your profession, practice, community or worldview. For an organization, describe how regenerative principles shape its mission and activities.</p>
-          <textarea id="regen-relationship" name="regen-relationship" class="join-textarea" rows="6" minlength="120" maxlength="2000" required aria-describedby="regen-relationship-hint"></textarea>
-        </div>
-
-        <fieldset class="join-field" data-min-choices="1" data-max-choices="3" aria-describedby="values-hint">
-          <legend class="join-question">Which of our values matter most to you?</legend>
-          <p class="join-hint" id="values-hint">Choose up to three.</p>
-          <div class="join-checkbox-grid">
-            <label class="join-check"><input type="checkbox" name="values" value="care" /><span>Care</span></label>
-            <label class="join-check"><input type="checkbox" name="values" value="stewardship" /><span>Stewardship</span></label>
-            <label class="join-check"><input type="checkbox" name="values" value="transparency" /><span>Transparency</span></label>
-            <label class="join-check"><input type="checkbox" name="values" value="reciprocity" /><span>Reciprocity</span></label>
-            <label class="join-check"><input type="checkbox" name="values" value="plurality" /><span>Plurality</span></label>
-            <label class="join-check"><input type="checkbox" name="values" value="collaboration" /><span>Collaboration</span></label>
-            <label class="join-check"><input type="checkbox" name="values" value="integrity" /><span>Integrity</span></label>
-          </div>
-        </fieldset>
-
-        <div class="join-field">
-          <label class="join-question" for="values-resonance">How do they show up in your work or life? <span class="join-label-hint">(optional)</span></label>
-          <textarea id="values-resonance" name="values-resonance" class="join-textarea" rows="4" maxlength="2000"></textarea>
+          <label class="join-label" for="regen-relationship">How would you describe your or your organization's relationship to regenerative work or thinking?</label>
+          <p class="join-hint">This could be through your profession, practice, community involvement, or personal worldview. For organizations: describe how regenerative principles show up in your mission and activities. (Suggested: 3&ndash;5 sentences.)</p>
+          <textarea id="regen-relationship" name="regen-relationship" class="join-textarea" rows="6" required></textarea>
         </div>
 
         <div class="join-nav">
@@ -261,34 +241,23 @@
         </div>
       </div>
 
-      <!-- ══════════ STEP 3: WHAT YOU'D BRING ══════════ -->
+      <!-- ══════════ STEP 3: ALIGNMENT AND VALUES ══════════ -->
       <div class="join-step" data-step="3">
-        <span class="join-eyebrow">Step 3 of 5</span>
-        <h2 class="join-heading" tabindex="-1">What you&rsquo;d bring</h2>
-        <p class="join-intro">Contributions take many forms: intellectual, social, cultural, experiential, material, living, financial and spiritual.</p>
+        <span class="join-eyebrow">Step 3 of 6</span>
+        <h2 class="join-heading" tabindex="-1">Alignment and values</h2>
+        <p class="join-intro">How your or your organization's values and collaborative approach align with the Commons.</p>
 
         <div class="join-field">
-          <label class="join-question" for="capital-contribution">What could you bring to the commons, and what would sharing it make possible for your work?</label>
-          <p class="join-hint" id="capital-contribution-hint">Knowledge, tools, land, networks, time, funding and care all count.</p>
-          <textarea id="capital-contribution" name="capital-contribution" class="join-textarea" rows="6" minlength="120" maxlength="2000" required aria-describedby="capital-contribution-hint"></textarea>
+          <label class="join-label" for="values-resonance">Which core values resonate most strongly with your own practice, and how do they show up in your work or life?</label>
+          <p class="join-hint">The Regen Commons is guided by seven core values: <em>care, stewardship, transparency, reciprocity, plurality, collaboration, and integrity</em>. (Suggested: 3&ndash;5 sentences.)</p>
+          <textarea id="values-resonance" name="values-resonance" class="join-textarea" rows="6" required></textarea>
         </div>
 
-        <fieldset class="join-field">
-          <legend class="join-question">Where would you most like to help? <span class="join-label-hint">(optional)</span></legend>
-          <div class="join-checkbox-grid">
-            <label class="join-check"><input type="checkbox" name="contribution-area" value="governance-design" /><span>Governance design</span></label>
-            <label class="join-check"><input type="checkbox" name="contribution-area" value="community-facilitation" /><span>Community facilitation</span></label>
-            <label class="join-check"><input type="checkbox" name="contribution-area" value="knowledge-sharing" /><span>Knowledge sharing</span></label>
-            <label class="join-check"><input type="checkbox" name="contribution-area" value="project-development" /><span>Project development</span></label>
-            <label class="join-check"><input type="checkbox" name="contribution-area" value="cultural-stewardship" /><span>Cultural stewardship</span></label>
-            <label class="join-check"><input type="checkbox" name="contribution-area" value="communications" /><span>Communications</span></label>
-            <label class="join-check join-check--full"><input type="checkbox" name="contribution-area" value="other" id="contrib-other" /><span>Something else</span></label>
-          </div>
-          <div class="join-field join-other-field" hidden>
-            <label class="join-label" for="contribution-area-other">What else?</label>
-            <input type="text" id="contribution-area-other" name="contribution-area-other" class="join-input" />
-          </div>
-        </fieldset>
+        <div class="join-field">
+          <label class="join-label" for="meaningful-participation">What would meaningful participation look like for you?</label>
+          <p class="join-hint">The Regen Commons is designed to help individuals and organizations pool resources, steward shared identity, and coordinate regenerative action together. What would become possible in your work if you had that kind of shared infrastructure to draw on? (Suggested: 2&ndash;4 sentences.)</p>
+          <textarea id="meaningful-participation" name="meaningful-participation" class="join-textarea" rows="5" required></textarea>
+        </div>
 
         <div class="join-nav">
           <button type="button" class="join-back" data-to="2">&larr; Back</button>
@@ -296,29 +265,33 @@
         </div>
       </div>
 
-      <!-- ══════════ STEP 4: TAKING PART ══════════ -->
-      <!-- Describes ways of taking part rather than dated events, so it stays
-           accurate as calls and programs change. -->
+      <!-- ══════════ STEP 4: WHAT WE CONTRIBUTE ══════════ -->
       <div class="join-step" data-step="4">
-        <span class="join-eyebrow">Step 4 of 5</span>
-        <h2 class="join-heading" tabindex="-1">Taking part</h2>
-        <p class="join-intro">Members take part in whatever way is authentic and sustainable for them.</p>
-
-        <fieldset class="join-field">
-          <legend class="join-question">How would you like to take part? <span class="join-label-hint">(optional)</span></legend>
-          <div class="join-checkbox-grid">
-            <label class="join-check"><input type="checkbox" name="participation" value="community-calls" /><span>Community calls</span></label>
-            <label class="join-check"><input type="checkbox" name="participation" value="online-discussion" /><span>Online discussion</span></label>
-            <label class="join-check"><input type="checkbox" name="participation" value="projects" /><span>Contributing to projects</span></label>
-            <label class="join-check"><input type="checkbox" name="participation" value="sharing" /><span>Sharing knowledge, tools or resources</span></label>
-            <label class="join-check join-check--full"><input type="checkbox" name="participation" value="not-sure" /><span>Not sure yet</span></label>
-          </div>
-        </fieldset>
+        <span class="join-eyebrow">Step 4 of 6</span>
+        <h2 class="join-heading" tabindex="-1">What we contribute</h2>
+        <p class="join-intro">Think broadly: contributions can include <strong>Intellectual, Social, Cultural, Experiential, Material, Living, Financial, and Spiritual</strong> capital.</p>
 
         <div class="join-field">
-          <label class="join-question" for="constraints">Is there anything we should know about your availability or access needs? <span class="join-label-hint">(optional)</span></label>
-          <p class="join-hint" id="constraints-hint">Time zone, capacity, accessibility, or anything else that would help.</p>
-          <textarea id="constraints" name="constraints" class="join-textarea" rows="3" maxlength="2000" aria-describedby="constraints-hint"></textarea>
+          <label class="join-label" for="capital-contribution">Which of the eight forms of capital could you or your organization contribute to the Regen Commons? What specific form might that take?</label>
+          <p class="join-hint">See the <a href="https://www.notion.so/Member-Contribution-Onboarding-Form-v0-1-35206d2570f280b784c8dec4257f2420" class="join-link" target="_blank" rel="noopener">Member Contribution Onboarding Form v0.1</a> for contribution details. (Suggested: 3&ndash;5 sentences.)</p>
+          <textarea id="capital-contribution" name="capital-contribution" class="join-textarea" rows="6" required></textarea>
+        </div>
+
+        <div class="join-field">
+          <label class="join-label">Is there a specific area of the Commons' work where you'd be most excited to contribute?</label>
+          <p class="join-hint">Select as many as apply.</p>
+          <div class="join-checkbox-grid">
+            <label class="join-check"><input type="checkbox" name="contribution-area" value="governance-design" /><span>Governance design</span></label>
+            <label class="join-check"><input type="checkbox" name="contribution-area" value="community-facilitation" /><span>Community facilitation</span></label>
+            <label class="join-check"><input type="checkbox" name="contribution-area" value="knowledge-sharing" /><span>Knowledge sharing</span></label>
+            <label class="join-check"><input type="checkbox" name="contribution-area" value="project-development" /><span>Project development</span></label>
+            <label class="join-check"><input type="checkbox" name="contribution-area" value="cultural-stewardship" /><span>Cultural stewardship</span></label>
+            <label class="join-check"><input type="checkbox" name="contribution-area" value="communications" /><span>Communications</span></label>
+            <label class="join-check join-check--full"><input type="checkbox" name="contribution-area" value="other" id="contrib-other" /><span>Something else entirely</span></label>
+          </div>
+          <div class="join-field join-other-field" style="display:none; margin-top: 0.8rem;">
+            <input type="text" id="contribution-area-other" name="contribution-area-other" class="join-input" placeholder="Tell us more..." />
+          </div>
         </div>
 
         <div class="join-nav">
@@ -327,38 +300,76 @@
         </div>
       </div>
 
-      <!-- ══════════ STEP 5: AGREEMENT ══════════ -->
+      <!-- ══════════ STEP 5: PARTICIPATION & AVAILABILITY ══════════ -->
       <div class="join-step" data-step="5">
-        <span class="join-eyebrow">Step 5 of 5</span>
-        <h2 class="join-heading" tabindex="-1">Agreement</h2>
-        <p class="join-intro">The commitments that hold the commons together.</p>
-
-        <fieldset class="join-field" aria-describedby="agreement-hint">
-          <legend class="join-question">Have you read the Membership Agreement?</legend>
-          <p class="join-hint" id="agreement-hint">It sets out what members commit to. <a href="https://portal.opencivics.co/regen-commons-membership-agreement" class="join-link" target="_blank" rel="noopener">Read the Membership Agreement</a></p>
-          <div class="join-radio-stack">
-            <label class="join-radio"><input type="radio" name="agreement-reviewed" value="yes" required /><span>Yes, and I understand its commitments</span></label>
-            <label class="join-radio"><input type="radio" name="agreement-reviewed" value="questions" /><span>I have questions (add them below)</span></label>
-          </div>
-        </fieldset>
-
-        <fieldset class="join-field" aria-describedby="consent-hint">
-          <legend class="join-question">Do you consent to the contribution protocol?</legend>
-          <p class="join-hint" id="consent-hint">It covers collective decision-making, conflict transformation and the possibility of membership review. <a href="https://portal.opencivics.co/regen-commons-contribution-protocol" class="join-link" target="_blank" rel="noopener">Read the contribution protocol</a></p>
-          <div class="join-radio-stack">
-            <label class="join-radio"><input type="radio" name="governance-consent" value="yes" required /><span>Yes, I consent</span></label>
-            <label class="join-radio"><input type="radio" name="governance-consent" value="questions" /><span>I have questions (add them below)</span></label>
-          </div>
-        </fieldset>
+        <span class="join-eyebrow">Step 5 of 6</span>
+        <h2 class="join-heading" tabindex="-1">Participation and availability</h2>
+        <p class="join-intro">We want to understand whether the timing and format of membership work for you right now.</p>
 
         <div class="join-field">
-          <label class="join-question" for="closing-notes">Is there anything else you&rsquo;d like the steward council to know? <span class="join-label-hint">(optional)</span></label>
-          <p class="join-hint" id="closing-notes-hint">Including any questions about the agreement or protocol.</p>
-          <textarea id="closing-notes" name="closing-notes" class="join-textarea" rows="4" maxlength="2000" aria-describedby="closing-notes-hint"></textarea>
+          <label class="join-label">Membership includes participation in 3 cohort onboarding events and ongoing engagement through monthly community calls or asynchronous channels. Are you (or a representative from your organization) able to commit to this level of participation for the coming quarter?</label>
+          <div class="join-radio-stack">
+            <label class="join-radio"><input type="radio" name="commitment" value="yes" required /><span>Yes</span></label>
+            <label class="join-radio"><input type="radio" name="commitment" value="yes-with-constraints" /><span>Yes, with some constraints</span></label>
+            <label class="join-radio"><input type="radio" name="commitment" value="unsure" /><span>I'm unsure (please explain below)</span></label>
+          </div>
+        </div>
+
+        <div class="join-field">
+          <label class="join-label" for="constraints">Are there any constraints on your availability or participation we should know about? <span class="join-label-hint">(optional: time zone, bandwidth, accessibility needs, etc.)</span></label>
+          <textarea id="constraints" name="constraints" class="join-textarea" rows="3"></textarea>
+        </div>
+
+        <div class="join-org-fields" style="display:none;">
+          <div class="join-field">
+            <label class="join-label">Are you a designated representative authorized to participate in governance processes (e.g. consent decisions, community deliberation) on behalf of the organization? <span class="join-label-hint">(optional)</span></label>
+            <div class="join-radio-stack">
+              <label class="join-radio"><input type="radio" name="authorized" value="yes" /><span>Yes</span></label>
+              <label class="join-radio"><input type="radio" name="authorized" value="yes-with-limits" /><span>Yes, with some limitations (please describe below)</span></label>
+            </div>
+          </div>
+
+          <div class="join-field">
+            <label class="join-label" for="other-colleagues">Other colleagues from your organization who might attend on its behalf? <span class="join-label-hint">(optional: names and emails)</span></label>
+            <textarea id="other-colleagues" name="other-colleagues" class="join-textarea" rows="3" placeholder="Name, email"></textarea>
+          </div>
         </div>
 
         <div class="join-nav">
           <button type="button" class="join-back" data-to="4">&larr; Back</button>
+          <button type="button" class="btn join-next" data-to="6"><span class="btn-label">Continue</span> &rarr;</button>
+        </div>
+      </div>
+
+      <!-- ══════════ STEP 6: CONSENT & AGREEMENT ══════════ -->
+      <div class="join-step" data-step="6">
+        <span class="join-eyebrow">Step 6 of 6</span>
+        <h2 class="join-heading" tabindex="-1">Consent and agreement</h2>
+        <p class="join-intro">The principles and protocols that hold the commons together.</p>
+
+        <div class="join-field">
+          <label class="join-label">I have reviewed the Regen Commons <a href="https://portal.opencivics.co/regen-commons-membership-agreement" class="join-link" target="_blank" rel="noopener">Membership Agreement</a> and understand the commitments it entails.</label>
+          <div class="join-radio-stack">
+            <label class="join-radio"><input type="radio" name="agreement-reviewed" value="yes" required /><span>Yes</span></label>
+            <label class="join-radio"><input type="radio" name="agreement-reviewed" value="questions" /><span>I have questions (please describe below)</span></label>
+          </div>
+        </div>
+
+        <div class="join-field">
+          <label class="join-label">I understand that membership involves consenting to the Commons' <a href="https://portal.opencivics.co/regen-commons-contribution-protocol" class="join-link" target="_blank" rel="noopener">contribution protocol</a>, including collective decision-making, conflict transformation processes, and the possibility of membership review.</label>
+          <div class="join-radio-stack">
+            <label class="join-radio"><input type="radio" name="governance-consent" value="yes" required /><span>Yes</span></label>
+            <label class="join-radio"><input type="radio" name="governance-consent" value="questions" /><span>I have questions (please describe below)</span></label>
+          </div>
+        </div>
+
+        <div class="join-field">
+          <label class="join-label" for="closing-notes">Is there anything else you'd like the steward council to know about you or your interest in joining? <span class="join-label-hint">(optional)</span></label>
+          <textarea id="closing-notes" name="closing-notes" class="join-textarea" rows="4"></textarea>
+        </div>
+
+        <div class="join-nav">
+          <button type="button" class="join-back" data-to="5">&larr; Back</button>
           <button type="submit" class="btn join-submit" id="join-submit"><span class="btn-label">Submit application</span> &rarr;</button>
         </div>
         <p class="join-error" id="join-error" role="alert" style="display:none;color:var(--ink);margin-top:1em;font-style:italic"></p>
@@ -370,10 +381,10 @@
     <div class="join-step join-confirmation" data-step="done" id="join-confirmation" tabindex="-1">
       <div class="join-confirmation-inner">
         <span class="join-eyebrow">What happens next</span>
-        <h2 class="join-heading" tabindex="-1">Thank you for applying.</h2>
-        <p class="join-intro">The steward council reads every application and may ask existing members for input. A steward will follow up by email.</p>
-        <p class="join-confirmation-quote">Questions in the meantime? Email <a href="mailto:regencommons@gmail.com" class="join-link">regencommons@gmail.com</a>.</p>
-        <a href="/map" class="btn join-enter"><span class="btn-label">Explore the map</span> &rarr;</a>
+        <h2 class="join-heading" tabindex="-1">Thank you for submitting.</h2>
+        <p class="join-intro">The council will review your responses, and your candidacy will enter a review period during which existing members may offer input. You'll hear back from your nominating steward within the cohort's review cycle.</p>
+        <p class="join-confirmation-quote">If you have questions at any point, reach out to the person who invited you; they're your primary point of contact through this process.</p>
+        <a href="/map" class="btn join-enter"><span class="btn-label">Return to the map</span> &rarr;</a>
       </div>
     </div>
 

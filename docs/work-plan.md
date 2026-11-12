@@ -218,17 +218,16 @@ overflow. Capture reproducible browser evidence and check console errors.
 Extract large inline scripts into feature files only where it improves this work,
 preserving behavior. A framework migration is not a prerequisite.
 
-### 5a. Council-call polish round — implemented, in review
+### 5a. Council-call polish round — merged and deployed
 
 From the 5 November council call and the maintainer's site review. Separate
 from the Supabase cutover and steward work.
 
-- **Join:** shorter left column. Five steps instead of six; the cohort
-  commitment, repeated representative question and colleague contacts are
-  removed. Questions now outrank context and typed text (16px inputs). Live
-  counters, and a 120 to 2,000 character rule on the two required written
-  answers, enforced in the page and the API. Telegram is optional, and
-  organizations must name a representative.
+- **Join:** the form restructure shipped in PR #15 was rolled back the same
+  day, because it had not been discussed with the team. The original questions,
+  steps, required fields, copy and server checks are restored. Only presentation
+  fixes remain: questions in full colour above muted hints, 16px inputs, a left
+  column that fits beside the form, and browser autofill for name and email.
 - **Learn:** practice card no longer tilts; seed cards sit beside their seed in
   the top layer, stay on screen, and close on Escape or an outside tap. Cards
   fit between the header and step dots from 1280×720 up.
@@ -242,17 +241,21 @@ from the Supabase cutover and steward work.
 fixtures in the in-app browser: Join submission and every validation path at
 1440×900 and 375×812; API rejections over local HTTP; Learn seed cards and card
 fit at 1280×720, 1280×800, 1366×768, 1440×900, 1536×864 and 1920×1080; map
-labels and hover card with 19 synthetic members. Share previews can only be
-confirmed after deployment.
+labels and hover card with 19 synthetic members. Merged as PR #15 and deployed
+on 11 November; the live pages, share images, photos and links were checked
+after deploy. No application was submitted through the live form.
 
-**Defaults awaiting confirmation:** 120-character minimum; required
-organization representative; left-column wording on what becomes public.
+**Join form changes for team discussion:** the cohort-commitment question
+(those calls have passed), a rework of the participation section, the
+colleague and repeated-representative questions, optional Telegram, minimum
+answer lengths, the values and contribution questions, and the left-column
+wording on cohorts and what becomes public.
 
 **Added in the same round:** `/about` with the five stewards (photos supplied by
 the maintainer, alphabetical by first name), governance and contact; `/constitution`
 with the v2 MVP text word for word, a labelled plain-words summary, contents and
 print styles. The nav's Email link became About; the address now sits on About and
-the Join confirmation. Rendered locally at desktop and 375px widths.
+the Join error messages. Rendered locally at desktop and 375px widths.
 
 **Pending, needs council input:** approval of the photos, affiliations and
 LinkedIn links (supplied by the maintainer) and of the constitution summary. For

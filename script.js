@@ -477,58 +477,26 @@
     var dots       = Array.from(document.querySelectorAll(".join-step-dot"));
     var confirm    = document.getElementById("join-confirmation");
     var currentStep = 1;
-    var lastStep    = steps.length;
 
-    // Organization-only fields stay disabled while hidden, so individuals are
-    // neither validated against them nor submit them.
+    // Individual / Organization radio — reveal org-only fields
     var applicantRadios = document.querySelectorAll('input[name="applicant-type"]');
     var orgFields       = document.querySelectorAll(".join-org-fields");
     function syncOrgFields() {
       var selected = document.querySelector('input[name="applicant-type"]:checked');
       var isOrg = selected && selected.value === "organization";
       orgFields.forEach(function (f) {
-        f.hidden = !isOrg;
-        f.disabled = !isOrg;
+        f.style.display = isOrg ? "block" : "none";
       });
     }
     applicantRadios.forEach(function (r) { r.addEventListener("change", syncOrgFields); });
     syncOrgFields();
 
-    // "Something else" contribution area reveals a free-text input
+    // "Other" contribution-area checkbox reveals a free-text input
     var otherCheckbox = document.getElementById("contrib-other");
     var otherField    = document.querySelector(".join-other-field");
     if (otherCheckbox && otherField) {
       otherCheckbox.addEventListener("change", function () {
-        otherField.hidden = !otherCheckbox.checked;
-      });
-    }
-
-    // Written answers with a minimum show a live count. Lengths are measured
-    // after trimming, matching the intake API (application-contract.js).
-    function answerLength(field) {
-      return field.value.trim().length;
-    }
-    function updateCounter(field) {
-      var counter = document.getElementById(field.id + "-count");
-      if (!counter) return;
-      var length = answerLength(field);
-      var remaining = field.minLength - length;
-      counter.classList.toggle("is-met", remaining <= 0);
-      counter.textContent = length === 0
-        ? "At least " + field.minLength + " characters."
-        : remaining > 0
-        ? remaining + (remaining === 1 ? " more character" : " more characters") + " needed."
-        : length + " of " + field.maxLength + " characters.";
-    }
-    if (form) {
-      form.querySelectorAll("textarea[minlength]").forEach(function (field) {
-        var counter = document.createElement("p");
-        counter.className = "join-counter";
-        counter.id = field.id + "-count";
-        field.insertAdjacentElement("afterend", counter);
-        field.setAttribute("aria-describedby", [field.getAttribute("aria-describedby"), counter.id].filter(Boolean).join(" "));
-        field.addEventListener("input", function () { updateCounter(field); });
-        updateCounter(field);
+        otherField.style.display = otherCheckbox.checked ? "block" : "none";
       });
     }
 
@@ -574,27 +542,6 @@
       }
     }
 
-    function showFieldError(wrapper, controls, id, message) {
-      wrapper.classList.add("has-error");
-      var error = document.createElement("p");
-      error.className = "join-field-error";
-      error.id = id;
-      error.textContent = message;
-      wrapper.appendChild(error);
-      controls.forEach(function (control) {
-        control.setAttribute("aria-invalid", "true");
-        control.setAttribute("aria-describedby", [control.getAttribute("aria-describedby"), error.id].filter(Boolean).join(" "));
-      });
-    }
-
-    function fieldMessage(field, length) {
-      if (field.validity.typeMismatch && field.type === "email") return "Enter a valid email address, such as name@example.com.";
-      if (field.validity.typeMismatch && field.type === "url") return "Enter a full web address, such as https://example.com, or leave this optional field blank.";
-      if (field.type === "radio") return "Choose an option to continue.";
-      if (length > 0 && length < field.minLength) return "Write at least " + field.minLength + " characters. You have " + length + " so far.";
-      return "Complete this field to continue.";
-    }
-
     function validateStep(n) {
       var step = form.querySelector('.join-step[data-step="' + n + '"]');
       if (!step) return true;
@@ -607,29 +554,26 @@
           checkedGroups.add(field.name);
         }
         clearFieldError(field);
-        var length = answerLength(field);
-        var blank = field.required && length === 0;
-        var tooShort = length > 0 && length < field.minLength;
-        if (field.validity.valid && !blank && !tooShort) return;
+        var blank = field.required && !field.value.trim();
+        if (field.validity.valid && !blank) return;
         if (!firstInvalid) firstInvalid = field;
         var wrapper = field.closest(".join-field");
         if (!wrapper) return;
-        var controls = field.type === "radio" ? Array.from(wrapper.querySelectorAll('input[type="radio"]')) : [field];
-        showFieldError(wrapper, controls, "join-error-" + field.name, fieldMessage(field, length));
-      });
-      // Checkbox groups with a choice limit, such as "choose up to three".
-      step.querySelectorAll("fieldset[data-min-choices], fieldset[data-max-choices]").forEach(function (group) {
-        var boxes = Array.from(group.querySelectorAll('input[type="checkbox"]'));
-        if (group.disabled || !boxes.length) return;
-        var chosen = boxes.filter(function (box) { return box.checked; }).length;
-        var min = Number(group.dataset.minChoices || 0);
-        var max = Number(group.dataset.maxChoices || boxes.length);
-        if (chosen >= min && chosen <= max) return;
-        if (!firstInvalid) firstInvalid = boxes[0];
-        showFieldError(group, boxes, "join-error-" + boxes[0].name,
-          chosen < min
-            ? (min === 1 ? "Choose at least one to continue." : "Choose at least " + min + " to continue.")
-            : "Choose up to " + max + ". You have " + chosen + " selected.");
+        wrapper.classList.add("has-error");
+        var error = document.createElement("p");
+        error.className = "join-field-error";
+        error.id = "join-error-" + field.name;
+        error.textContent = field.validity.typeMismatch && field.type === "email"
+          ? "Enter a valid email address, such as name@example.com."
+          : field.validity.typeMismatch && field.type === "url"
+          ? "Enter a full web address, such as https://example.com, or leave this optional field blank."
+          : field.type === "radio" ? "Choose an option to continue." : "Complete this field to continue.";
+        wrapper.appendChild(error);
+        var controls = field.type === "radio" ? wrapper.querySelectorAll('input[type="radio"]') : [field];
+        controls.forEach(function (control) {
+          control.setAttribute("aria-invalid", "true");
+          control.setAttribute("aria-describedby", [control.getAttribute("aria-describedby"), error.id].filter(Boolean).join(" "));
+        });
       });
       if (firstInvalid) firstInvalid.focus();
       return !firstInvalid;
@@ -692,11 +636,11 @@
       var lastSubmission = null, submissionId = null;
       form.addEventListener("submit", async function (e) {
         e.preventDefault();
-        if (currentStep < lastStep) {
+        if (currentStep < 6) {
           goToStep(currentStep + 1);
           return;
         }
-        if (!validateStep(lastStep)) return;
+        if (!validateStep(6)) return;
         clearSubmitError();
 
         var originalLabel = submitBtn ? submitBtn.querySelector(".btn-label").textContent : "";
@@ -737,10 +681,8 @@
             code === "rate_limited"
               ? "Too many submissions from this connection. Please try again later."
               : code === "network_error"
-              ? "We couldn't reach the server. Check your connection and try again, or email regencommons@gmail.com."
-              : code === "invalid_answer_length" || code === "missing_required_fields"
-              ? "Some answers are missing or too short. Go back through the steps, then try again."
-              : "Something went wrong sending your application. Please try again, or email regencommons@gmail.com."
+              ? "We couldn't reach the server. Check your connection and try again, or email regencommons@proton.me."
+              : "Something went wrong sending your application. Please try again, or email regencommons@proton.me."
           );
           if (submitBtn) {
             submitBtn.disabled = false;

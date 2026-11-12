@@ -130,15 +130,7 @@ test("seed validation and honeypot run in the actual handler; accepted seeds are
 test("application validation, pending publication gate, and rate limiting use actual handlers", async () => {
   assert.equal((await post("/api/apply", {})).status, 400);
   assert.equal((await post("/api/apply", { "full-name": "Demo", email: "invalid" })).status, 400);
-  const body = {
-    "full-name": "New Demo Applicant",
-    email: "new@example.test",
-    "regen-relationship": "Synthetic answer: I tend a community seed library and teach neighbours how to save, swap and replant local varieties each season.",
-    "capital-contribution": "Synthetic answer: seed-saving guides, a lending shelf of tools, and time to host monthly swaps for anyone in the network.",
-  };
-  const short = await post("/api/apply", { ...body, "regen-relationship": "Too short." });
-  assert.equal(short.status, 400);
-  assert.deepEqual(await short.json(), { error: "invalid_answer_length" });
+  const body = { "full-name": "New Demo Applicant", email: "new@example.test" };
   assert.deepEqual(await (await post("/api/apply", body)).json(), { ok: true });
   const { members } = await (await request("/api/members")).json();
   assert.ok(!members.some((member) => member.name === body["full-name"]));

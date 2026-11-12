@@ -93,7 +93,7 @@ export async function drainNotifications({
                 ...(applicant
                   ? {
                       reply_to:
-                        env.RESEND_REPLY_TO_EMAIL || "regencommons@gmail.com",
+                        env.RESEND_REPLY_TO_EMAIL || "regencommons@proton.me",
                     }
                   : {}),
               }),

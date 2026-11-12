@@ -99,12 +99,7 @@ test("notification errors stay separate from a confirmed application save", asyn
     {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: {
-        "full-name": "Synthetic Person",
-        email: "person@example.test",
-        "regen-relationship": "Synthetic answer: I tend a community seed library and teach neighbours how to save, swap and replant local varieties each season.",
-        "capital-contribution": "Synthetic answer: seed-saving guides, a lending shelf of tools, and time to host monthly swaps for anyone in the network.",
-      },
+      body: { "full-name": "Synthetic Person", email: "person@example.test" },
     },
     response,
   );
