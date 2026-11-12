@@ -663,3 +663,14 @@ light/dark visual checks pass. The new council link reaches its heading with 108
 clearance. Browser warnings/errors are empty. Rollback target:
 `dpl_C8wcHsf7uVKFRWLPcTtr27SV81S5`. No CI run exists for this revision;
 local required checks passed. Branch is `codex/about-contact`; main is unchanged.
+
+## Remove unrequested council link — 11 November 2026
+
+Remove the added “Meet the council” link and its anchor-specific scroll margin.
+Keep the shortened Members description and the alignment of the two existing
+Members/Constitution links. The council card remains descriptive, as requested.
+Rendered fixture checks confirm the council card contains no links, while the
+Members and Constitution links have identical vertical positions at 1280px.
+All three card heights remain equal. At 390px there is no horizontal overflow.
+Browser warnings/errors are empty. `npm run check`, all 88 tests and
+`npm run smoke` pass. Production delivery is pending.
