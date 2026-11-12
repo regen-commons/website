@@ -625,4 +625,13 @@ Rendered fixture checks at 1280px and 390px confirm correct contact text wrappin
 and no mobile overflow. Enter opens a separate tab with the correct forum category
 and About preserved. The link has `noopener` and the accessible new-tab label.
 Browser warnings/errors are empty. `npm run check`, all 88 tests and
-`npm run smoke` pass. Production delivery is pending.
+`npm run smoke` pass.
+
+Production is READY on `regencommons.com`, deployment
+`dpl_C8wcHsf7uVKFRWLPcTtr27SV81S5`, runtime commit
+`38d568aa3c9965f552c6bcdb68e618502376e97c`. Live click verification opens
+“About the Regen Commons category” in a separate tab with About preserved.
+The live HTML matches the tested file byte-for-byte. Browser warnings/errors and
+deployment error/fatal logs are empty. Rollback target:
+`dpl_2LwvsV6oBGELeL65SmLbv81J1AfH`. No CI run exists for this revision;
+local required checks passed. Branch is `codex/about-contact`; main is unchanged.
