@@ -387,3 +387,20 @@ The clearly marked synthetic record is retained for user review. See the
 [hosted release record](contact-messages.md#hosted-release--11-november-2026) for
 commits, deployments, migration, evidence and rollback targets. Releases use the
 published task branches; neither main branch has been merged.
+
+## Council sign-in and filtering polish — verified locally, 11 November 2026
+
+Keep the sign-in card steady across email, code, loading and ordinary error
+states by reserving the forms’ natural height and feedback space. Retain native
+dropdowns with an inset, theme-aware arrow. Membership type/state changes apply
+immediately; search applies after a brief typing pause or Enter, without moving
+focus away from the control. Preserve stale-request guards and reset pagination
+when filters change. Verification covers desktop/mobile card geometry, keyboard
+filtering, empty/error/retry states and the required repository checks.
+
+**Evidence:** check, all 88 tests and HTTP smoke pass. Rendered in-app Chromium
+fixtures at 1280px and 390px confirm equal sign-in card height across email, code
+and invalid-code states, automatic type/state filtering, search after a typing
+pause and Enter, focus retention, filtered-empty feedback, and failed-read retry.
+Both themes show inset dropdown arrows without horizontal overflow. See the
+[council usability record](steward-verification.md#council-usability--11-november-2026).

@@ -73,52 +73,54 @@
       <section id="login" class="login panel">
         <p class="eyebrow">Care for the commons</p>
         <h1>Steward sign-in</h1>
-        <form id="email-form" method="post" action="/api/admin">
-          <p class="muted login-description">
-            Manage membership requests, messages, Seeds, and Contributions.
-          </p>
-          <label for="email">Steward email</label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            autocomplete="email"
-            autocapitalize="off"
-            spellcheck="false"
-            required
-            maxlength="254"
-            aria-describedby="access-help"
-          />
-          <p id="access-help" class="help">
-            Access is granted by a project administrator. Signing in does not
-            create a steward account.
-          </p>
-          <button type="submit">
-            Send sign-in code <span aria-hidden="true">→</span>
-          </button>
-        </form>
-        <form id="code-form" method="post" action="/api/admin" hidden>
-          <p id="code-help">Enter the code from your email.</p>
-          <label for="code">Email code</label>
-          <input
-            id="code"
-            name="code"
-            type="text"
-            inputmode="numeric"
-            autocomplete="one-time-code"
-            pattern="[0-9]{6,10}"
-            minlength="6"
-            maxlength="10"
-            required
-            aria-describedby="code-help"
-          />
-          <button type="submit">
-            Open steward desk <span aria-hidden="true">→</span>
-          </button>
-          <button id="change-email" class="text-button" type="button">
-            Change email or request a new code
-          </button>
-        </form>
+        <div class="login-steps">
+          <form id="email-form" method="post" action="/api/admin">
+            <p class="muted login-description">
+              Manage membership requests, messages, Seeds, and Contributions.
+            </p>
+            <label for="email">Steward email</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              autocapitalize="off"
+              spellcheck="false"
+              required
+              maxlength="254"
+              aria-describedby="access-help"
+            />
+            <p id="access-help" class="help">
+              Access is granted by a project administrator. Signing in does not
+              create a steward account.
+            </p>
+            <button type="submit">
+              Send sign-in code <span aria-hidden="true">→</span>
+            </button>
+          </form>
+          <form id="code-form" method="post" action="/api/admin" hidden>
+            <p id="code-help">Enter the code from your email.</p>
+            <label for="code">Email code</label>
+            <input
+              id="code"
+              name="code"
+              type="text"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              pattern="[0-9]{6,10}"
+              minlength="6"
+              maxlength="10"
+              required
+              aria-describedby="code-help"
+            />
+            <button type="submit">
+              Open steward desk <span aria-hidden="true">→</span>
+            </button>
+            <button id="change-email" class="text-button" type="button">
+              Change email or request a new code
+            </button>
+          </form>
+        </div>
         <p id="login-message" role="status" aria-live="polite"></p>
         <button id="retry-sign-out" class="secondary" type="button" hidden>
           Retry sign out
@@ -226,10 +228,9 @@
                   <option value="legacy_active">Legacy active</option>
                 </select>
               </div>
-              <button type="submit" class="secondary">Apply filters</button>
             </form>
             <div class="list-caption">
-              <p id="queue-count"></p>
+              <p id="queue-count" aria-live="polite" aria-atomic="true"></p>
               <span class="help">Newest first</span>
             </div>
             <div id="application-list"></div>

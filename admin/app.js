@@ -55,7 +55,8 @@
     loginEmail = "",
     offset = 0,
     messageOffset = 0,
-    generation = 0;
+    generation = 0,
+    filterTimer = null;
   const filters = { search: "", state: "", type: "" };
   const menuButton = $("workspace-menu-toggle");
   const navigation = $("workspace-navigation");
@@ -211,6 +212,7 @@
     $("retry").hidden = true;
   }
   function showLogin(message = "") {
+    clearTimeout(filterTimer);
     signedIn = false;
     messageOffset = 0;
     closeMenu();
@@ -1206,7 +1208,8 @@
       root.append(controls);
     }
   }
-  async function loadView() {
+  async function loadView({ focusHeading = true } = {}) {
+    clearTimeout(filterTimer);
     if (!signedIn) return;
     closeMenu();
     clearPrivateData();
@@ -1268,7 +1271,7 @@
         if (current !== generation || !signedIn) return;
         renderMessages(data, !!contentId);
         $("load-message").textContent = "";
-        if (!menuIsOpen()) $("view-title").focus();
+        if (focusHeading && !menuIsOpen()) $("view-title").focus();
         return;
       }
       if (members) {
@@ -1298,7 +1301,7 @@
           );
         } else renderMembers(memberData);
         $("load-message").textContent = "";
-        if (!menuIsOpen()) $("view-title").focus();
+        if (focusHeading && !menuIsOpen()) $("view-title").focus();
         return;
       }
       if (managing) {
@@ -1317,7 +1320,7 @@
           renderContentList(resource, data);
         }
         $("load-message").textContent = "";
-        if (!menuIsOpen()) $("view-title").focus();
+        if (focusHeading && !menuIsOpen()) $("view-title").focus();
         return;
       }
       const params = detailId
@@ -1331,7 +1334,7 @@
       if (detailId) renderDetail(data, memberData);
       else renderQueue(data);
       $("load-message").textContent = "";
-      if (!menuIsOpen()) $("view-title").focus();
+      if (focusHeading && !menuIsOpen()) $("view-title").focus();
     } catch (error) {
       if (current !== generation) return;
       if ([401, 403].includes(error.status)) {
@@ -1345,12 +1348,27 @@
       $("retry").hidden = false;
     }
   }
-  $("filters").addEventListener("submit", (event) => {
-    event.preventDefault();
+  function applyFilters() {
+    clearTimeout(filterTimer);
     for (const key of Object.keys(filters)) filters[key] = $(key).value.trim();
     offset = 0;
-    loadView();
+    loadView({ focusHeading: false });
+  }
+  $("filters").addEventListener("submit", (event) => {
+    event.preventDefault();
+    applyFilters();
   });
+  for (const id of ["type", "state"])
+    $(id).addEventListener("change", applyFilters);
+  function scheduleSearch(event) {
+    clearTimeout(filterTimer);
+    if (!event.isComposing) filterTimer = setTimeout(applyFilters, 250);
+  }
+  $("search").addEventListener("input", scheduleSearch);
+  $("search").addEventListener("compositionstart", () => {
+    clearTimeout(filterTimer);
+  });
+  $("search").addEventListener("compositionend", scheduleSearch);
   $("previous").addEventListener("click", () => {
     offset = Math.max(0, offset - 25);
     loadView();
