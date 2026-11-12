@@ -700,4 +700,14 @@ contains only forum and feedback links, with the forum still opening in a new ta
 Browser warnings/errors are empty. `npm run check`, all 88 tests and
 `npm run smoke` pass. Existing reduced-motion styles remain in effect. Local
 Modern Web Guidance retrieval remains unavailable as documented previously;
-shared native flex rows are used. Production delivery is pending.
+shared native flex rows are used.
+
+Production is READY at `regencommons.com`, deployment
+`dpl_GDp7KyHKGYHhPHEXiyrVMcwDWCaU`, runtime commit
+`d180473ea6fbe7d7ec402e2913887a116f326ded`. All five changed runtime assets
+match the tested source byte-for-byte. Live browser checks confirm no email in
+the contact intro and zero right-edge offsets for all four submit actions.
+Browser and deployment error/fatal scans are empty. Application and database CI
+passed for the runtime revision. No live form submissions were needed.
+Rollback target: `dpl_2cDKyugJ8kRaHgh8kgsBk1kbQ7xg`. Published branch:
+`codex/contact-subtext`; draft PR #19 targets main. Main is unchanged.
