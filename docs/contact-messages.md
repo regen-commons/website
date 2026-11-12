@@ -67,7 +67,7 @@ origin. The configured intake secret’s hash must already exist in
 `private.intake_settings`.
 
 1. Deploy the companion agent’s contact event and corrected dashboard labels.
-2. Apply `20261112005445_contact_messages.sql` to the confirmed website project
+2. Apply `20261112013204_contact_messages.sql` to the confirmed website project
    through the normal reviewed migration process. It does not alter existing
    intake RPCs, membership tables or their notification jobs.
 3. Deploy the website change.
