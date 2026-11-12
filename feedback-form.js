@@ -12,11 +12,14 @@ document.getElementById("feedback-context").textContent =
   `Page: ${form.elements.page_path.value}`;
 for (const category of feedbackCategories) {
   const label = document.createElement("label");
+  label.className = "join-check";
   const checkbox = document.createElement("input");
   checkbox.type = "checkbox";
   checkbox.name = "categories";
   checkbox.value = category;
-  label.append(checkbox, document.createTextNode(category));
+  const text = document.createElement("span");
+  text.textContent = category;
+  label.append(checkbox, text);
   categories.append(label);
 }
 let busy = false,

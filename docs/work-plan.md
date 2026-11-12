@@ -436,3 +436,31 @@ error/fatal scan was empty. No new live contact message was submitted; the
 previous contact delivery verification remains the integration evidence.
 Rollback target: `dpl_M7scijv6VWicdTpBhTToAtfz4ehj`. The published task branch
 remains separate from main; no PR or CI run exists for this revision.
+
+
+## Public form consistency and centered contact — 11 November 2026
+
+- Feedback uses the membership card, display labels, checkbox grid, textarea,
+  hints and organic button, while keeping category selection and page context.
+- Both seed entry points use the membership textarea and organic button. Keep
+  their existing card colors/layouts and inherit control text from each card.
+- Center the About contact card, heading and introduction; keep field text left
+  aligned. Respect reduced motion for organic buttons and seed card pulsing.
+- Verify desktop/mobile, both themes, keyboard validation, error/retry and save
+  feedback with synthetic fixtures. Run check, tests and smoke before releasing.
+- Deploy the verified website revision, compare live assets and inspect the
+  rendered public forms. Live submissions are unnecessary for this visual change.
+
+**Rendered fixture evidence:** in-app Chromium at 1280px and 390px covers all
+four affected pages in both themes, shared 16px textarea controls, organic
+buttons, card palettes, no horizontal overflow, keyboard checkbox selection,
+required-field focus, and contact-card centering (zero-pixel center offset).
+Feedback and Seeds retain drafts through a forced failed save and succeed on
+retry. Mobile Learn saves by keyboard and hands off to the planted-seed screen.
+Console checks are clean. The browser reports no reduced-motion preference;
+CSSOM inspection confirms animation removal for buttons and seed cards under
+that media query, rather than claiming a rendered reduced-motion check.
+
+Local guidance tooling still cannot resolve its dev-surfaces module; this uses
+repository styles and native controls without refreshing the online package.
+Final check, all 88 tests and HTTP smoke pass. Production release is pending.

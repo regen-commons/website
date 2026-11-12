@@ -150,23 +150,6 @@ p:last-child { margin-bottom: 0; }
 }
 .btn-blob { animation: blob-breathe 6s ease-in-out infinite; }
 
-/* ── Simple outlined button for declaration cards ─────────────────────────── */
-.declaration-card .btn {
-  border: 1.5px solid rgba(var(--copper-rgb), 0.35);
-  border-radius: 2px;
-  padding: 0.85rem 2rem;
-  color: var(--copper);
-  transition: border-color 0.3s, background 0.3s, color 0.3s;
-}
-.declaration-card .btn:hover {
-  border-color: var(--copper);
-  background: rgba(var(--copper-rgb), 0.08);
-}
-[data-theme="light"] .declaration-card .btn {
-  color: var(--copper);
-  border-color: rgba(var(--copper-rgb), 0.4);
-}
-
 /* ── ANIMATED WAVY UNDERLINES ────────────────────────────────────────────── */
 .wavy-link {
   position: relative;
@@ -656,13 +639,9 @@ p:last-child { margin-bottom: 0; }
 .declaration-card .declaration-eyebrow { color: var(--copper); }
 .declaration-card .declaration-prompt { color: var(--paper); }
 .declaration-card .declaration-sub { color: rgba(0,0,0,0.58); }
-.declaration-card .declaration-textarea {
-  background: rgba(255,255,255,0.06);
-  color: rgba(0,0,0,0.72);
-  border-color: rgba(var(--copper-rgb), 0.2);
-}
-.declaration-card .declaration-textarea::placeholder { color: rgba(0,0,0,0.32); }
-.declaration-card .declaration-textarea:focus { border-color: var(--copper); }
+.declaration-card .declaration-textarea { color: inherit; }
+.declaration-card .declaration-textarea::placeholder { color: inherit; }
+.declaration-card :focus-visible { outline-color: currentColor; }
 
 /* Light mode: still dark card */
 [data-theme="light"] .declaration-card {
@@ -671,13 +650,6 @@ p:last-child { margin-bottom: 0; }
 }
 [data-theme="light"] .declaration-card .declaration-prompt { color: #EDE5D4; }
 [data-theme="light"] .declaration-card .declaration-sub { color: rgba(237,229,212,0.65); }
-[data-theme="light"] .declaration-card .declaration-textarea {
-  background: rgba(255,255,255,0.08);
-  color: rgba(237,229,212,0.85);
-}
-[data-theme="light"] .declaration-card .declaration-textarea::placeholder { color: rgba(237,229,212,0.35); }
-[data-theme="light"] .declaration-card .declaration-textarea:focus { border-color: var(--copper); }
-
 /* Pulse: draws attention to the planting card as the one affordance on the page */
 @keyframes declaration-card-pulse {
   0%, 100% { box-shadow: 0 0 0 0 rgba(var(--copper-rgb), 0.0), 0 0 0 0 rgba(var(--copper-rgb), 0.0); }
@@ -718,27 +690,9 @@ p:last-child { margin-bottom: 0; }
 }
 
 .declaration-textarea {
-  width: 100%;
-  background: transparent;
-  border: none;
-  border-bottom: 1.5px solid rgba(var(--copper-rgb), 0.30);
-  font-family: var(--font-serif);
-  font-size: 1.05rem;
-  line-height: 1.8;
-  color: var(--ink);
-  padding: 0.5rem 0 0.7rem;
-  resize: none;
-  outline: none;
-  text-align: center;
   display: block;
-  margin-bottom: 1.8rem;
-}
-.declaration-textarea::placeholder {
-  color: var(--ink-dim);
-  font-style: italic;
-}
-.declaration-textarea:focus {
-  border-color: var(--accent, var(--gold));
+  flex-shrink: 0;
+  margin-bottom: 1.6rem;
 }
 
 .declaration-note {
@@ -1744,7 +1698,7 @@ p:last-child { margin-bottom: 0; }
   display: block;
   margin-bottom: 0.8rem;
 }
-/* Shared membership and contact form card. */
+/* Shared public form card and controls, established by membership. */
 .join-form-card {
   background: var(--parchment);
   border: 1px solid rgba(var(--copper-rgb), 0.12);
@@ -2457,18 +2411,10 @@ p:last-child { margin-bottom: 0; }
 .feedback-page > p { line-height: 1.65; }
 .feedback-back { display: inline-block; padding-block: .75rem; margin-bottom: 1.5rem; color: inherit; }
 .feedback-page form { margin-top: 2rem; }
-.feedback-page fieldset { border: 1px solid var(--ink-mid); padding: 1rem; margin: 0 0 1.5rem; }
-.feedback-page legend, .feedback-message > label { font: 500 1rem/1.5 var(--font-sans); }
-#feedback-categories { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); }
-#feedback-categories label { display: flex; align-items: center; gap: .75rem; min-height: 48px; font: 1rem/1.4 var(--font-sans); cursor: pointer; }
-#feedback-categories input { width: 1.15rem; height: 1.15rem; accent-color: var(--copper); }
-.feedback-message > label { display: block; margin-bottom: .5rem; }
-.feedback-message textarea { box-sizing: border-box; width: 100%; padding: 1rem; border: 1px solid var(--ink-mid); background: var(--paper); color: inherit; font: 1rem/1.6 var(--font-sans); resize: vertical; }
-.feedback-help { margin: .5rem 0 1rem; color: inherit; font: .875rem/1.5 var(--font-sans); overflow-wrap: anywhere; }
-.feedback-page button[type="submit"] { min-height: 48px; padding: .8rem 1.25rem; border: 1px solid currentColor; background: var(--copper); color: var(--paper); font: 500 1rem/1.4 var(--font-sans); cursor: pointer; }
+.feedback-page fieldset { min-width: 0; border: 0; padding: 0; }
+.feedback-help { overflow-wrap: anywhere; }
 .feedback-page button:disabled { opacity: .65; cursor: default; }
-.feedback-page :focus-visible { outline: 3px solid var(--gold); outline-offset: 4px; }
-#feedback-status { min-height: 1.5em; margin-block: 1rem; font: 1rem/1.5 var(--font-sans); }
+#feedback-status { min-height: 1.5em; margin: 1rem 0 0; color: var(--ink); }
 
 /* Save and data feedback remains legible in both themes and at mobile widths. */
 .seed-hint, .seed-status {
@@ -2479,12 +2425,13 @@ p:last-child { margin-bottom: 0; }
 }
 .seed-status:empty { display: none; }
 .declaration-textarea[aria-invalid="true"] { border: 2px solid var(--copper); }
-.declaration-card button[type="submit"],
-[data-theme="light"] .declaration-card button[type="submit"] {
+/* Keep the shared organic button legible on each seed card’s own palette. */
+.declaration-card button[type="submit"] {
+  --accent: currentColor;
   color: inherit;
-  border-color: currentColor;
+  align-self: center;
+  flex-shrink: 0;
 }
-.declaration-card button[type="submit"] .btn-label { color: inherit; }
 .declaration-card button:disabled { opacity: 0.65; cursor: wait; }
 .seed-saved-link { display: block; margin-top: 1rem; color: inherit; }
 .data-feedback {
@@ -2541,6 +2488,7 @@ body:not([data-page="admin"])::before {
   html { scroll-behavior: auto; }
   .reveal, .reveal-scale { opacity: 1; transform: none; transition: none; }
   .logo-mark:hover canvas { transform: none; }
+  .btn-blob, .declaration-card--pulse { animation: none; }
 }
 
 /* Public overrides remain independent of the steward dashboard tokens. */
