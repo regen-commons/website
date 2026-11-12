@@ -673,4 +673,12 @@ Rendered fixture checks confirm the council card contains no links, while the
 Members and Constitution links have identical vertical positions at 1280px.
 All three card heights remain equal. At 390px there is no horizontal overflow.
 Browser warnings/errors are empty. `npm run check`, all 88 tests and
-`npm run smoke` pass. Production delivery is pending.
+`npm run smoke` pass.
+
+Correction is live and READY on `regencommons.com`, deployment
+`dpl_7FPCe94LLRNtCaytLJZAPdNxJtKe`, runtime commit
+`78fa932051b61893888cdc465d5e70fe3fc1eaf2`. The live HTML matches the corrected
+file exactly. Live rendered cards confirm no council link and identical positions
+for the two existing links. Rollback target: `dpl_9qYgbYV5iNgeFjzabCBMsAsnhpRB`.
+No CI run exists for this revision; local required checks passed. Branch is
+`codex/about-contact`; main is unchanged.
