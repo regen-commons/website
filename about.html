@@ -114,9 +114,10 @@
       text-decoration-color: rgba(var(--accent-rgb), 0.6);
     }
     .council-affiliation a:hover { color: var(--accent); }
-    .about-contact { text-align: center; }
-    .about-contact > p { margin-inline: auto; }
-    .contact-form { max-width: 640px; margin: 2rem auto; text-align: left; }
+    .contact-form { max-width: 640px; margin: 0 auto; text-align: left; }
+    .contact-intro { color: var(--ink-mid); line-height: 1.75; margin: 0 0 2.2rem; }
+    .contact-actions { display: flex; justify-content: flex-end; margin-top: 1.5rem; }
+    .contact-actions .btn { margin-top: 0; }
     .contact-form .contact-trap { position: absolute; left: -10000px; }
     .contact-form [role="status"] { min-height: 1.5em; color: var(--ink); margin: 1rem 0 0; }
     .council-affiliation a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
@@ -247,6 +248,7 @@
         <article>
           <h3>Members</h3>
           <p>People and organizations who tend the commons. Members join community calls, take part in discussions and advise the council on strategy and significant decisions.</p>
+          <a href="/join">Become a member &rarr;</a>
         </article>
         <article>
           <h3>Steward council</h3>
@@ -261,9 +263,9 @@
     </section>
 
     <section class="about-section about-contact" aria-labelledby="contact-title">
-      <h2 id="contact-title">Get in touch</h2>
-      <p>Email <a href="mailto:regencommons@proton.me">regencommons@proton.me</a>, join the conversation in the <a href="https://hub.regencoordination.xyz/t/about-the-regen-commons-category/365">Regen Commons forum</a>, or <a href="/feedback?from=/about">share feedback on the site</a>.</p>
-      <form id="contact-form" class="contact-form join-form-card" aria-describedby="contact-privacy">
+      <form id="contact-form" class="contact-form join-form-card" aria-labelledby="contact-title" aria-describedby="contact-privacy">
+        <h2 id="contact-title">Get in touch</h2>
+        <p class="contact-intro">Email <a href="mailto:regencommons@proton.me">regencommons@proton.me</a>, join the conversation in the <a href="https://hub.regencoordination.xyz/t/about-the-regen-commons-category/365">Regen Commons forum</a>, or <a href="/feedback?from=/about">share feedback on the site</a>.</p>
         <div class="join-field">
           <label class="join-label" for="contact-name">Your name</label>
           <input class="join-input" id="contact-name" name="name" autocomplete="name" maxlength="200" required />
@@ -282,11 +284,12 @@
         </div>
         <div class="contact-trap" aria-hidden="true"><label for="contact-website">Leave this blank</label><input id="contact-website" name="website_confirm" tabindex="-1" autocomplete="off" /></div>
         <p id="contact-privacy" class="join-hint">Your name, email and message are saved privately for the steward council to review and reply. A notification with a link to the message is sent to the council’s Telegram group.</p>
-        <button type="submit" class="btn"><span class="btn-label">Send message</span> &rarr;</button>
+        <div class="contact-actions">
+          <button type="submit" class="btn"><span class="btn-label">Send message</span> &rarr;</button>
+        </div>
         <p id="contact-status" role="status" aria-live="polite"></p>
+        <noscript><p>Please use the email link above to get in touch.</p></noscript>
       </form>
-      <noscript><p>Please use the email link above to get in touch.</p></noscript>
-      <a href="/join" class="btn btn--large btn--primary"><span class="btn-label">Become a member</span> &rarr;</a>
     </section>
   </main>
 

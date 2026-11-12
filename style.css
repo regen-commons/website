@@ -1993,13 +1993,18 @@ p:last-child { margin-bottom: 0; }
 /* ── Navigation ── */
 .join-nav {
   display: flex;
+  gap: 0.5rem;
   justify-content: space-between;
   align-items: center;
   margin-top: 2.5rem;
   padding-top: 1.5rem;
   border-top: 1px solid rgba(var(--copper-rgb), 0.08);
 }
+/* The shared button’s prose spacing must not offset centered navigation. */
+.join-nav .btn { margin-top: 0; }
 .join-back {
+  flex-shrink: 0;
+  white-space: nowrap;
   font-family: var(--font-sans);
   font-size: 0.65rem;
   letter-spacing: 0.12em;
@@ -2012,6 +2017,9 @@ p:last-child { margin-bottom: 0; }
   transition: color 0.2s;
 }
 .join-back:hover { color: var(--ink); }
+@media (max-width: 540px) {
+  .join-nav .btn { padding-inline: 1rem; letter-spacing: 0.12em; }
+}
 
 /* ── In-prose links (orange, not browser blue) ── */
 .join-link,

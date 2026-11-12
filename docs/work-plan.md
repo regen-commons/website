@@ -476,3 +476,36 @@ release; save/retry checks used isolated synthetic fixtures.
 
 Rollback target: `dpl_HpzZQDJB1D6zBbQfuLK45xL6GLDN`. This release remains on
 `codex/about-contact`; main is unchanged. No PR or CI run exists for this revision.
+
+## Contact composition and membership navigation — 11 November 2026
+
+Move Get in touch and its introduction inside the centered contact card. Keep
+field text left aligned and place Send message at the right edge of the card’s
+content. Move Become a member into the Members governance card as a text link.
+Remove the separate membership button below Contact.
+
+Fix the membership navigation’s vertical alignment. Before the fix, the shared
+button’s 2.2rem top margin placed Continue’s center 19.8px below Back even though
+the row used align-items: center. Override that margin within navigation rows;
+verify Back/Continue and Back/Submit centers at desktop/mobile widths.
+
+Acceptance: heading/card association, one membership CTA in the intended card,
+right-aligned contact action, centered membership navigation, both themes,
+keyboard navigation and validation, no horizontal overflow, required checks,
+and verified production publication.
+
+**Rendered fixture evidence:** in-app Chromium at 1280px and 390px confirms
+heading/introduction inside the contact card, zero center offset for that card,
+and zero offset between Send message’s right edge and the textarea’s right edge.
+There is one Become a member link, inside Members; it opens `/join`. The separate
+CTA below Contact is gone. Both themes, keyboard focus, required-field rejection
+and horizontal overflow checks pass; console checks are clean.
+
+Membership Back/Continue and Back/Submit now have zero vertical center offset
+at desktop/mobile widths. Back remains on one line; mobile navigation uses
+smaller side padding and tracking so Submit application fits beside it at 390px.
+Synthetic navigation through all six steps and back/forward recovery pass.
+Local guidance retrieval remains unavailable because the dev-surfaces module is
+missing; no online guidance package was refreshed. The 320px navigation check
+also has zero center offset and no horizontal overflow. Final check, all 88 tests
+and HTTP smoke pass. Production release is pending.
