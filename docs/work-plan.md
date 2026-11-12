@@ -587,3 +587,18 @@ warnings/errors are empty. No live submissions or provider data writes were need
 
 Rollback target: `dpl_HPCcJDbCBqssFqTRwEVWz1Nsu6eS`. The task branch remains
 `codex/about-contact`; main is unchanged. No CI run exists for this revision.
+
+## About organization links in new tabs — 11 November 2026
+
+OpenCivics Labs and Greater Than in Origins should open in new tabs. Inspection
+also found that council organization links still used the same tab, unlike the
+LinkedIn links. Apply native `target="_blank"`, `rel="noopener"` and an accessible
+new-tab label to both sets (13 links total), keeping constitution links internal.
+Rendered fixture proof confirms OpenCivics opens a separate tab with Enter and
+Greater Than opens a separate tab on click, with About preserved. Both destinations
+load successfully. All 13 links expose new-tab labels and `noopener`; all four
+constitution links retain same-tab navigation. Desktop (1280px) and mobile (390px)
+render correctly, with no mobile overflow or browser warnings/errors. Required
+`npm run check`, all 88 tests, and `npm run smoke` pass. Local modern-web guidance
+retrieval remains unavailable due to the missing dev-surfaces entrypoint; this
+uses existing native anchor conventions. Production delivery is pending.
