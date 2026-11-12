@@ -144,6 +144,8 @@
       gap: 1rem;
     }
     .governance-grid article {
+      display: flex;
+      flex-direction: column;
       background: var(--parchment);
       border: 1px solid rgba(var(--copper-rgb), 0.12);
       padding: 1.5rem 1.6rem;
@@ -169,7 +171,13 @@
       text-decoration-color: rgba(var(--accent-rgb), 0.6);
       text-underline-offset: 0.2em;
     }
-    .governance-grid a { display: inline-block; margin-top: 0.9rem; padding-block: 0.3rem; font-size: 0.92rem; }
+    .governance-grid a {
+      align-self: flex-start;
+      margin-top: auto;
+      padding: 1.2rem 0 0.3rem;
+      font-size: 0.92rem;
+    }
+    #council-title { scroll-margin-top: 6rem; }
 
     .about-contact .btn { margin-top: 0.4rem; }
   </style>
@@ -256,12 +264,13 @@
       <div class="governance-grid">
         <article>
           <h3>Members</h3>
-          <p>People and organizations who tend the commons. Members join community calls, take part in discussions and advise the council on strategy and significant decisions.</p>
+          <p>People and organizations who join community calls, share ideas and advise the council on strategy and key decisions.</p>
           <a href="/join">Become a member &rarr;</a>
         </article>
         <article>
           <h3>Steward council</h3>
           <p>Guides strategy, admits new members and keeps operations running. Its decisions are documented and shared with members.</p>
+          <a href="#council-title">Meet the council &rarr;</a>
         </article>
         <article>
           <h3>Constitution</h3>

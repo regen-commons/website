@@ -635,3 +635,22 @@ The live HTML matches the tested file byte-for-byte. Browser warnings/errors and
 deployment error/fatal logs are empty. Rollback target:
 `dpl_2LwvsV6oBGELeL65SmLbv81J1AfH`. No CI run exists for this revision;
 local required checks passed. Branch is `codex/about-contact`; main is unchanged.
+
+## Align governance card links — 11 November 2026
+
+Give Members, Steward council and Constitution matching bottom-aligned text links.
+Use flexible card columns so alignment survives wrapping and viewport changes.
+Shorten the Members description while preserving calls, discussions and advice on
+strategy/significant decisions. Add “Meet the council” pointing to the existing
+council section, with room below the fixed navigation when following the anchor.
+Rendered fixture checks at 1280px confirm equal card heights and identical link
+positions (zero vertical offset). Members/council descriptions use five lines,
+Constitution four. At 768px the first-row links stay aligned; at 390px and 320px
+cards stack with consistent 28px bottom gaps and no horizontal overflow. Light
+and dark theme rendering is verified. Keyboard focus follows the three card links
+with visible outlines; Become a member opens `/join`, Read the constitution opens
+`/constitution`, and Meet the council reaches the council heading 108px below the
+viewport top. Browser warnings/errors are empty. `npm run check`, all 88 tests and
+`npm run smoke` pass; the final prose adjustment was rechecked. Local guidance
+retrieval is still unavailable (missing dev-surfaces entrypoint); this uses native
+flex/grid and anchors. Production delivery is pending.
