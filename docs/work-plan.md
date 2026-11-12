@@ -682,3 +682,22 @@ file exactly. Live rendered cards confirm no council link and identical position
 for the two existing links. Rollback target: `dpl_9qYgbYV5iNgeFjzabCBMsAsnhpRB`.
 No CI run exists for this revision; local required checks passed. Branch is
 `codex/about-contact`; main is unchanged.
+
+## Contact intro without a public email — 12 November 2026
+
+Remove the displayed email address from the Get in touch intro now that the
+private contact form is available. Keep the forum link opening in a new tab and
+the site-feedback link. Audit current public submit button styling and placement;
+the user confirmed right-aligned feedback and seed actions. Share the action-row
+style with Contact, keep the distinct seed cards, and use membership-sized
+mobile button padding.
+
+Rendered fixtures at 1280px and 390px confirm zero right-edge offset for contact,
+feedback, standalone Seeds and Learn's seed action. Seed cards retain their own
+palettes and layouts; controls fit their mobile action rows. Feedback required-field
+focus and keyboard submission work, with a saved confirmation. The contact intro
+contains only forum and feedback links, with the forum still opening in a new tab.
+Browser warnings/errors are empty. `npm run check`, all 88 tests and
+`npm run smoke` pass. Existing reduced-motion styles remain in effect. Local
+Modern Web Guidance retrieval remains unavailable as documented previously;
+shared native flex rows are used. Production delivery is pending.
