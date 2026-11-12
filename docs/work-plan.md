@@ -508,4 +508,17 @@ Synthetic navigation through all six steps and back/forward recovery pass.
 Local guidance retrieval remains unavailable because the dev-surfaces module is
 missing; no online guidance package was refreshed. The 320px navigation check
 also has zero center offset and no horizontal overflow. Final check, all 88 tests
-and HTTP smoke pass. Production release is pending.
+and HTTP smoke pass.
+
+**Released:** website `7aed67197544f15e505a78fc7a924aee97037784` is production
+READY as `dpl_EsLh55P3iBxeitAMqHnY5MuYTsiq`, aliased to `regencommons.com`.
+Hosted About, shared CSS and membership HTML match the tested source byte for
+byte. Live desktop/mobile checks confirm the contact heading inside the card,
+zero card-center/right-action offsets, one membership link in Members and no
+membership link in Contact. That link opens the live application, whose visible
+Continue button has zero top margin. Six-step navigation/alignment proof uses
+synthetic fixtures. Console and runtime error/fatal scans are empty. No live
+submissions were made for this layout release.
+
+Rollback target: `dpl_7kMCaa2itHbKwKzKGtPkEW3Kcn2x`. The release remains on
+`codex/about-contact`; main is unchanged. No PR or CI run exists for this revision.
