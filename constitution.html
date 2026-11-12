@@ -4,12 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Constitution · Regen Commons</title>
-  <meta name="description" content="The Regen Commons constitution: its purpose, values, structure, roles and shared assets, with a short summary in plain words." />
+  <meta name="description" content="The Regen Commons constitution: its purpose, values, principles, structure and protocols, with a short summary in plain words." />
   <link rel="canonical" href="https://regencommons.com/constitution" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Regen Commons" />
   <meta property="og:title" content="The Regen Commons Constitution" />
-  <meta property="og:description" content="The Regen Commons constitution: its purpose, values, structure, roles and shared assets, with a short summary in plain words." />
+  <meta property="og:description" content="The Regen Commons constitution: its purpose, values, principles, structure and protocols, with a short summary in plain words." />
   <meta property="og:url" content="https://regencommons.com/constitution" />
   <meta property="og:image" content="https://regencommons.com/assets/share/constitution.png" />
   <meta property="og:image:width" content="1200" />
@@ -101,8 +101,16 @@
     .const-summary li { line-height: 1.65; color: var(--ink-mid); }
     .const-summary strong { color: var(--ink); font-weight: 600; }
 
-    /* Contents */
-    .const-toc { position: sticky; top: 6.5rem; align-self: start; }
+    /* Contents: sticky beside the text, scrolling on its own when taller than the screen */
+    .const-toc {
+      position: sticky;
+      top: 6.5rem;
+      align-self: start;
+      max-height: calc(100vh - 8rem);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+    }
     .const-toc summary {
       font-family: var(--font-sans);
       font-size: 0.66rem;
@@ -116,18 +124,20 @@
     .const-toc li { margin: 0; }
     .const-toc a {
       display: block;
-      padding: 0.35rem 0 0.35rem 0.8rem;
+      padding: 0.3rem 0 0.3rem 0.8rem;
       border-left: 1px solid rgba(var(--copper-rgb), 0.2);
       font-size: 0.88rem;
       color: var(--ink-mid);
       text-decoration: none;
     }
     .const-toc a:hover { color: var(--ink); border-left-color: var(--accent); }
+    .const-toc ol ol { margin-top: 0; }
     .const-toc ol ol a { padding-left: 1.6rem; font-size: 0.82rem; }
 
     /* Constitution text */
     .const-text { max-width: 70ch; }
-    .const-text section { scroll-margin-top: 6.5rem; }
+    .const-text section,
+    .const-text :is(h2, h3, h4, h5, h6) { scroll-margin-top: 6.5rem; }
     .const-text > section + section { margin-top: 3.5rem; padding-top: 3rem; border-top: 1px solid rgba(var(--copper-rgb), 0.12); }
     .const-text h2 {
       font-family: var(--font-display);
@@ -137,14 +147,40 @@
     }
     .const-text h3 {
       font-family: var(--font-display);
-      font-size: 1.3rem;
+      font-size: 1.5rem;
       font-weight: 400;
-      margin: 2.4rem 0 0.3rem;
-      scroll-margin-top: 6.5rem;
+      margin: 3rem 0 0.7rem;
+      padding-top: 1.8rem;
+      border-top: 1px solid rgba(var(--copper-rgb), 0.08);
     }
+    .const-text h2 + h3 { margin-top: 1.4rem; padding-top: 0; border-top: 0; }
+    .const-text h4 {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 400;
+      margin: 2.4rem 0 0.5rem;
+    }
+    .const-text h3 + h4 { margin-top: 1.2rem; }
+    .const-text h5 {
+      font-family: var(--font-sans);
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-mid);
+      margin: 2rem 0 0.7rem;
+    }
+    .const-text h6 {
+      font-family: var(--font-display);
+      font-size: 1.12rem;
+      font-weight: 400;
+      font-style: italic;
+      margin: 1.5rem 0 0.4rem;
+    }
+    .const-text h5 + h6 { margin-top: 0.8rem; }
     .const-text p, .const-text li, .const-text dd { line-height: 1.75; color: var(--ink-mid); }
     .const-text p { margin: 0 0 1rem; }
-    .const-lede { font-size: 0.85rem; font-family: var(--font-sans); letter-spacing: 0.02em; color: var(--ink-dim) !important; margin-bottom: 0.9rem !important; }
+    .const-text strong { color: var(--ink); font-weight: 600; }
     .const-statement {
       font-family: var(--font-display);
       font-size: 1.25rem;
@@ -155,23 +191,48 @@
       padding-left: 1.2rem;
       margin: 0.6rem 0 0.9rem !important;
     }
-    .const-test { font-size: 0.9rem; font-style: italic; color: var(--ink-dim) !important; }
-    .const-text ul { padding-left: 1.2rem; margin: 0 0 1rem; }
-    .const-facts { margin: 0.8rem 0 0; display: grid; grid-template-columns: max-content 1fr; gap: 0.5rem 1.2rem; }
+    .const-text .const-statement strong { font-weight: inherit; }
+    .const-text :is(ul, ol) { padding-left: 1.3rem; margin: 0 0 1rem; }
+    .const-text li + li { margin-top: 0.3rem; }
+    .const-text li > :is(ul, ol), .const-text dd > :is(ul, ol) { margin: 0.4rem 0 0; }
+    .const-facts { margin: 0.4rem 0 1rem; display: grid; grid-template-columns: fit-content(12rem) minmax(0, 1fr); gap: 0.5rem 1.2rem; }
     .const-facts dt {
       font-family: var(--font-sans);
       font-size: 0.66rem;
       letter-spacing: 0.14em;
       text-transform: uppercase;
       color: var(--ink-dim);
-      padding-top: 0.3rem;
+      padding-top: 0.35rem;
     }
     .const-facts dd { margin: 0; }
-    .const-values { margin: 0.8rem 0 0; }
-    .const-values dt { font-family: var(--font-display); font-size: 1.05rem; color: var(--ink); margin-top: 0.9rem; }
-    .const-values dd { margin: 0.1rem 0 0; }
+
+    /* Metadata tables, collapsed as they are in the source document */
+    .const-meta { margin: 0 0 1rem; }
+    .const-meta summary {
+      width: fit-content;
+      font-family: var(--font-sans);
+      font-size: 0.64rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+      cursor: pointer;
+      padding-block: 0.35rem;
+    }
+    .const-meta summary:hover, .const-meta[open] summary { color: var(--ink); }
+    .const-meta-list {
+      display: grid;
+      grid-template-columns: max-content minmax(0, 1fr);
+      gap: 0.3rem 1.2rem;
+      margin: 0.4rem 0 0;
+      padding: 0.9rem 1.1rem;
+      background: var(--parchment);
+      border: 1px solid rgba(var(--copper-rgb), 0.12);
+    }
+    .const-meta-list dt { font-family: var(--font-sans); font-size: 0.74rem; color: var(--ink-dim); padding-top: 0.15rem; }
+    .const-text .const-meta-list dd { margin: 0; font-size: 0.85rem; line-height: 1.55; overflow-wrap: anywhere; }
+
     .const-notes {
-      margin-top: 1.4rem;
+      margin-top: 3.5rem;
       padding: 1.2rem 1.4rem;
       background: var(--parchment);
       border: 1px solid rgba(var(--copper-rgb), 0.12);
@@ -182,9 +243,13 @@
 
     @media (max-width: 960px) {
       .const-page { grid-template-columns: 1fr; gap: 2.5rem; }
-      .const-toc { position: static; border: 1px solid rgba(var(--copper-rgb), 0.15); padding: 0.6rem 1rem; }
+      .const-toc { position: static; max-height: none; overflow: visible; border: 1px solid rgba(var(--copper-rgb), 0.15); padding: 0.6rem 1rem; }
       .const-facts { grid-template-columns: 1fr; gap: 0.1rem; }
       .const-facts dd { margin-bottom: 0.6rem; }
+    }
+    @media (max-width: 600px) {
+      .const-meta-list { grid-template-columns: 1fr; gap: 0.05rem; }
+      .const-text .const-meta-list dd { margin-bottom: 0.5rem; }
     }
 
     @media print {
@@ -193,7 +258,7 @@
       body { background: #fff !important; }
       .const-page { display: block; padding: 0; color: #111; }
       .const-page *, .const-statement { color: #111 !important; }
-      .const-summary, .const-notes { background: none; border: 1px solid #999; }
+      .const-summary, .const-notes, .const-meta-list { background: none; border: 1px solid #999; }
       .const-text > section + section { break-before: auto; }
       a { text-decoration: none; }
     }
@@ -226,8 +291,8 @@
     <header class="const-hero">
       <span class="section-label mono"><a href="/about">About</a> / Constitution</span>
       <h1>The Regen Commons Constitution</h1>
-      <p class="const-version">MVP constitution · version 2</p>
-      <p>The governing agreement of the commons: why it exists, how it is organized, and who holds which responsibilities. A short summary in plain words comes first, then the full text.</p>
+      <p class="const-version">MVP constitution · text as of 11 November 2026</p>
+      <p>The governing agreement of the commons: why it exists, how it is organized, who holds which responsibilities and the protocols it follows. A short summary in plain words comes first, then the full text.</p>
       <button type="button" class="const-print" id="const-print">Print or save as PDF</button>
     </header>
 
@@ -235,12 +300,13 @@
       <h2 id="summary-title">In plain words</h2>
       <p class="const-summary-note">This summary is not part of the constitution. Where the two differ, the full text below governs.</p>
       <ul>
-        <li><strong>Why it exists:</strong> to care for the shared identity of the regenerative movement as a commons, protecting its integrity while keeping it open to many kinds of practice.</li>
-        <li><strong>Freedom to act:</strong> anyone may act toward the commons&rsquo; purpose within the roles they hold, as long as they follow its protocols and uphold its values.</li>
-        <li><strong>Who decides:</strong> an elected steward council manages the treasury and day-to-day governance by simple majority within agreed limits. All members form the Community Assembly, which advises on major decisions and selects stewards.</li>
-        <li><strong>Members:</strong> people aligned with the purpose and values, admitted by invitation and consent. Members can vote on proposals within scope, propose projects and use member resources.</li>
-        <li><strong>Projects:</strong> approved initiatives govern themselves within their agreed scope and receive funding as they reach milestones.</li>
-        <li><strong>What is held in common:</strong> a governance forum, a shared treasury, brand assets, core intellectual property and the constitution itself.</li>
+        <li><strong>Why it exists:</strong> to give individuals and organizations common ground where they can pool resources, steward a shared identity and support regenerative action together.</li>
+        <li><strong>Freedom to act:</strong> anyone may act toward the commons&rsquo; purpose within the roles they hold, as long as they follow its protocols and uphold its values and principles.</li>
+        <li><strong>Joining:</strong> for the first six months, each seed member can invite up to five people. Invitees attend two or three onboarding events. If no member objects within seven days, the invitee can claim a membership credential; an objection goes to a consent vote of the assembly. Later, joining moves to a stricter process that members will design together.</li>
+        <li><strong>Stewards:</strong> a council of five to seven stewards holds the shared treasury and carries out decisions. Seed members elect the first council; later stewards are to be chosen by sortition, a weighted random draw from nominees.</li>
+        <li><strong>Decisions:</strong> each kind of decision has its own route. Role holders handle routine work, project funding goes to an advice process and a quadratic vote of members, and major allocations need collective consent, then wait one to three days before funds move. All members belong to the Commons Member Assembly, which meets monthly.</li>
+        <li><strong>Conflict:</strong> handled in steps, from direct dialogue to mediation and, as a last resort, binding arbitration.</li>
+        <li><strong>What is held in common:</strong> knowledge, technology, certification, branding and facilities, along with the constitution, the governance forum, the treasury, brand assets, core intellectual property and communication channels.</li>
         <li><strong>Today:</strong> during the foundation period, the <a href="https://portal.opencivics.co/regen-commons-membership-agreement">Membership Agreement</a> sets out the parts in operation. Some parts, such as the treasury and on-chain roles, are scaffolding for later.</li>
       </ul>
     </aside>
@@ -250,22 +316,35 @@
         <summary>Contents</summary>
         <ol>
           <li><a href="#context">Context</a></li>
-          <li><a href="#freedom">Freedom to participate</a></li>
+          <li><a href="#freedom">Freedom To Participate</a></li>
           <li><a href="#identity">Identity</a>
             <ol>
+              <li><a href="#about">About</a></li>
               <li><a href="#vision">Vision</a></li>
               <li><a href="#purpose">Purpose</a></li>
               <li><a href="#mission">Mission</a></li>
               <li><a href="#values">Values</a></li>
-              <li><a href="#worldview">Worldview</a></li>
               <li><a href="#mandates">Mandates</a></li>
+              <li><a href="#worldview">Worldview</a></li>
+              <li><a href="#principles">Principles</a></li>
             </ol>
           </li>
-          <li><a href="#structure">Structure</a></li>
-          <li><a href="#roles">Roles</a></li>
-          <li><a href="#assets">Assets</a></li>
-          <li><a href="#protocols">Protocols</a></li>
-          <li><a href="#building-blocks">Building blocks</a></li>
+          <li><a href="#structure">Structure</a>
+            <ol>
+              <li><a href="#components">Components</a></li>
+              <li><a href="#roles">Roles</a></li>
+              <li><a href="#assets">Assets</a></li>
+              <li><a href="#membranes">Membranes</a></li>
+            </ol>
+          </li>
+          <li><a href="#protocols">Protocols</a>
+            <ol>
+              <li><a href="#cultural-protocols">Cultural Protocols</a></li>
+              <li><a href="#role-protocols">Role Protocols</a></li>
+              <li><a href="#asset-protocols">Asset Protocols</a></li>
+              <li><a href="#membrane-protocols">Membrane Protocols</a></li>
+            </ol>
+          </li>
         </ol>
       </details>
     </nav>
@@ -273,241 +352,1280 @@
     <article class="const-text">
       <section id="context" aria-labelledby="context-title">
         <h2 id="context-title">Context</h2>
-        <p>Regen Commons is a cooperative governance container that stewards shared cultural, intellectual, and ecological assets for the regenerative movement during its MVP phase.</p>
+        <p>Regen Commons emerges in a moment when humanity faces intertwined ecological, social, and cultural crises that demand more than isolated solutions. While many individuals, organizations, and communities are already working toward regenerative futures, their efforts are often fragmented, under-resourced, or constrained by systems built on extraction and competition.</p>
+        <p>Regen Commons is a response to this need: a common ground where resources can be pooled and stewarded collectively in service of regenerative action. It is not itself the site of every action, but rather the enabling infrastructure — a cooperative field that supports diverse communities and activities to thrive by directing common pool resources toward their regenerative efforts.</p>
+        <p>This document — the organizational DNA and Constitution of Regen Commons — defines the identity, structure, and protocols that guide how Regen Commons operates. It articulates the shared understanding we hold, the roles we play, and the agreements we use to align around a life-centered ethos. In doing so, it provides coherence without control, ensuring that Regen Commons remains an open, evolving, and trustworthy foundation for self-organized collective stewardship.</p>
       </section>
 
       <section id="freedom" aria-labelledby="freedom-title">
-        <h2 id="freedom-title">Freedom to participate</h2>
-        <p>You are free to take any action that fulfills the Purpose of the organization and the Roles that you hold — as long as you do not violate any Protocols; and you seek to uphold the Values and principles of this Constitution.</p>
+        <h2 id="freedom-title">Freedom To Participate</h2>
+        <p>You are free to take any action that fulfills the <strong>Purpose</strong> of the organization and the <strong>Roles</strong> that you hold - as long as you do not violate any <strong>Protocols</strong>; and you uphold the <strong>Values</strong> and <strong>Principles</strong> of this <strong>Constitution</strong>.</p>
       </section>
 
       <section id="identity" aria-labelledby="identity-title">
         <h2 id="identity-title">Identity</h2>
-        <p>The core meaning and intentionality of the Commons — why it exists, what it serves, and how it stays oriented over time.</p>
-
+        <h3 id="about">About</h3>
+        <details class="const-meta">
+          <summary>Metadata + Instructions</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>regen-commons-vision</dd>
+            <dt>name</dt><dd>Vision</dd>
+            <dt>description</dt><dd>A concise definition of what Regen Commons is, why it exists, and the unique role it plays.</dd>
+            <dt>temporal focus</dt><dd>Present-facing (anchored in current identity and commitments)</dd>
+            <dt>scope</dt><dd>Organizational essence (who we are, what we do, how we hold ourselves)</dd>
+            <dt>function</dt><dd>Establish clarity of identity and invite others into resonance and relationship</dd>
+            <dt>test</dt><dd>If someone new read this, they would immediately know whether Regen Commons is “for them.”</dd>
+          </dl>
+        </details>
+        <p><strong>Short Form (one liner)</strong><br>Regen Commons is common ground where members pool resources to support regenerative collective action.</p>
+        <p><strong>Long Form (paragraph)</strong></p>
+        <p>Regen Commons exists to provide the common ground for pooling and stewarding resources that support regenerative collective action. Rather than being the site of the work itself, the Commons enables it — gathering contributions of knowledge, capital, and care into a shared resource base that members can draw from. By holding these resources in trust and directing them toward regenerative efforts, Regen Commons strengthens the conditions for diverse communities and ecosystems to thrive.</p>
         <h3 id="vision">Vision</h3>
-        <p class="const-lede">The world we seek to help create</p>
-        <p class="const-statement">Regenerative culture, ecology, and economy flourish together as a coherent movement, safeguarded and sustained by shared governance infrastructure that keeps the Regen Movement open, trusted, and life-affirming.</p>
-        <p class="const-test">Test: If this came true, the organization might no longer be needed.</p>
-
+        <details class="const-meta">
+          <summary>Metadata + Instructions</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>regen-commons-vision</dd>
+            <dt>name</dt><dd>Vision</dd>
+            <dt>description</dt><dd>The world we seek to help create</dd>
+            <dt>temporal focus</dt><dd>Future-facing</dd>
+            <dt>scope</dt><dd>Global or systemic context</dd>
+            <dt>function</dt><dd>Inspiration and direction</dd>
+            <dt>test</dt><dd>If this came true, the organization might no longer be needed.</dd>
+          </dl>
+        </details>
+        <p class="const-statement">Regenerative culture, ecology, and economy flourish together as a coherent movement, grounded in shared commons where individuals and organizations pool resources to coordinate action.</p>
         <h3 id="purpose">Purpose</h3>
-        <p class="const-lede">Why we exist now.</p>
-        <p class="const-statement">Regen Commons exists to care for regen identity as a shared cultural commons — protecting its integrity while enabling its plurality and cooperative use across the movement.</p>
-        <p class="const-test">Test: This would remain true even if our form evolves.</p>
-
+        <details class="const-meta">
+          <summary>Metadata + Instructions</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>regen-commons-purpose</dd>
+            <dt>name</dt><dd>Purpose</dd>
+            <dt>description</dt><dd>Why we exist now.</dd>
+            <dt>temporal focus</dt><dd>Present (ongoing commitment), Timeless and unbounded by success metrics.</dd>
+            <dt>scope</dt><dd>Organizational identity and function, rooted in your Philosophy of what is good and valuable.</dd>
+            <dt>function</dt><dd>Core reason for being, attractor it draws people, energy, and coherence over time.</dd>
+            <dt>test</dt><dd>This would remain true even if our form evolves.</dd>
+          </dl>
+        </details>
+        <p class="const-statement"><strong>Regen Commons provides the common ground for individuals and organizations to pool resources, steward shared identity, and strengthen the foundations for coordinated regenerative action.</strong></p>
         <h3 id="mission">Mission</h3>
-        <p class="const-lede">What we do to fulfill our purpose.</p>
-        <p class="const-statement">Develop and maintain commons-based governance, recognition, and licensing systems that safeguard Regen Movement assets, support aligned use, and equip the ecosystem with knowledge, IP, and tools to thrive.</p>
-        <p class="const-test">Test: It might change every few years — it&rsquo;s how the purpose is pursued today.</p>
-
+        <details class="const-meta">
+          <summary>Metadata + Instructions</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>regen-commons-mission</dd>
+            <dt>name</dt><dd>Mission</dd>
+            <dt>description</dt><dd>What we do to fulfill our purpose.</dd>
+            <dt>temporal focus</dt><dd>Strategic, Translates purpose into a present-tense strategy.</dd>
+            <dt>scope</dt><dd>Operational, is achievable and measurable (though not necessarily limited to numbers). Exists within constraints—funding, capacity, regulatory environments. Can evolve or be updated in response to new information.</dd>
+            <dt>function</dt><dd>Describes how the purpose is enacted now</dd>
+            <dt>test</dt><dd>It might change every few years — it's how the purpose is pursued today.</dd>
+          </dl>
+        </details>
+        <p class="const-statement">Develop and maintain commons-based governance, recognition, and licensing systems that enable individuals and organizations to pool resources and coordinate regenerative action.</p>
         <h3 id="values">Values</h3>
-        <p class="const-lede">What we stand for.</p>
-        <dl class="const-values">
-          <dt>Care</dt>
-          <dd>Grounding all work in responsibility to people, place, and planet.</dd>
-          <dt>Stewardship beyond ownership</dt>
-          <dd>Holding identity in trust, never as property.</dd>
-          <dt>Transparency</dt>
-          <dd>Creating clarity and openness in decisions and processes.</dd>
-          <dt>Reciprocity</dt>
-          <dd>Ensuring benefits flow back to those who nurture the commons.</dd>
-          <dt>Plurality</dt>
-          <dd>Honoring many expressions of regenerative practice while sustaining coherence.</dd>
-          <dt>Integrity</dt>
-          <dd>Prioritizing what is right for the commons over expedience or control.</dd>
-        </dl>
-        <p class="const-test">Test: If this value was violated, the organization would feel out of integrity — even if its mission was achieved.</p>
-
-        <h3 id="worldview">Worldview</h3>
-        <p class="const-lede">A core worldview or system of understanding that informs how the organization relates to life, place, and purpose.</p>
-        <p class="const-statement">We understand the Regen movement as a living cultural commons. Legitimacy emerges through participatory process, identity and trust are stewarded (not owned), and living systems offer the deepest models for regenerative governance and cultural design. Shared assets must remain open, cared-for, and participatory through protective-yet-permeable membranes and adaptive protocols.</p>
-        <p class="const-test">Test: If this philosophy were removed or violated, the organization&rsquo;s identity and integrity would be fundamentally altered — even if its activities remained the same.</p>
-
-        <h3 id="mandates">Mandates</h3>
-        <p class="const-lede">A clearly defined area of responsibility the organization is committed to upholding through its roles, actions, and structures.</p>
+        <details class="const-meta">
+          <summary>Metadata + Instructions</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>regen-commons-values</dd>
+            <dt>name</dt><dd>Values</dd>
+            <dt>description</dt><dd>What we stand for.</dd>
+            <dt>temporal focus</dt><dd>Present and continuous</dd>
+            <dt>scope</dt><dd>Guides internal conduct, cultural tone, and ethical posture.</dd>
+            <dt>function</dt><dd>Shapes behavior, design decisions, and protocols at all levels.</dd>
+            <dt>test</dt><dd>If this value was violated, the organization would feel out of integrity — even if its mission was achieved</dd>
+          </dl>
+        </details>
         <ul>
-          <li>Steward Regen identity and brand integrity as a shared commons</li>
-          <li>Maintain transparent protocols for membership, funding, and brand/IP use</li>
-          <li>Curate and protect shared assets (knowledge, technology, branding, legal)</li>
-          <li>Enable contribution recognition and reciprocal value flows</li>
-          <li>Safeguard legitimacy via accountable governance and conflict transformation</li>
+          <li>We value <strong>care</strong> as a grounding responsibility to people, place, and planet.</li>
+          <li>We value <strong>stewardship</strong> as a responsibility that transcends ownership or control.</li>
+          <li>We value <strong>transparency</strong> as a practice of creating clarity and openness in decisions and processes.</li>
+          <li>We value <strong>reciprocity</strong> as a commitment to ensuring benefits flow back to those who nurture the commons.</li>
+          <li>We value <strong>plurality</strong> as an honoring of many expressions of regenerative practice while sustaining coherence.</li>
+          <li>We value <strong>collaboration</strong> as trust in the power of collective intelligence and coordinated action.</li>
+          <li>We value <strong>integrity</strong> as a commitment to prioritizing what is right for the commons over expedience or control.</li>
         </ul>
-        <p class="const-test">Test: If this mandate were abandoned or neglected, the organization would no longer be fulfilling its reason for existing — even if other work continued.</p>
+        <h3 id="mandates">Mandates</h3>
+        <details class="const-meta">
+          <summary>Metadata + Instructions</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>regen-commons-mandates</dd>
+            <dt>name</dt><dd>Mandates</dd>
+            <dt>description</dt><dd>A clearly defined area of responsibility the organization is committed to upholding through its roles, actions, and structures.</dd>
+            <dt>temporal focus</dt><dd>Present and continuous</dd>
+            <dt>scope</dt><dd>Defines the organization’s functional responsibility</dd>
+            <dt>function</dt><dd>Guides strategic focus, resource allocation, role design, and partnership alignment</dd>
+            <dt>test</dt><dd>If this mandate were abandoned or neglected, the organization would no longer be fulfilling its reason for existing — even if other work continued.</dd>
+          </dl>
+        </details>
+        <ul>
+          <li>Steward Regen resources as a shared commons.</li>
+          <li>Maintain transparent protocols for membership, funding, and resource use that support collective trust.</li>
+          <li>Curate, protect, and activate shared resources so they generate value for the whole.</li>
+          <li>Enable recognition of contributions and reciprocal value flows across diverse archetypes and participants.</li>
+          <li>Facilitate collaborative processes and spaces that align efforts and allow new forms of coordination to emerge.</li>
+          <li>Safeguard legitimacy through accountable governance, cultural integrity, and conflict transformation.</li>
+        </ul>
+        <h3 id="worldview">Worldview</h3>
+        <details class="const-meta">
+          <summary>Metadata + Instructions</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>regen-commons-worldview</dd>
+            <dt>name</dt><dd>Worldview</dd>
+            <dt>description</dt><dd>A core worldview or system of understanding that informs how the organization relates to life, place, and purpose.</dd>
+            <dt>temporal focus</dt><dd>Foundational and enduring</dd>
+            <dt>scope</dt><dd>Informs values, ethics, design, governance, and cultural coherence<br>function: Grounds decisions and direction in a deeper cosmology or way of seeing the world</dd>
+            <dt>function</dt><dd>Guides strategic focus, resource allocation, role design, and partnership alignment</dd>
+            <dt>test</dt><dd>If this philosophy were removed or violated, the organization’s identity and integrity would be fundamentally altered — even if its activities remained the same.</dd>
+          </dl>
+        </details>
+        <p><strong>Regenerative (“Regen”)</strong> identity describes a life-centered approach to organizing human and ecological systems in ways that <em>restore, renew, and evolve the capacity of life to thrive in abundance across time.</em></p>
+        <p>It goes beyond sustainability (maintaining the status quo) toward reciprocity and flourishing: not just reducing harm, but actively repairing what has been degraded, strengthening resilience, and creating conditions for planetary well-being.</p>
+        <p>In practice, being regenerative means designing economies, cultures, and governance structures that produce dynamic equilibrium between human and natural systems through alignment with living-systems principles, and embed justice, equity, cohesion, belonging, trust, consent and interconnection at each level and scale of interaction.</p>
+        <p>Regen is both a <strong>worldview</strong> and a <strong>practice</strong>:</p>
+        <ul>
+          <li>A worldview that shifts from extraction to reciprocity, from scarcity to abundance, from isolated fixes to whole-systems flourishing.</li>
+          <li>A practice of cultivating relationships, institutions, and infrastructures that center care for people, place, and planet.</li>
+        </ul>
+        <h3 id="principles">Principles</h3>
+        <h4 id="life-centered-stewardship">Life-Centered Stewardship</h4>
+        <p><em>Place the flourishing of life — human and more-than-human — at the center of decisions, designs, and actions.</em></p>
+        <dl class="const-facts">
+          <dt>Strong adherence</dt><dd>Prioritizing life-supporting outcomes in all decisions, even if it means reduced profit, slower timelines, or added complexity.</dd>
+          <dt>Weak adherence</dt><dd>Using environmental or social considerations as one of several factors, but still centering growth or efficiency.</dd>
+          <dt>Strong violation</dt><dd>Actively exploiting people or ecosystems for gain, disregarding well-being entirely.</dd>
+          <dt>Weak violation</dt><dd>Overlooking ecological or human impacts in minor decisions (e.g., using extractive suppliers without due diligence).</dd>
+        </dl>
+        <h4 id="whole-systems-thinking">Whole-Systems Thinking</h4>
+        <p><em>Work across ecological, social, cultural, and economic dimensions as interconnected parts of one living system.</em></p>
+        <dl class="const-facts">
+          <dt>Strong adherence</dt><dd>Consistently designing with feedback loops and interdependencies in mind, seeking holistic outcomes.</dd>
+          <dt>Weak adherence</dt><dd>Occasionally recognizing system linkages, but treating domains (e.g., finance, ecology) as mostly separate.</dd>
+          <dt>Strong violation</dt><dd>Designing deliberately siloed, linear, or extractive systems that cause cascading harms.</dd>
+          <dt>Weak violation</dt><dd>Ignoring cross-system effects (e.g., ecological harm hidden by financial gains).</dd>
+        </dl>
+        <h4 id="reciprocity-renewal">Reciprocity &amp; Renewal</h4>
+        <p><em>Ensure that flows of value, energy, knowledge, and resources give back more than they take, fostering ongoing renewal rather than depletion.</em></p>
+        <dl class="const-facts">
+          <dt>Strong adherence</dt><dd>Embedding reciprocity into all exchanges, ensuring surplus for people, places, and ecosystems.</dd>
+          <dt>Weak adherence</dt><dd>Giving back occasionally (e.g., donations, offsets, energy), but not proportionally or systemically.</dd>
+          <dt>Strong violation</dt><dd>Extracting resources, labor, or culture without giving back, leaving lasting depletion.</dd>
+          <dt>Weak violation</dt><dd>Taking more than is given in small ways (e.g., underpaying contributors, neglecting replenishment).</dd>
+        </dl>
+        <h4 id="equity-justice">Equity &amp; Justice</h4>
+        <p><em>Recognize and honor diverse ways of knowing, being, and belonging. Commit to fair and just participation in regenerative futures.</em></p>
+        <dl class="const-facts">
+          <dt>Strong adherence</dt><dd>Centering equity in governance, redistributing resources, and embedding justice structurally.</dd>
+          <dt>Weak adherence</dt><dd>Including marginalized voices occasionally, but without shifting power or resources.</dd>
+          <dt>Strong violation</dt><dd>Excluding, exploiting, or actively marginalizing vulnerable groups.</dd>
+          <dt>Weak violation</dt><dd>Overlooking equity in decisions, tokenizing participation.</dd>
+        </dl>
+        <h4 id="relational-wealth">Relational Wealth</h4>
+        <p><em>Value trust, connection, and community as forms of wealth as essential as financial capital.</em></p>
+        <dl class="const-facts">
+          <dt>Strong adherence</dt><dd>Actively cultivating trust, reciprocity, and community bonds as the foundation of work.</dd>
+          <dt>Weak adherence</dt><dd>Naming relationships as important, but treating them as secondary to transactions.</dd>
+          <dt>Strong violation</dt><dd>Exploiting relationships for gain, sowing distrust, or eroding community fabric.</dd>
+          <dt>Weak violation</dt><dd>Breaking small commitments, neglecting community care.</dd>
+        </dl>
+        <h4 id="resilience-adaptability">Resilience &amp; Adaptability</h4>
+        <p><em>Design for flexibility, diversity, and adaptive capacity, ensuring continuity across generations.</em></p>
+        <dl class="const-facts">
+          <dt>Strong adherence</dt><dd>Building redundancy, diversity, and adaptive feedback loops into every system.</dd>
+          <dt>Weak adherence</dt><dd>Having contingency plans but not integrating resilience deeply into operations.</dd>
+          <dt>Strong violation</dt><dd>Creating rigid systems that collapse under stress, harming people or ecosystems.</dd>
+          <dt>Weak violation</dt><dd>Ignoring signals of change, relying on brittle or centralized solutions.</dd>
+        </dl>
+        <h4 id="movement-building">Movement Building</h4>
+        <p><em>Act in ways that strengthen collective capacity — linking individuals, communities, and institutions into a regenerative movement greater than the sum of its parts.</em></p>
+        <dl class="const-facts">
+          <dt>Strong adherence</dt><dd>Sharing resources, knowledge, and infrastructure to grow collective capacity and alignment.</dd>
+          <dt>Weak adherence</dt><dd>Participating in networks but prioritizing individual visibility or outcomes.</dd>
+          <dt>Strong violation</dt><dd>Fragmenting movements through competition, co-optation, or extraction of legitimacy.</dd>
+          <dt>Weak violation</dt><dd>Withholding contributions, failing to acknowledge interdependence.</dd>
+        </dl>
+        <h4 id="participation-co-creation">Participation &amp; Co-Creation</h4>
+        <p><em>Invite broad participation and distributed agency, trusting in collaborative intelligence to shape regenerative outcomes.</em></p>
+        <dl class="const-facts">
+          <dt>Strong adherence</dt><dd>Distributing decision-making power and trusting collective processes.</dd>
+          <dt>Weak adherence</dt><dd>Inviting participation but retaining central control over decisions.</dd>
+          <dt>Strong violation</dt><dd>Actively excluding stakeholders, enforcing top-down control, suppressing co-creation.</dd>
+          <dt>Weak violation</dt><dd>Limiting participation to surface-level input, ignoring community wisdom.</dd>
+        </dl>
+        <h4 id="abundance-mindset">Abundance Mindset</h4>
+        <p><em>Operate from the understanding that regeneration produces more possibility and vitality, not less, cultivating cultures of thriving rather than scarcity.</em></p>
+        <dl class="const-facts">
+          <dt>Strong adherence</dt><dd>Designing systems that unlock shared value, cultivating cultures of generosity and thriving.</dd>
+          <dt>Weak adherence</dt><dd>Using abundance language but still acting from fear of scarcity.</dd>
+          <dt>Strong violation</dt><dd>Operating from fear and zero-sum extraction, perpetuating scarcity culture.</dd>
+          <dt>Weak violation</dt><dd>Hoarding resources, failing to share knowledge or opportunity.</dd>
+        </dl>
       </section>
 
       <section id="structure" aria-labelledby="structure-title">
         <h2 id="structure-title">Structure</h2>
-        <p>A map of the components that make up the organization.</p>
-        <p>This section defines the membranes that compose Regen Commons (MVP).</p>
-
-        <h3 id="steward-council">Steward Council</h3>
-        <p>Interim stewardship membrane composed of elected multisig stewards to manage treasury and MVP governance execution.</p>
+        <h3 id="components">Components</h3>
+        <p>The fundamental categories and building blocks we use to name, organize, and relate to our structure. This section defines the core components within the Commons' operational reality.</p>
+        <h4 id="asset">Asset</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-asset-TYPE-###</dd>
+            <dt>name</dt><dd>null</dd>
+            <dt>description</dt><dd>null</dd>
+            <dt>assetType</dt><dd>null</dd>
+            <dt>relatedMembranes</dt><dd>null</dd>
+            <dt>relatedProtocols</dt><dd>null</dd>
+            <dt>relatedAssets</dt><dd>null</dd>
+            <dt>location</dt><dd>null</dd>
+          </dl>
+        </details>
+        <p>This object defines an asset owned or managed by the Commons. Assets can be financial, digital, reputational, or intellectual property. Each asset is stewarded by one or more roles and governed by specific protocols.</p>
+        <h4 id="membrane">Membrane</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-membrane-###</dd>
+            <dt>name</dt><dd>null</dd>
+            <dt>description</dt><dd>null</dd>
+            <dt>type</dt><dd>null</dd>
+            <dt>relatedProtocols</dt><dd>null</dd>
+            <dt>relatedMembranes</dt><dd>null</dd>
+            <dt>parentMembranes</dt><dd>null</dd>
+            <dt>childMembranes</dt><dd>null</dd>
+            <dt>relatedAssets</dt><dd>null</dd>
+            <dt>relatedRoles</dt><dd>null</dd>
+            <dt>sameAs</dt><dd>null</dd>
+            <dt>workSpaceLink</dt><dd>null</dd>
+          </dl>
+        </details>
+        <p>Boundaries that regulate participation, permissions, and trust thresholds.</p>
+        <p>Membranes are semi-permeable boundaries that define coherent units of action, intention, and collaboration. Each membrane has entry/exit criteria, maintains appropriate internal governance, is accountable to values and protocols, and can steward its own subset of assets, roles, and responsibilities.</p>
+        <h4 id="role">Role</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-role-###</dd>
+            <dt>name</dt><dd>null</dd>
+            <dt>description</dt><dd>null</dd>
+            <dt>relatedMembranes</dt><dd>null</dd>
+            <dt>relatedAssets</dt><dd>null</dd>
+            <dt>relatedProtocols</dt><dd>null</dd>
+            <dt>criteria</dt><dd>null</dd>
+            <dt>responsibilities</dt><dd>null</dd>
+            <dt>benefits</dt><dd>null</dd>
+            <dt>roleAddress</dt><dd>null</dd>
+            <dt>isActive</dt><dd>null</dd>
+          </dl>
+        </details>
+        <p>Containers of agency and responsibility within the organization.</p>
+        <p>This object defines a role within the Commons. Roles are distinct sets of responsibilities and permissions that can be held by members. They are the building blocks of the organization's structure.</p>
+        <h4 id="protocol">Protocol</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-protocol-###</dd>
+            <dt>name</dt><dd>null</dd>
+            <dt>description</dt><dd>null</dd>
+            <dt>initializationEvent</dt><dd>null</dd>
+            <dt>associatedFunctions</dt><dd>sense-making, decision making, resource allocation, coordination, learning, culture</dd>
+            <dt>associatedRoles</dt><dd>null</dd>
+            <dt>relatedMembranes</dt><dd>null</dd>
+            <dt>steps</dt><dd>null</dd>
+          </dl>
+        </details>
+        <p>The core life processes required to sustain and evolve the organism.</p>
+        <p>This object defines a protocol, which is a repeatable, documented process for coordinating action within the Commons.</p>
+        <h3 id="roles">Roles</h3>
+        <h4 id="member">Member</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-role-member</dd>
+            <dt>name</dt><dd>Member</dd>
+            <dt>description</dt><dd>Certified commoner with baseline governance rights and responsibilities.</dd>
+            <dt>relatedMembranes</dt><dd>Community Assembly</dd>
+            <dt>relatedAssets</dt><dd>Constitution</dd>
+            <dt>relatedProtocols</dt><dd>Member Protocol, Decision-Making Protocol</dd>
+            <dt>criteria</dt><dd>Verified alignment with Purpose and Values; invitation and consent per Member Protocol.</dd>
+            <dt>responsibilities</dt><dd>Participate in governance; uphold values; peer accountability; vote on proposals within scope.</dd>
+            <dt>benefits</dt><dd>Voting rights; ability to propose projects; access to member-only resources.</dd>
+            <dt>roleAddress</dt><dd>Hats role (TBD)</dd>
+          </dl>
+        </details>
         <dl class="const-facts">
-          <dt>Decision making</dt><dd>Simple majority on operational matters within protocol-defined thresholds</dd>
-          <dt>Meeting cadence</dt><dd>Bi-weekly first 6 months, then monthly</dd>
-          <dt>Transparency</dt><dd>Decisions documented and shared with assembly</dd>
-          <dt>Oversight</dt><dd>Assembly advice and review on major decisions</dd>
-          <dt>Roles</dt><dd>Steward (Multisig)</dd>
-          <dt>Protocols</dt><dd>Decision-Making Protocol, Treasury Management Protocol, Member Protocol</dd>
-          <dt>Assets</dt><dd>Commons Treasury Multi-Sig, Constitution</dd>
+          <dt>Role</dt><dd>Certified commoner with baseline governance rights and responsibilities in the MVP community.</dd>
+          <dt>Benefits</dt><dd>Voting rights on proposals; ability to propose projects; access to member-only Resources and Assets; participation in assemblies.</dd>
+          <dt>Rights</dt><dd>Equal voting rights; seek advice or consent on proposals; access governance records; fair process in advancement and exit.</dd>
+          <dt>Responsibilities</dt><dd>Participate in votes and discussions; uphold Values; peer accountability, including monitoring conditions of use of commons brand and assets; follow protocols; disclose conflicts of interest; contribute to shared learning where relevant.</dd>
         </dl>
-
-        <h3 id="community-assembly">Community Assembly</h3>
-        <p>Advisory and participatory membrane composed of all recognized members for sensemaking, selection, and guidance.</p>
+        <h4 id="gardener">Gardener</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-role-gardener</dd>
+            <dt>name</dt><dd>Gardener</dd>
+            <dt>description</dt><dd>Tends, cultivates, and cares for shared resources and relationships; curates knowledge, supports culture, and maintains health/abundance signals across the commons.</dd>
+            <dt>relatedMembranes</dt><dd>Community Assembly, Project</dd>
+            <dt>relatedAssets</dt><dd>Core IP, Governance Forum, Brand Assets</dd>
+            <dt>relatedProtocols</dt><dd>Publishing Protocol, IP Protocol, Decision-Making Protocol, Conflict Transformation Protocol</dd>
+            <dt>criteria</dt><dd>Alignment with Purpose and Values; demonstrated caretaking/curation skills; trusted participation record; willingness to steward cultural and knowledge assets.</dd>
+            <dt>responsibilities</dt><dd>Curate and organize resources; maintain documentation and metadata quality; support community rituals and communications; monitor health/abundance metrics; facilitate feedback and learning loops; uphold brand and knowledge integrity.</dd>
+            <dt>benefits</dt><dd>Recognition for care labor; access to curation tools and support; eligibility for funded scopes; attribution for contributions.</dd>
+            <dt>roleAddress</dt><dd>Hats role (Gardener) (TBD)</dd>
+            <dt>isActive</dt><dd>true</dd>
+          </dl>
+        </details>
         <dl class="const-facts">
-          <dt>Composition</dt><dd>All founding and admitted members</dd>
-          <dt>Meetings</dt><dd>Monthly community calls; ad hoc as needed</dd>
-          <dt>Powers</dt><dd>Advisory input on major decisions; steward selection; proposal incubation</dd>
-          <dt>Participation</dt><dd>Open discussion; temperature checks; recommendations</dd>
-          <dt>Roles</dt><dd>Member</dd>
-          <dt>Protocols</dt><dd>Member Protocol, Decision-Making Protocol</dd>
+          <dt>Role</dt><dd>Cultural and knowledge steward who tends the commons’ resources, documentation, and relationships to keep them healthy, accessible, and legitimate.</dd>
+          <dt>Benefits</dt><dd>Recognition and attribution for care labor; access to curation and collaboration tools; potential funded scopes via project proposals; visibility in Governance Forum as resource maintainer.</dd>
+          <dt>Rights</dt><dd>Propose curation standards and improvements; request access needed for metadata and publishing; raise care/legitimacy concerns; initiate advice processes for resource changes.</dd>
+          <dt>Responsibilities</dt><dd>Curate and maintain knowledge and brand resources; publish updates and changelogs; help facilitate community communications/rituals; track and report health/abundance indicators; ensure compliance with Publishing, IP, and Brand protocols; support conflict transformation through documentation and context.</dd>
         </dl>
-
-        <h3 id="project">Project</h3>
-        <p>Scoped membrane for approved initiatives operating under a self-governance plan and milestone-based funding.</p>
+        <h4 id="operator">Operator</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-role-operator</dd>
+            <dt>name</dt><dd>Operator</dd>
+            <dt>description</dt><dd>Operates core commons infrastructures, facilities, programs, and core infrastructure management, maintenance, and operations.</dd>
+            <dt>relatedMembranes</dt><dd>Operations Team</dd>
+            <dt>relatedAssets</dt><dd>Commons Treasury Multi-Sig, Governance Forum</dd>
+            <dt>relatedProtocols</dt><dd>Operator Protocol, Treasury Management Protocol, Decision-Making Protocol</dd>
+            <dt>criteria</dt><dd>Demonstrated operational skills; alignment with Purpose and Values; capacity for ongoing infrastructure work; approved by Operations Team.</dd>
+            <dt>responsibilities</dt><dd>Maintain and operate core infrastructure; manage facilities and programs; coordinate operational work streams; report on infrastructure status.</dd>
+            <dt>benefits</dt><dd>Compensation for operational work; access to operational tools and resources; recognition for infrastructure contributions.</dd>
+            <dt>roleAddress</dt><dd>Hats role (TBD)</dd>
+            <dt>isActive</dt><dd>true</dd>
+          </dl>
+        </details>
         <dl class="const-facts">
-          <dt>Composition</dt><dd>Members listed in approved project plan or selected by Project Lead</dd>
-          <dt>Meetings</dt><dd>Defined by scope</dd>
-          <dt>Powers</dt><dd>Any action within approved scope consistent with constitution and protocols</dd>
-          <dt>Participation</dt><dd>Defined by scope</dd>
-          <dt>Roles</dt><dd>Project Lead, Project Participant</dd>
-          <dt>Protocols</dt><dd>Project Protocol, Treasury Management Protocol, Decision-Making Protocol</dd>
+          <dt>Role</dt><dd>Individual who contributes to ongoing work streams related to commons facilities, programs, or core infrastructure management, maintenance, and operations.</dd>
+          <dt>Selection</dt><dd>Application or nomination to Operations Team; assessment of operational skills and capacity; approval by Stewards; role credentialed (Hats) with defined scope and responsibilities.</dd>
+          <dt>Requirements</dt><dd>Demonstrated operational skills and experience; alignment with Purpose and Values; capacity for ongoing infrastructure work; commitment to operational protocols and reporting.</dd>
+          <dt>Benefits</dt><dd>Compensation for operational work; access to operational tools and resources; recognition for infrastructure contributions; participation in operational planning and decision-making.</dd>
+          <dt>Rights</dt><dd>Access to necessary operational tools and data; propose operational improvements; request resources for infrastructure work; fair recognition of contributions.</dd>
+          <dt>Responsibilities</dt><dd>Maintain and operate core infrastructure; manage facilities and programs; coordinate operational work streams; report on infrastructure status and needs; follow operational protocols and safety standards.</dd>
         </dl>
-      </section>
-
-      <section id="roles" aria-labelledby="roles-title">
-        <h2 id="roles-title">Roles</h2>
-
-        <h3 id="member">Member</h3>
-        <p>Certified commoner with baseline governance rights and responsibilities.</p>
+        <h4 id="licensed-partners">Licensed Partners</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-role-licensed-partner</dd>
+            <dt>name</dt><dd>Licensed Partner</dd>
+            <dt>description</dt><dd>Organization using Regen brand under lightweight licensing agreements.</dd>
+            <dt>relatedMembranes</dt><dd>Community Assembly</dd>
+            <dt>relatedAssets</dt><dd>Brand Assets</dd>
+            <dt>relatedProtocols</dt><dd>Brand Usage Protocol</dd>
+            <dt>criteria</dt><dd>Values alignment assessment; license approval per protocol.</dd>
+            <dt>responsibilities</dt><dd>Adhere to brand guidelines; contribute back via fees/stories; uphold legitimacy.</dd>
+            <dt>benefits</dt><dd>Brand usage rights; community recognition; access to shared resources.</dd>
+            <dt>roleAddress</dt><dd>Access credential/NFT (TBD)</dd>
+          </dl>
+        </details>
         <dl class="const-facts">
-          <dt>Criteria</dt><dd>Verified alignment with Purpose and Values; invitation and consent per Member Protocol.</dd>
-          <dt>Responsibilities</dt><dd>Participate in governance; uphold values; peer accountability; vote on proposals within scope.</dd>
-          <dt>Benefits</dt><dd>Voting rights; ability to propose projects; access to member-only resources.</dd>
-          <dt>Membrane</dt><dd>Community Assembly</dd>
+          <dt>Role</dt><dd>External organization granted rights to use Regen brand assets under a lightweight license.</dd>
+          <dt>Benefits</dt><dd>Brand legitimacy and recognition; access to guidance/templates; optional inclusion in public directory; participation in aligned campaigns.</dd>
+          <dt>Rights</dt><dd>Use Regen brand within the scope/territory set by the license; appeal or request review/modification of terms; receive due process before revocation.</dd>
+          <dt>Responsibilities</dt><dd>Adhere to guidelines; maintain legitimacy and quality; report usage and outcomes; contribute back per terms (fees/stories/attribution); accept revocation if misuse is not resolved.</dd>
         </dl>
-
-        <h3 id="steward">Steward (Multisig)</h3>
-        <p>Interim guardians and decision-makers managing treasury and operational execution during MVP.</p>
+        <h4 id="project-participant">Project Participant</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-role-project-participant</dd>
+            <dt>name</dt><dd>Project Participant</dd>
+            <dt>description</dt><dd>Regen Commons member or non-member contributing to a project team.</dd>
+            <dt>relatedMembranes</dt><dd>Project Team</dd>
+            <dt>relatedAssets</dt><dd>null</dd>
+            <dt>relatedProtocols</dt><dd>Project Protocol</dd>
+            <dt>criteria</dt><dd>Whatever means defined in the scope of work to select project participants.</dd>
+            <dt>responsibilities</dt><dd>Execute assigned tasks; communicate progress; uphold values.</dd>
+            <dt>benefits</dt><dd>Compensation via project funds; attribution for contributions.</dd>
+            <dt>roleAddress</dt><dd>[…]</dd>
+          </dl>
+        </details>
         <dl class="const-facts">
-          <dt>Criteria</dt><dd>Selected via community election; meets eligibility defined by Member Protocol; term-limited.</dd>
-          <dt>Responsibilities</dt><dd>Manage treasury per protocol; approve project funding; maintain transparency; execute on-chain actions.</dd>
-          <dt>Benefits</dt><dd>Stewardship authority within defined scope; recognition.</dd>
-          <dt>Membrane</dt><dd>Steward Council</dd>
-          <dt>Role address</dt><dd>Multisig signer (Gnosis Safe), Hats role (TBD)</dd>
+          <dt>Role</dt><dd>Contributor executing defined tasks within an approved project scope.</dd>
+          <dt>Benefits</dt><dd>Compensation via project funds; attribution for contributions; access to project tools and learning opportunities.</dd>
+          <dt>Rights</dt><dd>Access to needed information/tools for tasks; raise concerns/risks; request support or clarification; fair recognition of work.</dd>
+          <dt>Responsibilities</dt><dd>Complete assigned tasks with quality and timeliness; communicate status/risks; follow IP, publishing, and collaboration protocols; respect team agreements.</dd>
         </dl>
-
-        <h3 id="project-lead">Project Lead</h3>
-        <p>Scope lead for an approved project within Regen Commons.</p>
+        <h4 id="project-lead">Project Lead</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-role-project-lead</dd>
+            <dt>name</dt><dd>Project Lead</dd>
+            <dt>description</dt><dd>Lead for a project within Regen Commons.</dd>
+            <dt>relatedMembranes</dt><dd>Project Team</dd>
+            <dt>relatedAssets</dt><dd>Commons Treasury Multi-Sig</dd>
+            <dt>relatedProtocols</dt><dd>Project Protocol, Treasury Management Protocol, Decision-Making Protocol</dd>
+            <dt>criteria</dt><dd>Capacity to execute approved scope; proposal accepted by Steward Council.</dd>
+            <dt>responsibilities</dt><dd>Deliver outcomes; manage allocated funds per milestones; coordinate contributors; report progress.</dd>
+            <dt>benefits</dt><dd>Funding per milestones; attribution for completed work; authority within approved scope.</dd>
+            <dt>roleAddress</dt><dd>[…]</dd>
+          </dl>
+        </details>
         <dl class="const-facts">
-          <dt>Criteria</dt><dd>Capacity to execute approved scope; proposal accepted by Steward Council.</dd>
-          <dt>Responsibilities</dt><dd>Deliver outcomes; manage allocated funds per milestones; coordinate contributors; report progress.</dd>
-          <dt>Benefits</dt><dd>Funding per milestones; attribution for completed work; authority within approved scope.</dd>
-          <dt>Membrane</dt><dd>Project</dd>
+          <dt>Role</dt><dd>Scope lead responsible for delivering an approved project with defined milestones, budget, and self-governance plan.</dd>
+          <dt>Benefits</dt><dd>Milestone-based compensation; authority within approved scope; access to support and Resources; attribution for outcomes.</dd>
+          <dt>Rights</dt><dd>Request milestone fund releases; select/approve participants per scope; propose scope/budget adjustments; access necessary tools/data; fair review of performance.</dd>
+          <dt>Responsibilities</dt><dd>Deliver outcomes on time/within budget; coordinate Project Participants and communications; maintain records and publish reports/retrospectives; ensure protocol compliance (IP, publishing, treasury); surface and address conflicts per protocol.</dd>
         </dl>
-
-        <h3 id="project-participant">Project Participant</h3>
-        <p>Contributor to an approved project scope.</p>
+        <h4 id="seed-member">Seed Member</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-role-seed-member</dd>
+            <dt>name</dt><dd>Seed Member</dd>
+            <dt>description</dt><dd>Founding participant automatically whitelisted to claim membership by virtue of participation in the formation process; same rights and responsibilities as a Member during MVP.</dd>
+            <dt>relatedMembranes</dt><dd>Community Assembly</dd>
+            <dt>relatedAssets</dt><dd>Constitution</dd>
+            <dt>relatedProtocols</dt><dd>Member Protocol, Decision-Making Protocol</dd>
+            <dt>criteria</dt><dd>Listed on the initial seed whitelist; alignment with Purpose and Values; acceptance of MVP protocols; claims role by accepting on-chain credential within the claim window.</dd>
+            <dt>responsibilities</dt><dd>Participate in governance; uphold values and protocols; peer accountability; vote on proposals; help bootstrap initial governance processes.</dd>
+            <dt>benefits</dt><dd>Voting rights; ability to propose projects; access to member-only resources; early recognition as founding participant; eligibility to vote in the initial steward election.</dd>
+            <dt>roleAddress</dt><dd>Hats role (Seed Member) (TBD)</dd>
+            <dt>isActive</dt><dd>true</dd>
+          </dl>
+        </details>
         <dl class="const-facts">
-          <dt>Criteria</dt><dd>Capacity to contribute meaningfully; selected per project scope.</dd>
-          <dt>Responsibilities</dt><dd>Execute assigned tasks; communicate progress; uphold values.</dd>
-          <dt>Benefits</dt><dd>Compensation via project funds; attribution for contributions.</dd>
-          <dt>Membrane</dt><dd>Project</dd>
+          <dt>Role</dt><dd>Founding Member of the Commons, recognized for participation in the formation process and granted the ability to claim membership with the same rights and responsibilities as a Member.</dd>
+          <dt>Benefits</dt><dd>All Member benefits (voting, proposals, member resources) plus early recognition and eligibility to vote in the initial Steward Council election.</dd>
+          <dt>Rights</dt><dd>Equal voting rights; seek advice or consent on proposals; access governance records; fair process in advancement and exit.</dd>
+          <dt>Responsibilities</dt><dd>Participate in discussions and votes; uphold Values and Protocols; peer accountability; support bootstrapping activities (e.g., Steward elections, initial processes) during MVP.</dd>
         </dl>
-
-        <h3 id="licensed-partner">Licensed Partner</h3>
-        <p>Organization using Regen brand under lightweight licensing agreements.</p>
+        <h4 id="steward">Steward</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-role-steward</dd>
+            <dt>name</dt><dd>Steward</dd>
+            <dt>description</dt><dd>Guardians of organizational identity and protocol integrity.</dd>
+            <dt>relatedMembranes</dt><dd>Steward Council</dd>
+            <dt>relatedAssets</dt><dd>Commons Treasury Multi-Sig, Constitution</dd>
+            <dt>relatedProtocols</dt><dd>Treasury Management Protocol, Decision-Making Protocol, Member Protocol, Conflict Protocol, Publishing Protocol</dd>
+            <dt>criteria</dt><dd>Selected via community election; meets eligibility defined by Member Protocol; term-limited.</dd>
+            <dt>responsibilities</dt><dd>Manage treasury per Treasury Management Protocols; publish decisions and reports and maintain documentation and auditability per Publishing Protocol; provide advice on proposals aligned with strategy per Decision Protocol; ensure integrity of organizational activities aligned with Identity.</dd>
+            <dt>benefits</dt><dd>Stewardship authority within defined scope; recognition.</dd>
+            <dt>roleAddress</dt><dd>Multisig signer (Gnosis Safe), Hats role (TBD)</dd>
+            <dt>appointment</dt><dd>Selected by seed members. Future: elected by members or via sortition</dd>
+            <dt>term</dt><dd>12 months with option for renewal</dd>
+            <dt>isActive</dt><dd>true</dd>
+          </dl>
+        </details>
         <dl class="const-facts">
-          <dt>Criteria</dt><dd>Values alignment assessment; license approval per protocol.</dd>
-          <dt>Responsibilities</dt><dd>Adhere to brand guidelines; contribute back via fees/stories; uphold legitimacy.</dd>
-          <dt>Benefits</dt><dd>Brand usage rights; community recognition; access to shared resources.</dd>
-          <dt>Membrane</dt><dd>Community Assembly</dd>
-          <dt>Role address</dt><dd>Access credential/NFT (TBD)</dd>
+          <dt>Role</dt><dd>Guardian(s) serving as authorized signers on the treasury multi-signature wallet (multisig) and executing governance operations within protocol-defined scope.</dd>
+          <dt>Benefits</dt><dd>Steward recognition; clear authority to execute actions within thresholds; access to context and support; reputation accrual.</dd>
+          <dt>Rights</dt><dd>Initiate/execute multi-sig financial transactions within Ops/Mid/Strategic tiers after decisions logged; request information for due diligence; convene votes, consent, or advice processes; pause disbursements if risk triggers per Treasury Management Protocol.</dd>
+          <dt>Responsibilities</dt><dd>Manage treasury per Treasury Management Protocols; publish decisions and reports and maintain documentation and auditability per Publishing Protocol; provide advice on proposals aligned with strategy per Decision Protocol; ensure integrity of organizational activities aligned with Identity.</dd>
         </dl>
-      </section>
-
-      <section id="assets" aria-labelledby="assets-title">
-        <h2 id="assets-title">Assets</h2>
-        <p>This section defines the assets owned and managed by the Commons (MVP).</p>
-
-        <h3 id="governance-forum">Governance Forum</h3>
-        <p>Primary venue for proposals, records, and communications. Public record-keeping for legitimacy and transparency.</p>
+        <h3 id="assets">Assets</h3>
+        <p><em>This object defines an asset owned or managed by the network. Assets can be financial, digital, reputational, or intellectual property. Each asset is stewarded by one or more roles and governed by specific protocols.</em></p>
+        <h4 id="common-pool-resources">Common Pool Resources</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-asset-resources</dd>
+            <dt>name</dt><dd>Common Pool Resources</dd>
+            <dt>description</dt><dd>A classification system for the diverse assets that compose the Regen Commons.</dd>
+            <dt>assetType</dt><dd>resources</dd>
+            <dt>relatedMembranes</dt><dd>members</dd>
+            <dt>relatedProtocols</dt><dd>resourcesProtocol (future)</dd>
+            <dt>relatedAssets</dt><dd></dd>
+            <dt>location</dt><dd>Add index location</dd>
+          </dl>
+        </details>
+        <h4 id="certification">Certification</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-resource-certification</dd>
+            <dt>name</dt><dd>Certification</dd>
+            <dt>description</dt><dd>Labels, protocols, and audits that legitimize Regen practices.</dd>
+            <dt>assetType</dt><dd>resource</dd>
+            <dt>relatedMembranes</dt><dd></dd>
+            <dt>relatedProtocols</dt><dd></dd>
+            <dt>relatedAssets</dt><dd></dd>
+            <dt>location</dt><dd>Add index location (for the type)</dd>
+          </dl>
+        </details>
         <dl class="const-facts">
-          <dt>Type</dt><dd>Infrastructural</dd>
-          <dt>Protocols</dt><dd>Publishing Protocol, Decision-Making Protocol</dd>
-          <dt>Location</dt><dd>Forum/website (TBD)</dd>
+          <dt>What</dt>
+          <dd>Labels, protocols, and audits that legitimize Regen practices.
+            <ul>
+              <li>This refers to the systems for impact verification and peer attestation, which can serve as a mechanism for determining levels of participation and governance weight.</li>
+            </ul>
+          </dd>
+          <dt>Benefits</dt><dd>Legitimacy, recognition, market differentiation.</dd>
+          <dt>Internal Facility Needs</dt><dd>Standards setting, verification processes, registry systems.</dd>
         </dl>
-
-        <h3 id="treasury">Commons Treasury Multi-Sig</h3>
-        <p>Primary treasury for MVP, controlled by Steward Council for allocations per protocol.</p>
+        <h4 id="technology">Technology</h4>
         <dl class="const-facts">
-          <dt>Type</dt><dd>Financial</dd>
-          <dt>Protocols</dt><dd>Treasury Management Protocol, Decision-Making Protocol</dd>
-          <dt>Allocation tiers</dt><dd>Ops, mid-tier, strategic (see Decision-Making Protocol)</dd>
-          <dt>Transparency</dt><dd>Transactions logged; reports published by stewards</dd>
-          <dt>Location</dt><dd>Gnosis Safe (address TBD)</dd>
+          <dt>What</dt>
+          <dd>Platforms, apps, and digital tools
+            <ul>
+              <li>This encompasses common-pooled technology licenses, apps, and open-source products that are shared for the benefit of members.</li>
+            </ul>
+          </dd>
+          <dt>Benefits</dt><dd>Enable scaling, coordination, monitoring.</dd>
+          <dt>Internal Facility Needs</dt><dd>Shared infrastructure, APIs, open protocols, licensing systems.</dd>
         </dl>
-
-        <h3 id="brand-assets">Brand Assets</h3>
-        <p>Regen identity assets including trademark, logos, domains, and narrative guidelines. Protocols for access and revocation to prevent Regen-washing. License tiers and usage guidelines.</p>
+        <h4 id="knowledge">Knowledge</h4>
         <dl class="const-facts">
-          <dt>Type</dt><dd>Reputational</dd>
-          <dt>Protocols</dt><dd>Brand Usage Protocol</dd>
-          <dt>Location</dt><dd>regen.eth (domain/account), brand repository (TBD)</dd>
+          <dt>What</dt>
+          <dd>Shared pool of practices, data, stories, and research.
+            <ul>
+              <li>This includes data pools, research, and bioregional organizing knowledge libraries that provide shared wisdom to the community.</li>
+            </ul>
+          </dd>
+          <dt>Benefits</dt><dd>Collective intelligence, knowledge commons, innovation.</dd>
+          <dt>Internal Facility Needs</dt><dd>Data curation, versioning, attribution, community research support.</dd>
         </dl>
-
-        <h3 id="core-ip">Core IP</h3>
-        <p>Foundational intellectual property and documentation stewarded by the Commons. Contribution intake, attribution, and licensing managed via protocols.</p>
+        <h4 id="branding">Branding</h4>
         <dl class="const-facts">
-          <dt>Type</dt><dd>Intellectual property</dd>
-          <dt>Protocols</dt><dd>IP Protocol, Publishing Protocol</dd>
-          <dt>Location</dt><dd>Repositories and knowledge bases (TBD)</dd>
+          <dt>What</dt>
+          <dd>Visual identity, narrative, and other contributed brand assets..
+            <ul>
+              <li>This includes  trademarks, logos, slogans, and domains, which form the core intellectual property of the commons.</li>
+            </ul>
+          </dd>
+          <dt>Benefits</dt><dd>Legitimacy, cohesion, recognition, amplification.</dd>
+          <dt>Internal Facility Needs</dt><dd>Brand governance, brand use protocols, communication channels.</dd>
         </dl>
-
-        <h3 id="constitution-asset">Constitution</h3>
-        <p>The governing agreement of the Commons during MVP.</p>
+        <h4 id="facilities">Facilities</h4>
         <dl class="const-facts">
-          <dt>Type</dt><dd>Agreement</dd>
-          <dt>Protocols</dt><dd>Constitution Protocol</dd>
+          <dt>What</dt><dd>Organizational, legal, and material backbone (funds, hosting, facilities).</dd>
+          <dt>Benefits</dt><dd>Stability, continuity, operational capacity.</dd>
+          <dt>Internal Facility Needs</dt><dd>Governance frameworks, financing protocols, coordination tools.</dd>
+        </dl>
+        <h4 id="constitution">Constitution</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-asset-constitution</dd>
+            <dt>name</dt><dd>Constitution</dd>
+            <dt>description</dt><dd>The governing agreement of the Commons during MVP.</dd>
+            <dt>assetType</dt><dd>agreement</dd>
+            <dt>relatedMembranes</dt><dd>Community Assembly, Steward Council</dd>
+            <dt>relatedProtocols</dt><dd>Constitution Protocol</dd>
+            <dt>relatedAssets</dt><dd>null</dd>
+            <dt>location</dt><dd>Regen Commons MVP Constitution</dd>
+          </dl>
+        </details>
+        <p><strong>Purpose</strong>: Define the MVP governance agreement, its Identity, Structure, and Protocols, serving as the source of legitimacy and clarity.</p>
+        <p><strong>Location</strong>: Regen Commons MVP Constitution with change log entries per Constitution Protocol.</p>
+        <p><strong>Related Membranes</strong>: Community Assembly (advice/consent), Steward Council (proposal and execution).</p>
+        <p><strong>Related Protocols</strong>: Constitution Protocol (adoption and amendment), Publishing Protocol (public redlines and logs).</p>
+        <p><strong>Governance &amp; Permissions</strong>: Amendments use thresholds defined in the Decision-Making Protocol. Historical versions remain accessible to preserve institutional memory.</p>
+        <p><strong>Operations &amp; Usage</strong>: Reference identity and structure components via transclusions; keep links up to date as components evolve.</p>
+        <p><strong>Transparency &amp; Records</strong>: Publish proposals with redlines, rationales, and adoption records; retain prior versions.</p>
+        <p><strong>Risks &amp; Safeguards</strong>: Prevent unauthorized edits; require proper consent evidence; maintain consistent indexing and link integrity.</p>
+        <h4 id="governance-forum">Governance Forum</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-asset-governance-forum</dd>
+            <dt>name</dt><dd>Governance Forum</dd>
+            <dt>description</dt><dd>Primary venue for proposals, records, and communications.</dd>
+            <dt>assetType</dt><dd>infrastructural</dd>
+            <dt>relatedMembranes</dt><dd>Community Assembly, Steward Council</dd>
+            <dt>relatedProtocols</dt><dd>Publishing Protocol, Decision-Making Protocol</dd>
+            <dt>relatedAssets</dt><dd>null</dd>
+            <dt>location</dt><dd>Forum/website (TBD)</dd>
+          </dl>
+        </details>
+        <p><strong>Purpose</strong>: Provide a canonical venue for proposals, records, discussion, and publication, ensuring transparency and continuity.</p>
+        <p><strong>Location</strong>: Forum/website (TBD) linked from official channels; access policy favors public readability.</p>
+        <p><strong>Related Membranes</strong>: Community Assembly (discussion, advice), Steward Council (decisions and reports).</p>
+        <p><strong>Related Protocols</strong>: Publishing Protocol (posting and record standards), Decision-Making Protocol (evidence of consent/votes).</p>
+        <p><strong>Governance &amp; Permissions</strong>: Clear posting templates; moderators ensure completeness and civility; records are immutable once decisions are executed, with edits tracked.</p>
+        <p><strong>Operations &amp; Usage</strong>: Host proposals, decisions, reports, retrospectives, and change logs; tag and index content for discoverability.</p>
+        <p><strong>Transparency &amp; Records</strong>: Link execution artifacts (transaction hashes, credential IDs) and maintain archives for audit.</p>
+        <p><strong>Risks &amp; Safeguards</strong>: Anti‑spam/capture moderation; backup and export routines; access levels for sensitive content as needed.</p>
+        <h4 id="commons-treasury">Commons Treasury</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-asset-treasury</dd>
+            <dt>name</dt><dd>Commons Treasury Multi-Sig</dd>
+            <dt>description</dt><dd>Primary treasury for MVP, controlled by Steward Council for allocations per protocol.</dd>
+            <dt>assetType</dt><dd>financial</dd>
+            <dt>relatedMembranes</dt><dd>Steward Council</dd>
+            <dt>relatedProtocols</dt><dd>Treasury Management Protocol, Decision-Making Protocol</dd>
+            <dt>relatedAssets</dt><dd>null</dd>
+            <dt>location</dt><dd>Gnosis Safe (address TBD)</dd>
+          </dl>
+        </details>
+        <p><strong>Purpose</strong>: Primary treasury for MVP, enabling timely, legitimate funding of Commons operations and projects under clear, tiered rules.</p>
+        <p><strong>Custody &amp; Location</strong>: Gnosis Safe multi-sig (address TBD) with designated Stewards as signers per Treasury Management Protocol. Regen.eth ENS will likely be used as public facing address.</p>
+        <p><strong>Related Membranes</strong>: Steward Council (execution and oversight).</p>
+        <p><strong>Related Protocols</strong>: Treasury Management Protocol (tiers and approvals), Decision-Making Protocol (domain application and quadratic voting for mid‑tier).</p>
+        <p><strong>Governance &amp; Permissions</strong>: Stewards execute transactions within Ops/Mid/Strategic tiers after required off‑chain approvals (advice/consent/vote) and on‑chain enforcement (timelock where applicable). Role‑based authority is revocable via collective vote.</p>
+        <p><strong>Operations &amp; Usage</strong>: Funds are released by milestone verification for projects and for approved operational expenses. Thresholds define when discretion, vote, or consent is required. All requests and approvals reference forum records.</p>
+        <p><strong>Transparency &amp; Records</strong>: Publish allocations, approval evidence (votes/consent), transaction hashes, and periodic reports to the Governance Forum.</p>
+        <p><strong>Risks &amp; Safeguards</strong>: Timelocks for strategic disbursements; signer rotation at term end; conflict pathway for disputes; clear audit trail to reduce capture or misuse.</p>
+        <h4 id="brand-assets">Brand Assets</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-asset-brand-assets</dd>
+            <dt>name</dt><dd>Brand Assets</dd>
+            <dt>description</dt><dd>Regen Commons identity assets including logos, domains, and narrative guidelines.</dd>
+            <dt>assetType</dt><dd>reputational</dd>
+            <dt>relatedMembranes</dt><dd>Community Assembly, Steward Council</dd>
+            <dt>relatedProtocols</dt><dd>Brand Usage Protocol</dd>
+            <dt>relatedAssets</dt><dd>null</dd>
+            <dt>location</dt><dd>regen.eth (domain/account), brand repository (TBD)</dd>
+          </dl>
+        </details>
+        <p><strong>Purpose</strong>: Hold and steward the Regen Commons identity (logo assets and guides, web2 and web3 domains, narrative, email account) to protect legitimacy and enable aligned, shared use.</p>
+        <p><strong>Location</strong>: brand repository (TBD); credentials managed per Brand Usage Protocol.</p>
+        <p><strong>Related Membranes</strong>: Community Assembly (advice), Steward Council (certified approvals and enforcement).</p>
+        <p><strong>Related Protocols</strong>: Brand Usage Protocol (fair‑use vs certified), Decision-Making Protocol (consent mechanisms), Conflict Transformation Protocol (dispute handling).</p>
+        <p><strong>Governance &amp; Permissions</strong>: Generic fair use is permissionless within published guidance and the Commons conditional license. Certified uses require steward‑led consent and are credentialed on‑chain. Misuse may lead to revocation subject to review and Conflict Protocol.</p>
+        <p><strong>Operations &amp; Usage</strong>: Publish and maintain brand guidelines; issue credentials; log terms and royalties where relevant; track usage narratives and outcomes.</p>
+        <p><strong>Transparency &amp; Records</strong>: Approvals, revocations, and guideline updates are published in the Governance Forum.</p>
+        <p><strong>Risks &amp; Safeguards</strong>: Periodic revision of guidance; appeals for certified decisions; documentation of cases for learning.</p>
+        <h4 id="core-ip">Core IP</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-asset-core-ip</dd>
+            <dt>name</dt><dd>Core IP</dd>
+            <dt>description</dt><dd>Foundational intellectual property and documentation stewarded by the Commons.</dd>
+            <dt>assetType</dt><dd>intellectual property</dd>
+            <dt>relatedMembranes</dt><dd>Community Assembly</dd>
+            <dt>relatedProtocols</dt><dd>IP Protocol, Publishing Protocol</dd>
+            <dt>relatedAssets</dt><dd>Constitution</dd>
+            <dt>location</dt><dd>Repositories and knowledge bases (TBD)</dd>
+          </dl>
+        </details>
+        <p><strong>Purpose</strong>: Preserve, attribute, and share the Commons’ foundational knowledge and IP in ways that uphold integrity and enable reuse.</p>
+        <p><strong>Location</strong>: Repositories and knowledge bases (TBD), with licensing captured in credentials per IP Protocol.</p>
+        <p><strong>Related Membranes</strong>: Community Assembly (advice and peer review).</p>
+        <p><strong>Related Protocols</strong>: IP Protocol (intake, peer review, non‑revocability upon acceptance), Publishing Protocol (public record).</p>
+        <p><strong>Governance &amp; Permissions</strong>: Submissions undergo advice + peer review; accepted contributions become non‑revocable commons records. Licenses/credentials specify terms; attribution is mandatory.</p>
+        <p><strong>Operations &amp; Usage</strong>: Curate submissions, maintain metadata quality, link to projects and learning artifacts; provide clear citation practices.</p>
+        <p><strong>Transparency &amp; Records</strong>: Publish acceptance decisions, licenses, and changelogs in the Governance Forum.</p>
+        <p><strong>Risks &amp; Safeguards</strong>: Avoid plagiarism/misattribution; consent and privacy for sensitive material; clear difference between draft (withdrawable) and accepted (non‑revocable) works.</p>
+        <h4 id="communication-channels">Communication Channels</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-asset-comms</dd>
+            <dt>name</dt><dd>Communication Channels</dd>
+            <dt>description</dt><dd>The shared communication channels operated by Commons Stewards, including email lists, Telegram group, and any future communication platforms.</dd>
+            <dt>assetType</dt><dd>platform</dd>
+            <dt>relatedMembranes</dt><dd>Community Assembly, Steward Council</dd>
+            <dt>relatedProtocols</dt><dd>Moderation Protocol, Communication Protocol</dd>
+            <dt>relatedAssets</dt><dd>null</dd>
+            <dt>location</dt><dd>Regen Commons Email Lists, Regen Commons Telegram Group</dd>
+          </dl>
+        </details>
+        <p><strong>Purpose:</strong> To enable effective communication, timely information sharing, and focused discussion for the governance and operation of the Regen Commons.</p>
+        <p><strong>Location:</strong> A directory of official channels and access instructions is maintained and published by the Commons Stewards.</p>
+        <p><strong>Related Membranes:</strong> <strong>Community Assembly</strong> (participation), <strong>Steward Council</strong> (administration and moderation).</p>
+        <p><strong>Related Protocols:</strong> <strong>Moderation Protocol</strong> (defining conduct and enforcement), <strong>Communication Protocol</strong> (guiding official announcements and discussions).</p>
+        <p><strong>Governance &amp; Permissions:</strong> Access permissions and moderation roles are managed by Commons Stewards. The creation or retirement of an official channel requires a decision by the Steward Council.</p>
+        <p><strong>Operations &amp; Usage:</strong> Used for official announcements, governance proposals, community discussions, and coordinating activities. Stewards are responsible for channel administration and moderation.</p>
+        <p><strong>Transparency &amp; Records:</strong> Public-facing channels will have publicly accessible archives where feasible. Key decisions and moderation actions are logged internally by the Stewards.</p>
+        <p><strong>Risks &amp; Safeguards:</strong> Prevent spam and disruptive behavior through active moderation. Safeguard against unauthorized administrative access by limiting permissions to current Stewards. Ensure channel continuity through documented procedures for transferring ownership.</p>
+        <h3 id="membranes">Membranes</h3>
+        <p><em>Boundaries that regulate participation, permissions, and trust thresholds.</em></p>
+        <h4 id="steward-council">Steward Council</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-membrane-steward-council</dd>
+            <dt>name</dt><dd>Steward Council</dd>
+            <dt>description</dt><dd>Interim stewardship membrane composed of elected multisig stewards to manage treasury and MVP governance execution.</dd>
+            <dt>type</dt><dd>council</dd>
+            <dt>relatedProtocols</dt><dd>Decision-Making Protocol, Treasury Management Protocol, Member Protocol</dd>
+            <dt>relatedMembranes</dt><dd>Commons Members, Project Team</dd>
+            <dt>parentMembranes</dt><dd>Commons Members</dd>
+            <dt>childMembranes</dt><dd>null</dd>
+            <dt>relatedAssets</dt><dd>Commons Treasury Multi-Sig, Constitution</dd>
+            <dt>relatedRoles</dt><dd>Steward</dd>
+            <dt>sameAs</dt><dd>null</dd>
+            <dt>workSpaceLink</dt><dd>null</dd>
+          </dl>
+        </details>
+        <dl class="const-facts">
+          <dt>Decision Making</dt><dd>Simple majority voting and role-based authority on operational matters, and supporting advice and consent processes on key decisions per decision protocol.</dd>
+          <dt>Meeting Frequency</dt><dd>Bi-weekly for first 6 months, then monthly</dd>
+          <dt>Transparency</dt><dd>All decisions documented and shared with community</dd>
+          <dt>Oversight</dt><dd>Community review and feedback process for major decisions</dd>
+        </dl>
+        <h4 id="commons-member-assembly">Commons Member Assembly</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-membrane-commons-members</dd>
+            <dt>name</dt><dd>Commons Members</dd>
+            <dt>description</dt><dd>Composed of all recognized members of the commons.</dd>
+            <dt>type</dt><dd>assembly</dd>
+            <dt>relatedProtocols</dt><dd>Member Protocol, Decision-Making Protocol</dd>
+            <dt>relatedMembranes</dt><dd>Steward Council, Project Team</dd>
+            <dt>parentMembranes</dt><dd>null</dd>
+            <dt>childMembranes</dt><dd>Project Team</dd>
+            <dt>relatedAssets</dt><dd>Constitution</dd>
+            <dt>relatedRoles</dt><dd>Member</dd>
+            <dt>sameAs</dt><dd>null</dd>
+            <dt>workSpaceLink</dt><dd>null</dd>
+          </dl>
+        </details>
+        <dl class="const-facts">
+          <dt>Composition</dt><dd>All seed members, members, and stewards</dd>
+          <dt>Meetings</dt><dd>Monthly community calls for updates, input, and relationship building</dd>
+          <dt>Powers</dt><dd>Participation in major decisions (whether via advice, consent, role-based, or voting, depending on the decision type), steward selection, proposal development</dd>
+          <dt>Participation</dt><dd>Open discussion, consensual temperature checks, recommendation development</dd>
+        </dl>
+        <h4 id="project-teams">Project Teams</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-membrane-project-team</dd>
+            <dt>name</dt><dd>Project Team</dd>
+            <dt>description</dt><dd>Membrane for approved initiatives operating under a scoped self-governance plan and milestone-based funding.</dd>
+            <dt>type</dt><dd>project</dd>
+            <dt>relatedProtocols</dt><dd>Project Protocol, Treasury Management Protocol, Decision-Making Protocol</dd>
+            <dt>relatedMembranes</dt><dd>Commons Members, Steward Council</dd>
+            <dt>parentMembranes</dt><dd>Commons Members</dd>
+            <dt>childMembranes</dt><dd>null</dd>
+            <dt>relatedAssets</dt><dd>Commons Treasury Multi-Sig</dd>
+            <dt>relatedRoles</dt><dd>Project Lead, Project Participant</dd>
+            <dt>sameAs</dt><dd>null</dd>
+            <dt>workSpaceLink</dt><dd>null</dd>
+          </dl>
+        </details>
+        <dl class="const-facts">
+          <dt>Temporal State</dt><dd>Temporary</dd>
+          <dt>Composition</dt><dd>Project Participants listed in approved project plan or approved by Project Lead.</dd>
+          <dt>Meetings</dt><dd>As defined by project scope</dd>
+          <dt>Powers</dt><dd>Membrane-based authority (Project Team, or any Roles within) with accountability cycles. Any action within approved project scope that does not conflict with this constitution</dd>
+          <dt>Participation</dt><dd>As defined by project scope</dd>
+        </dl>
+        <h4 id="operations-teams">Operations Teams</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-membrane-operations-team</dd>
+            <dt>name</dt><dd>Operations Team</dd>
+            <dt>description</dt><dd>Operational membrane responsible for core commons infrastructure, facilities, programs, and ongoing operational work streams.</dd>
+            <dt>type</dt><dd>operations</dd>
+            <dt>relatedProtocols</dt><dd>Operator Protocol, Treasury Management Protocol, Decision-Making Protocol</dd>
+            <dt>relatedMembranes</dt><dd>Community Assembly, Steward Council</dd>
+            <dt>parentMembranes</dt><dd>Community Assembly</dd>
+            <dt>childMembranes</dt><dd>null</dd>
+            <dt>relatedAssets</dt><dd>Commons Treasury Multi-Sig, Governance Forum</dd>
+            <dt>relatedRoles</dt><dd>Operator</dd>
+            <dt>sameAs</dt><dd>null</dd>
+            <dt>workSpaceLink</dt><dd>null</dd>
+          </dl>
+        </details>
+        <dl class="const-facts">
+          <dt>Temporal State</dt><dd>Ongoing</dd>
+          <dt>Composition</dt><dd>Operator Leads and Operator Team</dd>
+          <dt>Meetings</dt><dd>regular operational check-ins; infrastructure planning sessions; emergency response coordination</dd>
+          <dt>Powers</dt><dd>operational decision-making within infrastructure scope approved by Steward Council; resource allocation for operational needs; coordination of operational work streams</dd>
+          <dt>Participation</dt><dd>As defined by operation team protocol</dd>
         </dl>
       </section>
 
       <section id="protocols" aria-labelledby="protocols-title">
         <h2 id="protocols-title">Protocols</h2>
-        <p>This index provides a complete list of governance protocols during the MVP.</p>
+        <h3 id="cultural-protocols">Cultural Protocols</h3>
+        <h4 id="decision-making-protocol">Decision-Making Protocol</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-protocol-decision-making</dd>
+            <dt>name</dt><dd>Decision-Making Protocol</dd>
+            <dt>description</dt><dd>Tiered decision-making processes (consent, advice, role-based, temp check) applied by domain with on-chain execution.</dd>
+            <dt>initializationEvent</dt><dd>MVP activation; roles credentialed; forum open.</dd>
+            <dt>associatedFunctions</dt><dd>sense-making, decision making, coordination, resource allocation, culture</dd>
+            <dt>associatedRoles</dt><dd>Member, Steward (Multisig), Project Lead</dd>
+            <dt>relatedMembranes</dt><dd>Community Assembly, Steward Council, Project</dd>
+          </dl>
+        </details>
+        <p><strong>Purpose</strong>: Provide clear, lightweight pathways for how decisions are made across membranes, balancing human discernment with on‑chain enforcement.</p>
+        <p><strong>Initialization</strong>: This protocol activates at MVP launch when roles are credentialed and the Governance Forum is open for proposals, records, and votes.</p>
+        <p><strong>Participants</strong>: Members participate in advice/consent and voting; Stewards (multi-sig) execute approved actions on‑chain and manage treasury protocols; Project Leads coordinate project‑level execution.</p>
+        <h5 id="decision-domains-flows">Decision Domains &amp; Flows</h5>
+        <h6 id="membership-decisions">Membership Decisions</h6>
+        <p><strong>Foundation Period (Months 0-6) — Lower Barrier Entry</strong>:</p>
+        <ol>
+          <li><strong>Invitation</strong>: Seed Members exercise individual authority to extend invitations (up to five per member) to prospective members demonstrating alignment with Purpose and Values</li>
+          <li><strong>Onboarding</strong>: Prospective members complete structured enculturation sequence of two to three (2-3) ritualized onboarding events facilitated by Gardeners and Stewards</li>
+          <li><strong>Lazy Consent Review</strong>: Upon completion of onboarding, prospective members enter seven (7) day lazy consent window
+            <ul>
+              <li>Any existing Member may raise substantive objections</li>
+              <li>Objections trigger formalized consent vote within Community Assembly</li>
+              <li>Absence of blocking objections results in automatic advancement</li>
+              <li>Batched processing permitted for operational efficiency</li>
+            </ul>
+          </li>
+          <li><strong>Credential Claim</strong>: Successful candidates receive eligibility to claim non-transferable membership credential, constituting formal consent to Constitution and election to sortition pool</li>
+          <li><strong>Registry Update</strong>: EAS registry reflects new member status and governance eligibility</li>
+        </ol>
+        <p><strong>Transition Period (Month 6+) — Higher Barrier Entry</strong>: Following Foundation Period, upon Steward Council determination of adequate cultural coherence and governance capacity, membership admission transitions to enhanced verification model (specific mechanisms to be collaboratively defined during Foundation Period, potentially including attestation systems or Operations Team review).</p>
+        <p><strong>Role Advancement</strong>: Advancement to higher‑responsibility roles (e.g. project lead, operator, gardener) requires advice process followed by consent at the appropriate membrane. Steward selection follows protocols defined in Steward Protocol, transitioning to sortition-based selection concurrent with membership barrier elevation.</p>
+        <h6 id="licensee-engagement">Licensee Engagement</h6>
+        <p><strong>Generic Fair Use</strong>: Permissionless within published guidance and Commons conditional use license framework.</p>
+        <p><strong>Certified Use</strong>: Steward-led consent process required for certified or narrow uses. Approved parties receive non-transferable access credential/NFT. Terms, duties, and royalty obligations are recorded in Governance Forum.</p>
+        <h6 id="intellectual-property-contribution">Intellectual Property Contribution</h6>
+        <p><strong>Submission</strong>: Contributors submit works with attribution and licensing intent to Governance Forum.</p>
+        <p><strong>Review</strong>: Advice and peer review process conducted by community members and Gardeners.</p>
+        <p><strong>Acceptance</strong>: Upon community acceptance, contributions become non-revocable commons resources with clear attribution, credentialed and licensed per IP Protocol.</p>
+        <h6 id="operational-decisions">Operational Decisions</h6>
+        <p><strong>Core Operations</strong>: Routine operational activities (credential issuance, infrastructure maintenance, software updates) are executed via delegated role-based authority with defined accountability cycles. Such delegations remain revocable via collective vote, with timelock enforcement where applicable.</p>
+        <h6 id="member-exit">Member Exit</h6>
+        <p><strong>Voluntary Departure</strong>: Members may exit voluntarily at any time. Upon exit, credentials are revoked and registry updated accordingly.</p>
+        <p><strong>Inactive Member Review</strong>: Community conducts periodic review (every twelve months) to maintain registry accuracy. Inactive members may be removed following due process.</p>
+        <p><strong>Non-Revocable Contributions</strong>: Accepted IP contributions and commons resources remain non-revocable regardless of member status.</p>
+        <h6 id="brand-resource-governance">Brand Resource Governance</h6>
+        <p><strong>Fair-Use Guidance</strong>: Stewards facilitate ongoing development and refinement of fair-use guidance, ensuring coherence between software licenses and brand licenses. Adoption of conditional use license framework for all IP associated with "Regen" designation.</p>
+        <p><strong>Permissionless Use</strong>: Anyone may adopt Regen use patterns compliant with published fair-use guidelines. All members share responsibility for monitoring usage patterns and maintaining legitimacy.</p>
+        <p><strong>Certified Use</strong>: Certified uses require formal consent process as outlined in Brand Usage Protocol.</p>
+        <p><strong>Enforcement</strong>: Misuse follows Conflict &amp; Tension Protocol escalation pathway. Persistent misuse may result in on-chain credential revocation.</p>
+        <h6 id="financial-decisions-tiered-governance">Financial Decisions (Tiered Governance)</h6>
+        <p><strong>Operational Tier</strong>: Expenditures below defined financial and temporal thresholds (subject to twelve-month re-evaluation) are executed via role-based discretion (e.g., Treasurer Hat). Stewards execute directly via multi-signature authorization.</p>
+        <p><strong>Project Tier</strong>: Project funding requests follow advice process, followed by quadratic voting among credentialed members. Successful votes authorize multi-signature execution per Treasury Management Protocol.</p>
+        <p><strong>Strategic Tier</strong>: Major allocations require collective consent from Commons Member Assembly or Steward Council. Approved transactions execute via on-chain timelock (one to three day delay) to enable community review and emergency intervention if necessary.</p>
+        <h6 id="strategic-planning">Strategic Planning</h6>
+        <p><strong>Priority Setting</strong>: Annual strategic priorities established through collective sense-making processes within Community Assembly.</p>
+        <p><strong>Action Alignment</strong>: Strategic initiatives require advice and consent processes to ensure collective alignment.</p>
+        <p><strong>Automation</strong>: Only low-risk, routinized activities are candidates for on-chain automation.</p>
+        <h6 id="conflict-resolution">Conflict Resolution</h6>
+        <p><strong>Escalation Pathway</strong>: Conflicts follow graduated resolution process: direct dialogue → facilitated mediation → binding arbitration.</p>
+        <p><strong>Enforcement</strong>: Outcomes (including credential revocation, fund reallocation, or other remedies) are enforceable on-chain and recorded in Governance Forum.</p>
+        <p><strong>Protocol Reference</strong>: See Conflict &amp; Tension Protocol for detailed procedures and requirements.</p>
+        <p><strong>Records &amp; Transparency</strong>: Each decision should link to Governance Forum context, evidence of consent/votes, and, when relevant, transaction hashes or credential IDs. All meeting minutes are made available to members. Changelogs are maintained for Protocols and the Constitution.</p>
+        <p><strong>Safeguards</strong>: Clear thresholds, timelocks for high‑stakes moves, revocability of delegated authority, and an active conflict protocol protect against capture and support legitimacy.</p>
+        <p><strong>Process Flows Summary</strong>:</p>
+        <p><strong>Membership (Foundation Period)</strong>: <strong>Invitation → Onboarding Events (2-3) → Lazy Consent Review (7 days) → Credential Claim → Registry Update</strong></p>
+        <p><strong>Membership (Post-Foundation)</strong>: <strong>Application → Enhanced Verification → Community Review → Approval → Onboarding → Credential Claim</strong></p>
+        <p><strong>Stewardship (Foundation Period)</strong>: <strong>Nomination → Election by Seed Members → Term Confirmation → Ongoing Service</strong></p>
+        <p><strong>Stewardship (Post-Foundation)</strong>: <strong>Nomination → Community Advice → Sortition Selection → Term Service</strong></p>
+        <p><strong>General Operations</strong>: <strong>Proposal → [Advice/Consent/Vote per Domain] → Execution → Documentation → Review</strong></p>
+        <h4 id="conflict-tension-protocol">Conflict &amp; Tension Protocol</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-protocol-conflict</dd>
+            <dt>name</dt><dd>Conflict &amp; Tension Protocol</dd>
+            <dt>description</dt><dd>Graduated pathway from reflection to dialogue, mediation, and arbitration, with repair and learning.</dd>
+            <dt>initializationEvent</dt><dd>MVP activation; mediator pool identified; arbitration guardrail defined.</dd>
+            <dt>associatedFunctions</dt><dd>culture, coordination, decision making, learning</dd>
+            <dt>associatedRoles</dt><dd>Member, Steward (Multisig)</dd>
+            <dt>relatedMembranes</dt><dd>Community Assembly, Steward Council</dd>
+          </dl>
+        </details>
+        <p><strong>Purpose</strong>: Normalize conflict as a signal, provide a humane path to address tensions, and protect the commons’ integrity.</p>
+        <p><strong>Initialization</strong>: a mediator team is identified and the arbitration guardrail is defined; members are oriented to the protocol during onboarding; a tension or conflict is worked out between members (and if additional support needed, mediation or arbitration is made available).</p>
+        <p><strong>Participants</strong>: Any member may initiate; mediators and, if necessary, arbitrators support the process; Stewards enforce outcomes on‑chain where required.</p>
+        <p><strong>Pathway</strong>: Conflicts begin with self‑reflection and direct dialogue. If dialogue stalls or is unsafe, a Gardener or external mediator facilitates supported dialogue. If still unresolved, external arbitration serves as a last resort, weighing mission, values, and community health. Outcomes may include credential burns or fund reallocations and must be documented. If infractions are resolved, but continue to repeat, member is removed after 3 repeat infractions.</p>
+        <p><strong>Repair &amp; Learning</strong>: After resolution, parties reflect on harms and repairs, share lessons at the appropriate scope, and propose updates to norms if patterns persist. Training and periodic circles build community capacity over time.</p>
+        <p><strong>Steps:</strong> Self-Reflection: clarify experiences, needs, and desired outcomes before engagement; Direct Dialogue: share impacts/needs, use "I" statements, ask with curiosity, make specific requests; Mediation: invite neutral mediator if dialogue stalls/unsafe; support co-created agreements; Arbitration (Last Resort): trusted pool issues binding decision guided by mission/values and community health; Enforcement: outcomes can trigger credential burn or fund reallocation on-chain per protocols; Repair &amp; Learning: reflect on harms/reparations; share learnings; update norms if patterns emerge; Capacity Building: train in listening, mediation; normalize tension processing rituals</p>
+        <h3 id="role-protocols">Role Protocols</h3>
+        <h4 id="member-protocol">Member Protocol</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-protocol-member</dd>
+            <dt>name</dt><dd>Member Protocol</dd>
+            <dt>description</dt><dd>Admission, advancement, and exit of members; credentialing and registry updates.</dd>
+            <dt>initializationEvent</dt><dd>Adoption of MVP constitution and initial member whitelist.</dd>
+            <dt>associatedFunctions</dt><dd>sense-making, decision making, coordination, culture</dd>
+            <dt>associatedRoles</dt><dd>Member</dd>
+            <dt>relatedMembranes</dt><dd>Community Assembly</dd>
+          </dl>
+        </details>
+        <p><strong>Purpose</strong>: This protocol governs how people become members, advance to deeper stewardship, and exit, while keeping records consistent on-chain. It establishes a phased approach to membership admission designed to ensure cultural coherence, collective trust, and operational readiness for distributed governance.</p>
+        <p><strong>Initialization</strong>: The protocol becomes active upon adoption of the MVP Constitution and the publication of an initial whitelist of seed members.</p>
+        <p><strong>Requirements</strong>: Alignment with Purpose and Values; demonstrated contribution and engagement; acceptance of Constitution and Protocols; completion of onboarding sequence and credential claim; willingness to participate in governance; maintenance of good standing. For project team participation, relevant skills and availability are required.</p>
+        <p><strong>Participants</strong>: Seed Members initiate invitations; Gardeners and Stewards facilitate enculturation; Community Assembly exercises consent authority; prospective members complete onboarding requirements.</p>
+        <h5 id="membership-phases">Membership Phases</h5>
+        <h6 id="phase-1-foundation-period-months-0-6">Phase 1: Foundation Period (Months 0-6)</h6>
+        <p><strong>Lower Barrier Entry Process</strong> — Designed to establish a foundational membership cohort of approximately 100 individuals while maintaining cultural integrity and collective alignment.</p>
+        <p><strong>Invitation Authority</strong>: Each Seed Member may extend invitations to up to five (5) individuals who demonstrate alignment with organizational Purpose and Values and show contributory capacity.</p>
+        <p><strong>Onboarding Sequence</strong>: Prospective members must complete a structured enculturation process consisting of:</p>
+        <ol>
+          <li>Participation in two to three (2-3) ritualized onboarding events conducted over the Foundation Period</li>
+          <li>Engagement with constitutional frameworks, decision-making protocols, and conflict transformation practices</li>
+          <li>Integration into cultural norms and collective sense-making processes</li>
+        </ol>
+        <p><strong>Lazy Consent Review</strong>: Following completion of the onboarding sequence, each prospective member enters a seven (7) day lazy consent window during which:</p>
+        <ul>
+          <li>Any existing Member may raise substantive objections based on alignment with Purpose, Values, or Protocols</li>
+          <li>Objections trigger a formalized consent process within the Community Assembly</li>
+          <li>Absence of blocking objections results in automatic advancement to credential claim eligibility</li>
+          <li>Batched processing of admissions may be employed for operational efficiency</li>
+        </ul>
+        <p><strong>Credential Issuance</strong>: Upon successful completion of the lazy consent period, prospective members receive eligibility to claim a non-transferable membership credential. Credential acceptance constitutes formal consent to this Constitution and includes election to join the sortition pool for future governance selection processes.</p>
+        <p><strong>Registry Update</strong>: The EAS registry is updated to reflect new member status, participation history, and governance eligibility.</p>
+        <h6 id="phase-2-transition-period-month-6">Phase 2: Transition Period (Month 6+)</h6>
+        <p><strong>Barrier Adjustment</strong>: Following the Foundation Period and upon determination by the Steward Council that sufficient cultural coherence and governance capacity have been established, membership criteria transition to a higher-threshold model:</p>
+        <p><strong>Higher Barrier Entry Process</strong> — Designed to ensure sustained organizational integrity through enhanced verification mechanisms (specific model to be determined collaboratively during Foundation Period, potentially including attestation systems, Operations Team review, or other community-defined mechanisms).</p>
+        <p><strong>Governance Democratization</strong>: Concurrent with membership barrier elevation, stewardship selection transitions to sortition-based processes, lowering barriers to governance participation while ensuring distributed authority.</p>
+        <h6 id="legacy-provisions">Legacy Provisions</h6>
         <dl class="const-facts">
-          <dt>Role protocols</dt><dd>Member Protocol</dd>
-          <dt>Membrane protocols</dt><dd>Project Protocol</dd>
-          <dt>Asset protocols</dt><dd>Treasury Management Protocol, IP Protocol, Brand Usage Protocol, Publishing Protocol, Constitution Protocol</dd>
-          <dt>Cultural protocols</dt><dd>Decision-Making Protocol</dd>
+          <dt>Seed Members</dt><dd>Automatically whitelisted from formation participants; claim role by accepting non-transferable credential within published claim window; EAS registry updated accordingly. Unclaimed credentials revert to standard admission pathways. Seed Member designation sunsets after twelve (12) months, transitioning to standard Member status.</dd>
+          <dt>Project Team Participation</dt><dd>Selection by Project Lead or via process defined in project scope; requires agreement to project-specific terms, timelines, and deliverables.</dd>
         </dl>
-        <div class="const-notes">
-          <p>Note: the protocols are documented separately from this text. During the foundation period, the <a href="https://portal.opencivics.co/regen-commons-membership-agreement">Membership Agreement</a> sets out the membership, decision-making and conflict protocols in use.</p>
-        </div>
+        <p><strong>Advancement</strong>: Moving into roles uses an advice process to signal nomination + consent process at the relevant membrane level that the role contributes to, and is informed by transparent participation thresholds recorded in the registry.</p>
+        <p><strong>Exit and List Hygiene</strong>: Members may depart voluntarily or via initiated exit. The community periodically reviews inactivity to keep the registry accurate. On exit, membership credentials are burned and the registry is updated. Access to assets is adjusted per protocols. Accepted IP contributions remain non‑revocable and part of the Common Pool Resources.</p>
+        <h5 id="key-responsibilities-during-foundation-period">Key Responsibilities During Foundation Period</h5>
+        <p><strong>Seed Members</strong>: Exercise strategic discernment in cohort composition, extending invitations to individuals who demonstrate both alignment and contributory capacity. Responsible for cultivating a diverse yet coherent foundational membership body.</p>
+        <p><strong>Gardeners and Stewards</strong>: Design and facilitate enculturation processes, onboarding sequences, and ritualized events. Ensure prospective members develop functional literacy in constitutional frameworks, decision-making protocols, and cultural practices. Prepare governance infrastructure and mechanisms to support transition to sortition-based selection in Phase 2.</p>
+        <p><strong>Community Assembly</strong>: Exercise consent authority through lazy consent review processes. Maintain collective accountability for membership composition and cultural coherence.</p>
+        <h5 id="dependencies-and-preparatory-work">Dependencies and Preparatory Work</h5>
+        <p><strong>Business Model Development</strong>: Establishment of clear membership benefits and value propositions (targeted for completion within initial months of Foundation Period) to inform invitation processes and support sustainable organizational operations.</p>
+        <p><strong>Participatory Design</strong>: Engagement in collaborative business model design processes serves dual purposes: defining membership value propositions and identifying prospective members aligned with organizational direction.</p>
+        <p><strong>Steps</strong>: <strong>Invitation → Onboarding Sequence (2-3 Events) → Lazy Consent Review (7 Days) → Credential Claim Eligibility → Registry Update → [Ongoing] Advancement or Exit</strong></p>
+        <h4 id="steward-protocol">Steward Protocol</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-protocol-steward</dd>
+            <dt>name</dt><dd>Steward Protocol</dd>
+            <dt>description</dt><dd>This protocol outlines the process for adding and removing a Steward.</dd>
+            <dt>initializationEvent</dt><dd>Change in role state proposed.</dd>
+            <dt>associatedFunctions</dt><dd>decision making, resource allocation, coordination</dd>
+            <dt>associatedRoles</dt><dd>Steward, Seed Member, Member</dd>
+            <dt>relatedMembranes</dt><dd>Steward Council, Community Assembly</dd>
+          </dl>
+        </details>
+        <p><strong>Purpose</strong>: Establish legitimate stewardship selection through initial democratic election, then transition to sortition-based selection to prevent power concentration while ensuring competency.</p>
+        <p><strong>Initialization</strong>: Change in role state proposed.</p>
+        <p><strong>Requirements:</strong> Active Member in good standing; availability for meetings and transaction signing when necessary; demonstrable trust and process/treasury competency; commitment to transparency and Conflict Protocol.</p>
+        <p><strong>Participants</strong>: Seed Members conduct initial election; Community Assembly provides nominations and advice; eligible Members may be nominated or self-nominate; selected Stewards receive credentials and permissions.</p>
+        <p><strong>Selection:</strong></p>
+        <dl class="const-facts">
+          <dt>Initial Election</dt><dd>Seed Members vote to elect the first Steward Council (5-7 members) for a 9-month term (e.g., via Snapshot or equivalent). This establishes initial legitimacy and accountability during the critical MVP phase.</dd>
+          <dt>Subsequent Selection</dt><dd>After the initial term, a peer nomination process opens where eligible members may be nominated or self-nominate. The community provides advice on nominations and selection criteria.</dd>
+          <dt>Future Intention - Sortition Process</dt><dd>Random selection from the nominated pool uses weighted criteria including participation history, trust signals from the registry, and relevant expertise. This prevents popularity contests while ensuring competency.</dd>
+        </dl>
+        <p><strong>Role Assignment</strong>: Selected stewards receive multi-sig permissions (Gnosis Safe signer access) and Hats credentials with appropriate scope and authority for treasury management and governance execution.</p>
+        <p><strong>Removal and Term Management</strong>: Stewards serve 9-month terms with staggered rotation to ensure continuity unless an election is called by 2/3 vote of Members before the 9 month term is complete. Regular accountability cycles and performance reviews conducted by the Project Evaluation Team to maintain quality and legitimacy. Stewards are removed after a 9-month term or after an election has been called to remove them.</p>
+        <p><strong>Transition</strong>: Outgoing stewards transfer knowledge, context, and permissions to incoming cohort through structured handoff processes, ensuring smooth governance continuity.</p>
+        <p><strong>Steps (MVP): Nomination Period → Candidate Statements → Election → Confirmation → Exit</strong></p>
+        <h4 id="project-lead-protocol">Project Lead Protocol</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-protocol-project-lead</dd>
+            <dt>name</dt><dd>Project Lead Protocol</dd>
+            <dt>description</dt><dd>How to become a Project Lead through scoped proposal submission and approval.</dd>
+            <dt>initializationEvent</dt><dd>Commons opens project intake process.</dd>
+            <dt>associatedFunctions</dt><dd>decision making, resource allocation, coordination, learning</dd>
+            <dt>associatedRoles</dt><dd>Project Lead, Steward</dd>
+            <dt>relatedMembranes</dt><dd>Project, Steward Council, Community Assembly</dd>
+          </dl>
+        </details>
+        <p><strong>Purpose</strong>: Define how individuals become Project Leads through proposal submission and approval, ensuring clear scope, accountability, and learning.</p>
+        <p><strong>Initialization</strong>: The protocol activates when the Commons announces project intake and opens the Governance Forum for proposals.</p>
+        <p><strong>Requirements</strong>: Demonstrated capacity and relevant expertise; clear scope, milestones, budget, and reporting plan; alignment with strategy and Protocols; availability to coordinate Project Participants.</p>
+        <p><strong>Participants</strong>: Prospective Project Leads submit proposals; the Community Assembly provides advice; project review team reviews and approves; Project Participants are engaged by the Lead.</p>
+        <p><strong>Selection:</strong> Proposal submitted to Governance Forum; advice process; project review team approval; role credentialed (Hats) with authorized scope and milestones.</p>
+        <p><strong>Proposal &amp; Review</strong>: Submit a detailed proposal including scope, milestones, self-governance plan, budget, and timeline. The community offers advice during a review period; proposers address feedback and iterate. The project review team evaluates for strategic alignment and protocol compliance.</p>
+        <p><strong>Role Assignment</strong>: Upon approval, the Project Lead receives a credentialed role (Hats) with authorized scope and milestones. The role is scoped to the specific project and expires upon completion.</p>
+        <p><strong>Execution &amp; Accountability</strong>: Project Leads execute within approved parameters, coordinate Participants, manage milestone-based funding, and report progress and variances to the Governance Forum.</p>
+        <p><strong>Closeout</strong>: Upon completion, Project Leads deliver outcomes, publish retrospectives, and the role expires with the project. Learnings are captured for future reference.</p>
+        <p><strong>Steps: Nomination → Vetting → Approval → Assignment → Onboarding → Active → Membership Review → Removed</strong></p>
+        <h4 id="licensed-partner-protocol">Licensed Partner Protocol</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-protocol-licensed-partner</dd>
+            <dt>name</dt><dd>Licensed Partner Protocol</dd>
+            <dt>description</dt><dd>How organizations gain, maintain, and lose Licensed Partner status through brand usage agreements.</dd>
+            <dt>initializationEvent</dt><dd>Brand assets committed to Commons custody; fair-use guidance published.</dd>
+            <dt>associatedFunctions</dt><dd>culture, decision making, coordination</dd>
+            <dt>associatedRoles</dt><dd>Licensed Partner, Steward (Multisig)</dd>
+            <dt>relatedMembranes</dt><dd>Community Assembly, Steward Council</dd>
+          </dl>
+        </details>
+        <p><strong>Purpose</strong>: Define the lifecycle of Licensed Partner status, from application through credentialing, use, and potential expiration.</p>
+        <p><strong>Initialization</strong>: The protocol activates when brand assets are committed to Commons custody and fair-use guidance is published, enabling the Licensed Partner application process.</p>
+        <p><strong>Requirements</strong>: Demonstrated alignment with Values; commitment to brand guidelines; acceptance of license terms and reporting expectations; no prior misuse.</p>
+        <p><strong>Participants</strong>: Organizations seeking Licensed Partner status; Stewards review applications and manage credentials; Community Assembly provides advice on criteria and recognition.</p>
+        <p><strong>Selection</strong>: Apply via Brand Usage Protocol; values alignment assessment; steward-led consent; issuance of a non-transferable access credential; license terms (including any fees/royalties) recorded.</p>
+        <p><strong>Application Process</strong>: Organizations submit applications with values alignment assessments and proposed use cases. The process follows the Brand Usage Protocol for review and consent.</p>
+        <p><strong>Credentialing</strong>: Upon approval, organizations receive non-transferable brand access credentials that grant Licensed Partner status and access to partner resources and recognition systems.</p>
+        <p><strong>Role Activation</strong>: Licensed Partners gain community recognition, and the ability to use Regen branding within their approved scope and terms.</p>
+        <p><strong>Ongoing Use</strong>: Licensed Partners must adhere to brand guidelines, contribute back per agreed terms (fees, stories, attribution), and maintain legitimacy through consistent alignment with commons values.</p>
+        <p><strong>Monitoring &amp; Compliance</strong>: Regular compliance checks ensure adherence to terms. Disputes are resolved through the Conflict Transformation Protocol, with escalation paths for persistent issues.</p>
+        <p><strong>Expiration</strong>: Licensed Partner status expires if misuse persists after the conflict pathway is exhausted. Credentials are revoked and access is terminated, with the decision recorded in the Governance Forum.</p>
+        <p><strong>Steps: Application → Review → Credentialing → Role Activation → Ongoing Use → Monitoring → Expiration</strong></p>
+        <h4 id="gardener-protocol">Gardener Protocol</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-protocol-gardener</dd>
+            <dt>name</dt><dd>Gardener Protocol</dd>
+            <dt>description</dt><dd>How to become a Gardener through specialized training and demonstrated caretaking skills.</dd>
+            <dt>initializationEvent</dt><dd>Training programs established; Gardener role criteria defined.</dd>
+            <dt>associatedFunctions</dt><dd>learning, coordination, culture</dd>
+            <dt>associatedRoles</dt><dd>Gardener, Member</dd>
+            <dt>relatedMembranes</dt><dd>Community Assembly, Project</dd>
+          </dl>
+        </details>
+        <p><strong>Purpose</strong>: Develop and credential community members with specialized skills for tending, curating, and caring for commons resources and relationships.</p>
+        <p><strong>Initialization</strong>: The protocol activates when training programs are established and Gardener role criteria are defined by the community.</p>
+        <p><strong>Requirements</strong>: Alignment with Purpose/Values; demonstrated curation/care skills (knowledge organization, facilitation, documentation); consistent participation; commitment to publishing and conflict transformation practices.</p>
+        <p><strong>Selection</strong>: Nominated or self‑nominated; advice + consent at the membrane level (e.g., Community Assembly for network‑wide gardening, or within a Project for project‑scoped gardening). Role credentialed via Hats with a defined scope/term where applicable.</p>
+        <p><strong>Participants</strong>: Members seeking Gardener roles; training facilitators; Community Assembly provides advice and consent; Projects may have scoped Gardener roles.</p>
+        <p><strong>Training &amp; Skills</strong>: Complete specialized training in relevant stewardship areas such as relational tending, conflict mediation, knowledge gardening, and grant program operations. Demonstrate caretaking skills through community participation and meaningful contributions.</p>
+        <p><strong>Role Assignment</strong>: Nomination or self-nomination triggers an advice + consent process at the appropriate membrane level (Community Assembly for network-wide gardening, or within Projects for scoped roles). Upon approval, the role is credentialed (Hats) with defined scope and term where applicable.</p>
+        <p><strong>Execution &amp; Responsibilities</strong>: Gardeners execute caretaking responsibilities within their authorized scope, including curating resources, maintaining documentation, supporting community rituals, monitoring health/abundance metrics, and facilitating learning loops.</p>
+        <p><strong>Review &amp; Renewal</strong>: Periodic review ensures Gardeners maintain performance standards and meet evolving community needs. Roles may be renewed, adjusted, or transitioned based on community feedback and changing requirements.</p>
+        <p><strong>Steps:</strong> <strong>Training → Demonstration → Nomination → Credentialing → Role Execution → Review &amp; Renewal</strong></p>
+        <h4 id="operator-protocol">Operator Protocol</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-protocol-operator</dd>
+            <dt>name</dt><dd>Operator Protocol</dd>
+            <dt>description</dt><dd>How to become an Operator through application, assessment, and approval for ongoing operational work streams.</dd>
+            <dt>initializationEvent</dt><dd>Operations Team established; operational infrastructure needs identified.</dd>
+            <dt>associatedFunctions</dt><dd>coordination, resource allocation, learning</dd>
+            <dt>associatedRoles</dt><dd>Operator, Member</dd>
+            <dt>relatedMembranes</dt><dd>Operations Team, Community Assembly</dd>
+          </dl>
+        </details>
+        <p><strong>Purpose</strong>: Define how individuals become Operators through application, assessment, and approval for ongoing operational work streams related to commons infrastructure, facilities, and programs.</p>
+        <p><strong>Initialization</strong>: The protocol activates when the Operations Team is established and operational infrastructure needs are identified, enabling the Operator application process.</p>
+        <p><strong>Participants</strong>: Prospective Operators submit applications; Steward Council evaluates and approves; Operations Team provides operational guidance and oversight.</p>
+        <p><strong>Application Process</strong>: Individuals submit applications with operational skills assessments and proposed scope of work. Applications should demonstrate relevant experience in infrastructure management, facilities operations, or program coordination.</p>
+        <p><strong>Assessment &amp; Approval</strong>: The Steward Council evaluates applications based on demonstrated operational skills, capacity for ongoing work, and alignment with identified infrastructure needs. Approval is based on demonstrated capabilities and current operational requirements.</p>
+        <p><strong>Role Assignment</strong>: Upon approval, Operators receive Hats credentials with defined operational scope and responsibilities. The role is scoped to specific operational work streams and infrastructure areas.</p>
+        <p><strong>Execution &amp; Monitoring</strong>: Operators perform operational work streams within their approved scope, maintaining infrastructure and facilities. Regular performance reviews, infrastructure status reporting, and operational metrics tracking ensure quality and accountability.</p>
+        <p><strong>Renewal &amp; Continuity</strong>: Periodic review and renewal processes ensure Operators maintain performance standards and meet evolving infrastructure needs. Roles may be adjusted, expanded, or transitioned based on operational requirements and community feedback.</p>
+        <p><strong>Steps:</strong> <strong>Application → Assessment → Approval → Role Assignment → Execution → Monitoring → Renewal</strong></p>
+        <h3 id="asset-protocols">Asset Protocols</h3>
+        <h4 id="brand-usage-protocol">Brand Usage Protocol</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-protocol-brand</dd>
+            <dt>name</dt><dd>Brand Usage Protocol</dd>
+            <dt>description</dt><dd>Access, fair-use guidance, certified use approvals, and revocation processes protecting brand integrity.</dd>
+            <dt>initializationEvent</dt><dd>Brand assets committed to Commons custody.</dd>
+            <dt>associatedFunctions</dt><dd>culture, decision making, coordination</dd>
+            <dt>associatedRoles</dt><dd>Licensed Partner, Steward (Multisig)</dd>
+            <dt>relatedMembranes</dt><dd>Steward Council, Community Assembly</dd>
+          </dl>
+        </details>
+        <p><strong>Purpose</strong>: Protect Regen Commons brand integrity while enabling legitimate, commons‑aligned use.</p>
+        <p><strong>Initialization</strong>: The protocol becomes active when Regen Commons brand assets are utilized.</p>
+        <p><strong>Participants</strong>: Licensed Partners and Members engage the brand; Stewards oversee guidance, approvals, and enforcement.</p>
+        <p><strong>Generic Fair Use</strong>: Anyone may use the Regen Commons brand within the published fair‑use guidance and the Commons conditional use license, without a bespoke approval. Community members help observe and uphold the guidance.</p>
+        <p><strong>Monitoring &amp; Enforcement</strong>: Misuse triggers the conflict pathway first (dialogue and mediation). If unresolved, stewards may revoke membership on‑chain. Stewards periodically update guidance and criteria with community input.</p>
+        <p><strong>Steps:</strong> Generic Fair Use (permissionless): anyone may adopt Regen use patterns that comply with published fair-use guidelines and the Commons conditional use license; Certified Regen (consented): steward-led consent process for certified/narrow uses; values alignment assessment; appeals available; Credentialing: issue non-transferable brand access credential; record terms; royalties logged where relevant; Monitoring &amp; Enforcement: transparent oversight; conflict pathway first; revoke credential if misuse persists; Governance: stewards support cyclical revisions to fair-use guidance and certified criteria; members may propose changes</p>
+        <h4 id="constitution-protocol">Constitution Protocol</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-protocol-constitution</dd>
+            <dt>name</dt><dd>Constitution Protocol</dd>
+            <dt>description</dt><dd>Adoption, amendment, and publication process for the Constitution.</dd>
+            <dt>initializationEvent</dt><dd>MVP Constitution proposed for adoption by Steward Council.</dd>
+            <dt>associatedFunctions</dt><dd>decision making, culture, learning</dd>
+            <dt>associatedRoles</dt><dd>Member, Steward (Multisig)</dd>
+            <dt>relatedMembranes</dt><dd>Community Assembly, Steward Council</dd>
+          </dl>
+        </details>
+        <p><strong>Purpose</strong>: Provide a clear and participatory path for adopting and amending the Constitution.</p>
+        <p><strong>Initialization</strong>: The MVP Constitution is proposed by the interim Steward Council (current Coordination team) for adoption, after which any amendments use this protocol.</p>
+        <p><strong>Participants</strong>: Members and Stewards co‑steward constitutional changes; the Community Assembly provides input on proposed decisions to determine if safe enough for adoption via advice process, or requires consent.</p>
+        <p><strong>Continuity</strong>: Historical versions remain accessible, preserving institutional memory and legitimacy.</p>
+        <p><strong>Steps/ Change Flow</strong>: A proposal presents redlines and rationale. An advice window gathers feedback; authors iterate. Consent thresholds follow the Decision‑Making Protocol (e.g., assembly consent for major changes). Upon approval, redlines are merged, Constitution links are updated, and a change log entry is published.</p>
+        <h4 id="ip-protocol">IP Protocol</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-protocol-ip</dd>
+            <dt>name</dt><dd>IP Protocol</dd>
+            <dt>description</dt><dd>Intake, peer review, attribution, licensing, and protection for contributed IP and knowledge.</dd>
+            <dt>initializationEvent</dt><dd>Governance Forum open for submissions; legal framework initialized.</dd>
+            <dt>associatedFunctions</dt><dd>learning, coordination, culture</dd>
+            <dt>associatedRoles</dt><dd>Member, Project Lead, Steward (Multisig)</dd>
+            <dt>relatedMembranes</dt><dd>Community Assembly</dd>
+          </dl>
+        </details>
+        <p><strong>Purpose</strong>: Provide a clear path to share knowledge and IP into the commons with proper review, attribution, and protection.</p>
+        <p><strong>Initialization</strong>: The Governance Forum is open for submissions and the legal framework for conditional use is in place.</p>
+        <p><strong>Participants</strong>: Members submit works; contributors and gardeners support peer review; Stewards ensure records and alignment.</p>
+        <p><strong>Submission &amp; Review</strong>: Authors submit works with attribution and licensing intent, agreeing to the Commons conditional use license. The community conducts an advice + peer review process and records the acceptance decision.</p>
+        <p><strong>Acceptance &amp; Record</strong>: Upon acceptance, contributions become non‑revocable commons records. Licenses/credentials are issued and works are published with clear attribution.</p>
+        <p><strong>Access Changes</strong>: Authors may request access changes for unaccepted submissions. Accepted works remain in the commons record for continuity and legitimacy.</p>
+        <p><strong>Steps:</strong> Submit IP/knowledge with attribution and licensing intent; agree to Commons conditional use license; Peer review/advice (contributors/gardeners); document acceptance decision; Once accepted: contribution is non-revocable; record license/credential; publish to repository with attribution; Access withdrawal: contributors may request access changes to unaccepted submissions; accepted works remain in commons record</p>
+        <h4 id="publishing-protocol">Publishing Protocol</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-protocol-publishing</dd>
+            <dt>name</dt><dd>Publishing Protocol</dd>
+            <dt>description</dt><dd>Public documentation of proposals, decisions, and learnings for legitimacy and transparency.</dd>
+            <dt>initializationEvent</dt><dd>Governance Forum activated; roles onboarded.</dd>
+            <dt>associatedFunctions</dt><dd>culture, learning, coordination</dd>
+            <dt>associatedRoles</dt><dd>Member, Project Lead, Steward (Multisig)</dd>
+            <dt>relatedMembranes</dt><dd>Community Assembly, Steward Council</dd>
+          </dl>
+        </details>
+        <p><strong>Purpose</strong>: Ensure proposals, decisions, project learnings, and constitutional changes are visible and traceable.</p>
+        <p><strong>Initialization</strong>: The Governance Forum is activated and roles are onboarded to publishing responsibilities.</p>
+        <p><strong>Participants</strong>: Members and Project Leads publish; Stewards ensure completeness and continuity of records.</p>
+        <p><strong>Legitimacy &amp; Access</strong>: Publishing supports transparency and legitimacy. Public read‑access is preferred; sensitive details are redacted per policy where necessary.</p>
+        <p><strong>Steps/ Publishing Flow</strong>: Proposals are posted with context, scope, and requested actions. Decisions are recorded with rationale, evidence of consent/vote, and execution links. Project reports and retrospectives are archived and tagged for discovery. Constitutional and protocol changes are logged with diffs and dates.</p>
+        <h4 id="treasury-management-protocol">Treasury Management Protocol</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-protocol-treasury</dd>
+            <dt>name</dt><dd>Treasury Management Protocol</dd>
+            <dt>description</dt><dd>Tiered financial decision-making and execution for the Commons treasury.</dd>
+            <dt>initializationEvent</dt><dd>Treasury multi-sig configured; stewards elected.</dd>
+            <dt>associatedFunctions</dt><dd>resource allocation, coordination, decision making</dd>
+            <dt>associatedRoles</dt><dd>Steward (Multisig), Project Lead</dd>
+            <dt>relatedMembranes</dt><dd>Steward Council, Project</dd>
+          </dl>
+        </details>
+        <p><strong>Purpose</strong>: This protocol establishes clear, tiered pathways for making and executing financial decisions from the Commons treasury.</p>
+        <p><strong>Initialization</strong>: The protocol activates when the treasury multisig is configured and stewards are credentialed.</p>
+        <p><strong>Participants</strong>: Stewards lead treasury execution; Project Leads request releases after milestone verification; members participate in mid‑ and high‑tier approvals.</p>
+        <p><strong>Tiers &amp; Approvals</strong>: Operational expenditures under a defined threshold are handled through delegated role‑based discretion. Mid‑tier allocations use an advice process followed by a quadratic vote by credentialed members; approved votes authorize the multisig to execute. Strategic allocations require collective consent (assembly/council) and execute via on‑chain timelock.</p>
+        <p><strong>Transparency &amp; Records</strong>: All allocations, votes, and transactions are published with sufficient detail to enable auditability and community oversight.</p>
+        <p><strong>Steps:</strong> Ops Tier (&lt; threshold): role-based discretion (e.g., Treasurer Hat); direct multisig execution; Project-Tier: advice + quadratic vote by credentialed members; multisig executes approved tx; Strategic Tier: collective consent (assembly/council) for major allocations; timelocked execution; Transparency: publish allocations and reports; maintain on-chain records.</p>
+        <h3 id="membrane-protocols">Membrane Protocols</h3>
+        <h4 id="steward-council-protocol">Steward Council Protocol</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-protocol-steward council</dd>
+            <dt>name</dt><dd>Steward Council Protocol</dd>
+            <dt>description</dt><dd>Lifecycle for Council decision-making, including proposal, approval, execution, and transparent reporting.</dd>
+            <dt>initializationEvent</dt><dd>Council convenes with elected/appointed Stewards and decision-making protocol in force.</dd>
+            <dt>associatedFunctions</dt><dd>decision making, role-based authority, oversight, resource allocation, transparency</dd>
+            <dt>associatedRoles</dt><dd>Steward, Operator, Commons Member (advice giver)</dd>
+            <dt>relatedMembranes</dt><dd>Steward Council, Commons Members Assembly, Operations Team</dd>
+          </dl>
+        </details>
+        <p><strong>Purpose</strong>: Establish legitimate stewardship selection through phased governance approach: initial elected Steward Council during Foundation Period to ensure organizational stability and cultural coherence, transitioning to sortition-based selection to prevent power concentration while ensuring competency and distributed authority.</p>
+        <p><strong>Initialization</strong>: Change in role state proposed, either through nomination period or electoral process as appropriate to current governance phase.</p>
+        <p><strong>Requirements</strong>: Active Member in good standing; availability for meetings and transaction signing when necessary; demonstrable trust and process/treasury competency; commitment to transparency and Conflict Protocol; capacity to facilitate governance infrastructure development and member enculturation.</p>
+        <p><strong>Participants</strong>: Seed Members conduct Foundation Period election; Community Assembly provides nominations and advice in subsequent phases; eligible Members may be nominated or self-nominate; selected Stewards receive credentials and permissions.</p>
+        <h5 id="selection-phases">Selection Phases</h5>
+        <h6 id="phase-1-foundation-period-months-0-6-minimum">Phase 1: Foundation Period (Months 0-6, Minimum)</h6>
+        <p><strong>Higher Barrier Steward Selection</strong> — Designed to ensure organizational stability, treasury security, and governance capacity development during critical formation phase.</p>
+        <p><strong>Initial Election</strong>: Seed Members nominate and elect Interim Steward Council (five to seven members) for minimum six-month term via democratic voting mechanism (e.g., Snapshot or equivalent platform). This establishes initial legitimacy and accountability while foundational membership cohort is being established.</p>
+        <p><strong>Term Duration</strong>: Interim Steward Council serves minimum six-month term, extendable by Seed Member determination until such time as:</p>
+        <ol>
+          <li>Foundation Period objectives are substantially achieved</li>
+          <li>Membership cohort demonstrates adequate cultural coherence and governance literacy</li>
+          <li>Infrastructure for sortition-based selection is operationally ready</li>
+        </ol>
+        <p><strong>Foundation Period Responsibilities</strong>: Interim Steward Council bears enhanced responsibility for:</p>
+        <ul>
+          <li>Designing and supporting member enculturation processes and ritualized onboarding events</li>
+          <li>Developing governance agreements and decision-making infrastructure</li>
+          <li>Preparing sortition mechanisms and selection criteria</li>
+          <li>Ensuring foundational members develop functional literacy in constitutional frameworks</li>
+          <li>Stewarding treasury with heightened accountability during formation phase</li>
+          <li>Facilitating participatory business model development</li>
+        </ul>
+        <h6 id="phase-2-transition-to-distributed-governance-month-6">Phase 2: Transition to Distributed Governance (Month 6+)</h6>
+        <p><strong>Lower Barrier Steward Selection</strong> — Concurrent with elevation of membership admission barriers, stewardship selection barriers are lowered to democratize governance participation.</p>
+        <p><strong>Nomination Process</strong>: Following Foundation Period, peer nomination process opens where eligible Members may be nominated or self-nominate based on demonstrated participation, competency signals, and alignment with Purpose and Values.</p>
+        <p><strong>Community Advice</strong>: Community Assembly provides advice on nominations, selection criteria, and governance needs during open advice period.</p>
+        <p><strong>Sortition-Based Selection</strong>: Random selection from nominated pool employs weighted criteria including:</p>
+        <ul>
+          <li>Participation history and contribution patterns recorded in registry</li>
+          <li>Trust signals and peer attestations</li>
+          <li>Relevant expertise and demonstrated competencies</li>
+          <li>Commitment to term obligations</li>
+        </ul>
+        <p>This approach prevents popularity contests and power consolidation while ensuring distributed authority and ongoing competency.</p>
+        <p><strong>Role Assignment</strong>: Selected Stewards receive multi-signature permissions (Gnosis Safe signer access) and Hats credentials with appropriate scope and authority for treasury management and governance execution.</p>
+        <p><strong>Term Management</strong>: Post-Foundation Period Stewards serve defined terms (typically nine months) with staggered rotation to ensure continuity. Terms may be renewed through sortition process. Early removal requires two-thirds (2/3) vote of Members. Regular accountability cycles maintain quality and legitimacy.</p>
+        <p><strong>Transition Protocol</strong>: Outgoing Stewards transfer knowledge, context, and permissions to incoming cohort through structured handoff processes, ensuring smooth governance continuity and institutional memory preservation.</p>
+        <p><strong>Steps</strong>:</p>
+        <p><strong>Foundation Period</strong>: <strong>Nomination → Candidate Statements → Election by Seed Members → Term Confirmation → Role Assignment → [Ongoing Service] → Transition or Extension Determination</strong></p>
+        <p><strong>Post-Foundation</strong>: <strong>Nomination Period → Community Advice → Sortition Selection → Credential Issuance → Term Service → Renewal or Transition</strong></p>
+        <h4 id="commons-member-assembly-protocol">Commons Member Assembly Protocol</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-protocol-commons-assembly</dd>
+            <dt>name</dt><dd>Commons Members Assembly Protocol</dd>
+            <dt>description</dt><dd>Lifecycle for Assembly engagement, including proposal development, advice processes, and relationship building.</dd>
+            <dt>initializationEvent</dt><dd>Monthly Assembly call announced and agenda published in Governance Forum.</dd>
+            <dt>associatedFunctions</dt><dd>input gathering, proposal development, consent/voting, steward selection, relationship building</dd>
+            <dt>associatedRoles</dt><dd>Member, Seed Member, Steward, Facilitator</dd>
+            <dt>relatedMembranes</dt><dd>Commons Members Assembly, Steward Council, Project</dd>
+          </dl>
+        </details>
+        <p><strong>Purpose</strong>: This protocol defines how the Assembly convenes members, participates in governance, and serves as the primary forum for collective input, relationship building, and legitimacy.</p>
+        <p><strong>Initialization</strong>: Monthly community calls are announced and facilitated by Stewards or delegated facilitators. Agenda includes updates, input gathering, and proposals.</p>
+        <p><strong>Participants</strong>: Seed Members, Members, and Stewards (all credentialed Commons members).</p>
+        <p><strong>Proposal &amp; Approval</strong>: Any member can bring forward a proposal or recommendation. Proposals are shared in advance in the Governance Forum. Temperature checks and consensus-building guide refinement. Final approvals depend on decision type per Decision Protocol: advice, consent, role-based authority, or voting.</p>
+        <p><strong>Execution &amp; Funding</strong>: Once approved, execution follows the appropriate operational or project protocol. Members may join as contributors; funding follows the Treasury Management Protocol.</p>
+        <p><strong>Reporting &amp; Closeout</strong>: Updates are shared in subsequent Assembly calls. Reports and learnings are archived in the Governance Forum for transparency and iteration.</p>
+        <p><strong>Steps: Idea → Discussion → Temperature Check → Proposal Drafted → Community Input → Steward Council Consideration / Consent / Assembly Vote → Approved / Declined.</strong></p>
+        <h4 id="project-team-protocol">Project Team Protocol</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-protocol-project</dd>
+            <dt>name</dt><dd>Project Protocol</dd>
+            <dt>description</dt><dd>Lifecycle for scoped initiatives, including proposal, approval, execution, and reporting.</dd>
+            <dt>initializationEvent</dt><dd>Commons opens project intake process.</dd>
+            <dt>associatedFunctions</dt><dd>decision making, resource allocation, coordination, learning</dd>
+            <dt>associatedRoles</dt><dd>Project Lead, Project Participant, Steward</dd>
+            <dt>relatedMembranes</dt><dd>Project, Steward Council, Community Assembly</dd>
+          </dl>
+        </details>
+        <p><strong>Purpose</strong>: This protocol defines how scoped initiatives are proposed, approved, executed, and closed, ensuring clarity, accountability, and learning.</p>
+        <p><strong>Initialization</strong>: The Steward Council announces project intake aligned to strategic priorities and opens the Governance Forum to receive proposals.</p>
+        <p><strong>Participants</strong>: Project Leads, Project Participants, and Stewards execute this protocol; the Community Assembly contributes advice and context.</p>
+        <p><strong>Proposal &amp; Approval</strong>: A Project Lead submits a proposal outlining scope, milestones, governance plan, and budget. The community offers advice; projects with funding associated follow the Treasury Management Protocol. Approved projects are credentialed, and milestones are recorded for tracking.</p>
+        <p><strong>Execution &amp; Funding</strong>: Funds are released by milestones via the Treasury Management Protocol. Stewards execute on‑chain transactions after approvals. The Project Lead coordinates contributors, reporting progress and variances.</p>
+        <p><strong>Reporting &amp; Closeout</strong>: On completion, the Project Lead publishes a report and retrospective to the Governance Forum. Learning is captured for reuse, and the project is formally closed.</p>
+        <p><strong>Steps: Prospect → Proposed → Planning → Active → Acceptance → Paused → Reflecting → Complete → Cancelled → Declined.</strong></p>
+        <h4 id="operations-team-protocol">Operations Team Protocol</h4>
+        <details class="const-meta">
+          <summary>Metadata</summary>
+          <dl class="const-meta-list">
+            <dt>id</dt><dd>RC-protocol-operations-team</dd>
+            <dt>name</dt><dd>Operations Team Protocol</dd>
+            <dt>description</dt><dd>Lifecycle for operational work streams, including proposal, prioritization, execution, and reporting.</dd>
+            <dt>initializationEvent</dt><dd>Operator Leads convene for regular check-ins or infrastructure planning session.</dd>
+            <dt>associatedFunctions</dt><dd>operational planning, infrastructure maintenance, resource allocation, program management</dd>
+            <dt>associatedRoles</dt><dd>Operator Lead, Steward (oversight), Contributor</dd>
+            <dt>relatedMembranes</dt><dd>Operations Team, Steward Council, Project</dd>
+          </dl>
+        </details>
+        <p><strong>Purpose</strong>: This protocol defines how the Operations Team manages Commons infrastructure, coordinates operational work streams, and responds to emergent needs.</p>
+        <p><strong>Initialization</strong>: The Operations Team is composed of domain-specific Operator Leads. Domains may include Project Review, Member Review, or others as defined. Regular check-ins and planning sessions are scheduled by Operators.</p>
+        <p><strong>Participants</strong>: Operator Leads, supporting contributors, and relevant Stewards for alignment.</p>
+        <p><strong>Proposal &amp; Approval</strong>: Operational needs and improvements are proposed within domains. Operator Leads prioritize based on capacity and urgency. For resource-intensive or cross-domain actions, the Steward Council reviews and approves.</p>
+        <p><strong>Execution &amp; Funding</strong>: Operators coordinate day-to-day execution within their domains. Resource allocation and infrastructure budgets are managed under the Treasury Management Protocol with Steward sign-off where required.</p>
+        <p><strong>Reporting &amp; Closeout</strong>: Operators provide regular status reports to the Steward Council and the Commons Members Assembly. Completed operational initiatives are documented for continuity and future reference.</p>
+        <p><strong>Steps: Identified Need → Proposal Drafted → Operator Review → Approved / Declined → Implementation → Status Reporting → Retrospective.</strong></p>
       </section>
 
-      <section id="building-blocks" aria-labelledby="blocks-title">
-        <h2 id="blocks-title">Building blocks</h2>
-        <p>The fundamental categories and building blocks we use to name, organize, and relate to ourselves. This section defines the core objects within the Commons&rsquo; operational reality.</p>
-
-        <h3 id="asset-definition">Asset</h3>
-        <p>This object defines an asset owned or managed by the Commons. Assets can be financial, digital, reputational, or intellectual property. Each asset is stewarded by one or more roles and governed by specific protocols.</p>
-
-        <h3 id="membrane-definition">Membrane</h3>
-        <p>Boundaries that regulate participation, permissions, and trust thresholds. Membranes are semi-permeable boundaries that define coherent units of action, intention, and collaboration. Each membrane has entry/exit criteria, maintains appropriate internal governance, is accountable to values and protocols, and can steward its own subset of assets, roles, and responsibilities.</p>
-
-        <h3 id="protocol-definition">Protocol</h3>
-        <p>The core life processes required to sustain and evolve the organism. This object defines a protocol, which is a repeatable, documented process for coordinating action within the Commons.</p>
-
-        <h3 id="role-definition">Role</h3>
-        <p>Containers of agency and responsibility within the organization. This object defines a role within the Commons. Roles are distinct sets of responsibilities and permissions that can be held by members. They are the building blocks of the organization&rsquo;s structure.</p>
-
-        <div class="const-notes">
-          <p>Notes for readers, not part of the constitution:</p>
-          <p><strong>Multisig:</strong> a shared account that needs several stewards to approve before funds move. Gnosis Safe is one such account.</p>
-          <p><strong>Hats role:</strong> an on-chain record of who holds a role. The constitution plans for these; they are not yet in use.</p>
-        </div>
-      </section>
+      <aside class="const-notes" aria-label="Notes for readers">
+        <p>Notes for readers, not part of the constitution:</p>
+        <p><strong>Lazy consent:</strong> a proposal goes ahead unless someone objects within a set time.</p>
+        <p><strong>Quadratic vote:</strong> each extra vote a member puts on the same option costs more than the last, so strong preferences count without letting a few voices dominate.</p>
+        <p><strong>Sortition:</strong> choosing people by a random draw from a pool. The constitution plans to weight the draw by participation, trust signals and expertise.</p>
+        <p><strong>Multisig:</strong> a shared account that needs several stewards to approve before funds move. Gnosis Safe is one such account.</p>
+        <p><strong>Timelock:</strong> a set wait between approving a transaction and carrying it out, which leaves time to review or stop it.</p>
+        <p><strong>Hats role:</strong> an on-chain record of who holds a role. The constitution plans for these; they are not yet in use.</p>
+        <p><strong>EAS registry:</strong> a list of members and their status kept with the Ethereum Attestation Service, which the constitution plans to use.</p>
+      </aside>
     </article>
   </main>
 
