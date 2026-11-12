@@ -576,4 +576,14 @@ keyboard focus. Desktop (1280px) and mobile (390px) rendering are verified in
 light/dark themes, with no horizontal overflow or browser warnings/errors.
 Keyboard focus moves through the partner links to the constitution, which opens
 the correct page. `npm run check`, all 88 tests, and `npm run smoke` pass.
-Production delivery is pending.
+Production delivery is complete: runtime commit
+`ee4727928f9759ed239602cb3a35dd282bd47bc3` is READY on Vercel deployment
+`dpl_E6TmrMZXZ9htQyVik9Gjnm6igsQh`, aliased to `regencommons.com`.
+The live About HTML matches the committed file byte-for-byte. Live desktop and
+390px mobile checks confirm the partner links are underlined and there is no
+horizontal overflow; all four constitution links (three prose and one card) are
+present. The origins constitution link opens the live constitution page. Browser
+warnings/errors are empty. No live submissions or provider data writes were needed.
+
+Rollback target: `dpl_HPCcJDbCBqssFqTRwEVWz1Nsu6eS`. The task branch remains
+`codex/about-contact`; main is unchanged. No CI run exists for this revision.
