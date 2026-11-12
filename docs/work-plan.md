@@ -425,4 +425,14 @@ overflow, 16px input text, keyboard focus and required-field validation. A faile
 synthetic save retained the draft and succeeded on retry. Membership card padding
 and responsive layout are preserved. Local guidance retrieval remains unavailable;
 this change follows the existing native controls and repository styles without
-refreshing the online guidance package. Production publication is pending.
+refreshing the online guidance package.
+
+**Released:** website `62dab2226af5fc31ce821bc21827f09680f12bea` is production
+READY as `dpl_HpzZQDJB1D6zBbQfuLK45xL6GLDN`, aliased to `regencommons.com`.
+Live About, membership HTML and shared CSS bytes match the tested source. Live
+in-app Chromium checks confirm the shared card and fields at desktop/mobile
+widths, with no horizontal overflow or console errors. The release’s runtime
+error/fatal scan was empty. No new live contact message was submitted; the
+previous contact delivery verification remains the integration evidence.
+Rollback target: `dpl_M7scijv6VWicdTpBhTToAtfz4ehj`. The published task branch
+remains separate from main; no PR or CI run exists for this revision.
