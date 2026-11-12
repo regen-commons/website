@@ -354,3 +354,331 @@ The separate draft PR owns publication and current-head CI results. The migratio
 is unapplied and automatic production dispatch remains a release verification step.
 
 Contract and release limits: [membership decision emails](membership-decision-emails.md).
+
+## About and contact messages — live, 11 November 2026
+
+Scope: one organization per line with verified links; a private contact form on
+About; Supabase persistence and retry identities; an authorized Messages inbox in
+`/council`; minimal Telegram alerts through the existing agent. Sender addresses
+and message bodies remain in the dashboard. Contact intake does not create a
+membership application or a public profile. The agent’s stale Notion link label
+will be corrected in its repository, with a separate review of Weave integration.
+
+Acceptance: validate and bound input, save before notifying, deduplicate retries,
+show truthful success/failure feedback, deny anonymous and non-steward reads,
+clear private UI on sign-out, and verify desktop/mobile keyboard flows. Delivery
+uncertainty must remain visible without an automatic duplicate Telegram send.
+Hosted migration, deployment and real delivery remain separate release steps.
+
+**Evidence:** website check, 88 tests and HTTP smoke pass. All migrations and
+nine SQL suites pass in disposable PostgreSQL 17. Rendered in-app Chromium
+fixtures cover desktop/mobile organization rows, contact submission and retry,
+and private inbox/detail. See [contract and verification](contact-messages.md).
+The companion agent adds accurate dashboard labels and contact alerts, fixes
+two installed-SDK failures, and records a review and Weave recommendations in
+its `docs/agent-review.md`. Hosted migration, publication and real Telegram
+delivery remain pending; local checks do not establish those outcomes.
+
+**Authorized production release:** the contact migration is applied to Platform,
+and both the agent and website are production READY. A real About-form test is
+saved and visible in the authenticated council inbox; the agent acknowledged
+Telegram delivery and the dashboard shows Sent. Anonymous access checks passed.
+The clearly marked synthetic record is retained for user review. See the
+[hosted release record](contact-messages.md#hosted-release--11-november-2026) for
+commits, deployments, migration, evidence and rollback targets. Releases use the
+published task branches; neither main branch has been merged.
+
+## Council sign-in and filtering polish — live, 11 November 2026
+
+Keep the sign-in card steady across email, code, loading and ordinary error
+states by reserving the forms’ natural height and feedback space. Retain native
+dropdowns with an inset, theme-aware arrow. Membership type/state changes apply
+immediately; search applies after a brief typing pause or Enter, without moving
+focus away from the control. Preserve stale-request guards and reset pagination
+when filters change. Verification covers desktop/mobile card geometry, keyboard
+filtering, empty/error/retry states and the required repository checks.
+
+**Evidence:** check, all 88 tests and HTTP smoke pass. Rendered in-app Chromium
+fixtures at 1280px and 390px confirm equal sign-in card height across email, code
+and invalid-code states, automatic type/state filtering, search after a typing
+pause and Enter, focus retention, filtered-empty feedback, and failed-read retry.
+Both themes show inset dropdown arrows without horizontal overflow. See the
+[council usability record](steward-verification.md#council-usability--11-november-2026).
+
+**Released:** website `5dd6b20` is production READY. Live asset bytes match the
+verified source, and the authenticated dashboard confirmed automatic search,
+focus retention, the removed button, padded arrows and recovery to the full
+queue after clearing the verification search. The existing session was retained.
+See the [hosted usability release](steward-verification.md#hosted-usability-release).
+
+
+## Contact form visual consistency — 11 November 2026
+
+Use the membership form’s existing card, field spacing, display labels, serif
+inputs, textarea and organic button on About. Move the card rules into the shared
+stylesheet so both forms use one definition, including mobile padding. Preserve
+contact validation, private submission and retry behavior.
+
+**Evidence:** check, all 88 tests and HTTP smoke pass. Rendered in-app Chromium
+fixtures at 1280px and 390px confirm the shared styles, both themes, no horizontal
+overflow, 16px input text, keyboard focus and required-field validation. A failed
+synthetic save retained the draft and succeeded on retry. Membership card padding
+and responsive layout are preserved. Local guidance retrieval remains unavailable;
+this change follows the existing native controls and repository styles without
+refreshing the online guidance package.
+
+**Released:** website `62dab2226af5fc31ce821bc21827f09680f12bea` is production
+READY as `dpl_HpzZQDJB1D6zBbQfuLK45xL6GLDN`, aliased to `regencommons.com`.
+Live About, membership HTML and shared CSS bytes match the tested source. Live
+in-app Chromium checks confirm the shared card and fields at desktop/mobile
+widths, with no horizontal overflow or console errors. The release’s runtime
+error/fatal scan was empty. No new live contact message was submitted; the
+previous contact delivery verification remains the integration evidence.
+Rollback target: `dpl_M7scijv6VWicdTpBhTToAtfz4ehj`. The published task branch
+remains separate from main; no PR or CI run exists for this revision.
+
+
+## Public form consistency and centered contact — 11 November 2026
+
+- Feedback uses the membership card, display labels, checkbox grid, textarea,
+  hints and organic button, while keeping category selection and page context.
+- Both seed entry points use the membership textarea and organic button. Keep
+  their existing card colors/layouts and inherit control text from each card.
+- Center the About contact card, heading and introduction; keep field text left
+  aligned. Respect reduced motion for organic buttons and seed card pulsing.
+- Verify desktop/mobile, both themes, keyboard validation, error/retry and save
+  feedback with synthetic fixtures. Run check, tests and smoke before releasing.
+- Deploy the verified website revision, compare live assets and inspect the
+  rendered public forms. Live submissions are unnecessary for this visual change.
+
+**Rendered fixture evidence:** in-app Chromium at 1280px and 390px covers all
+four affected pages in both themes, shared 16px textarea controls, organic
+buttons, card palettes, no horizontal overflow, keyboard checkbox selection,
+required-field focus, and contact-card centering (zero-pixel center offset).
+Feedback and Seeds retain drafts through a forced failed save and succeed on
+retry. Mobile Learn saves by keyboard and hands off to the planted-seed screen.
+Console checks are clean. The browser reports no reduced-motion preference;
+CSSOM inspection confirms animation removal for buttons and seed cards under
+that media query, rather than claiming a rendered reduced-motion check.
+
+Local guidance tooling still cannot resolve its dev-surfaces module; this uses
+repository styles and native controls without refreshing the online package.
+Final check, all 88 tests and HTTP smoke pass.
+
+**Released:** website `d29d7e1927a140f36aaea3237e16f3fb49cb4fa2` is production
+READY as `dpl_7kMCaa2itHbKwKzKGtPkEW3Kcn2x`, aliased to `regencommons.com`.
+All seven changed HTML/JS/CSS assets match the tested source byte for byte.
+Live in-app Chromium confirms Feedback’s shared controls, both seed cards with
+organic buttons, and the centered contact card at desktop/mobile widths with
+zero center offset and no horizontal overflow. Live console and runtime
+error/fatal scans are empty. No live submissions were made for this visual
+release; save/retry checks used isolated synthetic fixtures.
+
+Rollback target: `dpl_HpzZQDJB1D6zBbQfuLK45xL6GLDN`. This release remains on
+`codex/about-contact`; main is unchanged. No PR or CI run exists for this revision.
+
+## Contact composition and membership navigation — 11 November 2026
+
+Move Get in touch and its introduction inside the centered contact card. Keep
+field text left aligned and place Send message at the right edge of the card’s
+content. Move Become a member into the Members governance card as a text link.
+Remove the separate membership button below Contact.
+
+Fix the membership navigation’s vertical alignment. Before the fix, the shared
+button’s 2.2rem top margin placed Continue’s center 19.8px below Back even though
+the row used align-items: center. Override that margin within navigation rows;
+verify Back/Continue and Back/Submit centers at desktop/mobile widths.
+
+Acceptance: heading/card association, one membership CTA in the intended card,
+right-aligned contact action, centered membership navigation, both themes,
+keyboard navigation and validation, no horizontal overflow, required checks,
+and verified production publication.
+
+**Rendered fixture evidence:** in-app Chromium at 1280px and 390px confirms
+heading/introduction inside the contact card, zero center offset for that card,
+and zero offset between Send message’s right edge and the textarea’s right edge.
+There is one Become a member link, inside Members; it opens `/join`. The separate
+CTA below Contact is gone. Both themes, keyboard focus, required-field rejection
+and horizontal overflow checks pass; console checks are clean.
+
+Membership Back/Continue and Back/Submit now have zero vertical center offset
+at desktop/mobile widths. Back remains on one line; mobile navigation uses
+smaller side padding and tracking so Submit application fits beside it at 390px.
+Synthetic navigation through all six steps and back/forward recovery pass.
+Local guidance retrieval remains unavailable because the dev-surfaces module is
+missing; no online guidance package was refreshed. The 320px navigation check
+also has zero center offset and no horizontal overflow. Final check, all 88 tests
+and HTTP smoke pass.
+
+**Released:** website `7aed67197544f15e505a78fc7a924aee97037784` is production
+READY as `dpl_EsLh55P3iBxeitAMqHnY5MuYTsiq`, aliased to `regencommons.com`.
+Hosted About, shared CSS and membership HTML match the tested source byte for
+byte. Live desktop/mobile checks confirm the contact heading inside the card,
+zero card-center/right-action offsets, one membership link in Members and no
+membership link in Contact. That link opens the live application, whose visible
+Continue button has zero top margin. Six-step navigation/alignment proof uses
+synthetic fixtures. Console and runtime error/fatal scans are empty. No live
+submissions were made for this layout release.
+
+Rollback target: `dpl_7kMCaa2itHbKwKzKGtPkEW3Kcn2x`. The release remains on
+`codex/about-contact`; main is unchanged. No PR or CI run exists for this revision.
+
+## About origins — 11 November 2026
+
+Add a short origins section immediately before the steward council. Describe the
+2025 shared-identity invitation, July–September participatory design process,
+and connection to the present foundation period. Use the existing prose-section
+layout. Avoid a precise founding day or turning proposed legal/funding structures
+into completed events; use organizational credits rather than private reflections
+or individual attribution.
+
+Source basis checked through connected Drive and public primary material:
+
+- [Early ETHDenver invitation](https://docs.google.com/document/d/1sPE3LtLtSPrSODFFQUaPHeoP8bGXvlACLyZC4Vi1bEg/edit):
+  documents the 2025 invitation and shared identity/IP commons purpose; its
+  prospective partnerships, legal structures and funding asks are not outcomes.
+- [Governance Activation Public Summary](https://drive.google.com/file/d/1fSNrk_kckPUnTCOpgly8Ot4puYH7slnR/view):
+  labeled Public; records July–September 2025, OpenCivics Labs/Greater Than
+  facilitation, workshops/feedback and constitutional work. The archive’s 2026
+  import/edit metadata does not date these events. Its legal-status and funding
+  assertions are not used.
+- [OpenCivics June 2025 report](https://broadcast.opencivics.co/p/opencivics-monthly-report-june-2025):
+  public contemporary corroboration that OpenCivics Labs and Greater Than were
+  preparing to co-lead the process. It does not establish later outcomes alone.
+
+The current foundation-period language matches the existing About page. Private
+coordination notes and raw retrieved files are not copied into this repository.
+**Verification:** source-to-copy review confirms the invitation/design chronology
+and organizational credits; the exact founding day remains unspecified. In-app
+Chromium at 1280px and 390px confirms readable prose in both themes, no horizontal
+overflow, and the heading order Intro → Our origins → The steward council →
+Governance → Contact. Origins immediately precedes the council in the document
+and accessibility tree. Console checks are clean. Check, all 88 tests and HTTP
+smoke pass. No new interactions, provider operations or dependencies were added.
+**Released:** website `03e80134ed3a60e5fa924c67497138531a554028` is production
+READY as `dpl_HPCcJDbCBqssFqTRwEVWz1Nsu6eS`, aliased to `regencommons.com`.
+The hosted About page matches the tested source byte for byte. Live in-app
+Chromium at 1280px and 390px confirms the three paragraphs and placement before
+the council, with no horizontal overflow or console errors. Runtime error/fatal
+scan is empty. No provider writes or live submissions were needed.
+
+Rollback target: `dpl_EsLh55P3iBxeitAMqHnY5MuYTsiq`. The task branch remains
+`codex/about-contact`; main is unchanged. No PR or CI run exists for this revision.
+
+## About origins links — 11 November 2026
+
+Link OpenCivics Labs to its official homepage (`www.opencivics.co`), which lists
+Labs, and Greater Than to `greaterthan.works`, which redirects to the collective’s
+legacy site. Both destinations return HTTP 200 after redirects. Link the three
+prose mentions of the constitution on About to the existing `/constitution`
+route (also HTTP 200). Reuse About’s theme-aware inline link treatment and native
+keyboard focus. Desktop (1280px) and mobile (390px) rendering are verified in
+light/dark themes, with no horizontal overflow or browser warnings/errors.
+Keyboard focus moves through the partner links to the constitution, which opens
+the correct page. `npm run check`, all 88 tests, and `npm run smoke` pass.
+Production delivery is complete: runtime commit
+`ee4727928f9759ed239602cb3a35dd282bd47bc3` is READY on Vercel deployment
+`dpl_E6TmrMZXZ9htQyVik9Gjnm6igsQh`, aliased to `regencommons.com`.
+The live About HTML matches the committed file byte-for-byte. Live desktop and
+390px mobile checks confirm the partner links are underlined and there is no
+horizontal overflow; all four constitution links (three prose and one card) are
+present. The origins constitution link opens the live constitution page. Browser
+warnings/errors are empty. No live submissions or provider data writes were needed.
+
+Rollback target: `dpl_HPCcJDbCBqssFqTRwEVWz1Nsu6eS`. The task branch remains
+`codex/about-contact`; main is unchanged. No CI run exists for this revision.
+
+## About organization links in new tabs — 11 November 2026
+
+OpenCivics Labs and Greater Than in Origins should open in new tabs. Inspection
+also found that council organization links still used the same tab, unlike the
+LinkedIn links. Apply native `target="_blank"`, `rel="noopener"` and an accessible
+new-tab label to both sets (13 links total), keeping constitution links internal.
+Rendered fixture proof confirms OpenCivics opens a separate tab with Enter and
+Greater Than opens a separate tab on click, with About preserved. Both destinations
+load successfully. All 13 links expose new-tab labels and `noopener`; all four
+constitution links retain same-tab navigation. Desktop (1280px) and mobile (390px)
+render correctly, with no mobile overflow or browser warnings/errors. Required
+`npm run check`, all 88 tests, and `npm run smoke` pass. Local modern-web guidance
+retrieval remains unavailable due to the missing dev-surfaces entrypoint; this
+uses existing native anchor conventions.
+
+Production is READY at `regencommons.com`, deployment
+`dpl_2LwvsV6oBGELeL65SmLbv81J1AfH`, runtime commit
+`59b561a33a3b2dcec548307b2441cefa8ef9f5fd`. Live keyboard/click activation
+opens OpenCivics and Greater Than in separate tabs with correct destination titles,
+while the original About tab remains open. The live HTML matches the released file
+byte-for-byte. Browser warnings/errors and deployment error/fatal logs are empty.
+Rollback target: `dpl_E6TmrMZXZ9htQyVik9Gjnm6igsQh`. No CI run exists for this
+revision; local required checks passed. Branch is `codex/about-contact`; main is
+unchanged.
+
+## Contact forum link in a new tab — 11 November 2026
+
+Make the Regen Commons forum link inside Get in touch open in a new tab using
+native `target="_blank"`, `rel="noopener"` and an accessible new-tab label,
+matching the other external About links. Verify keyboard activation, the loaded
+forum destination and preservation of the About page, rendered desktop/mobile
+layout, required checks and production delivery.
+
+Rendered fixture checks at 1280px and 390px confirm correct contact text wrapping
+and no mobile overflow. Enter opens a separate tab with the correct forum category
+and About preserved. The link has `noopener` and the accessible new-tab label.
+Browser warnings/errors are empty. `npm run check`, all 88 tests and
+`npm run smoke` pass.
+
+Production is READY on `regencommons.com`, deployment
+`dpl_C8wcHsf7uVKFRWLPcTtr27SV81S5`, runtime commit
+`38d568aa3c9965f552c6bcdb68e618502376e97c`. Live click verification opens
+“About the Regen Commons category” in a separate tab with About preserved.
+The live HTML matches the tested file byte-for-byte. Browser warnings/errors and
+deployment error/fatal logs are empty. Rollback target:
+`dpl_2LwvsV6oBGELeL65SmLbv81J1AfH`. No CI run exists for this revision;
+local required checks passed. Branch is `codex/about-contact`; main is unchanged.
+
+## Align governance card links — 11 November 2026
+
+Give Members, Steward council and Constitution matching bottom-aligned text links.
+Use flexible card columns so alignment survives wrapping and viewport changes.
+Shorten the Members description while preserving calls, discussions and advice on
+strategy/significant decisions. Add “Meet the council” pointing to the existing
+council section, with room below the fixed navigation when following the anchor.
+Rendered fixture checks at 1280px confirm equal card heights and identical link
+positions (zero vertical offset). Members/council descriptions use five lines,
+Constitution four. At 768px the first-row links stay aligned; at 390px and 320px
+cards stack with consistent 28px bottom gaps and no horizontal overflow. Light
+and dark theme rendering is verified. Keyboard focus follows the three card links
+with visible outlines; Become a member opens `/join`, Read the constitution opens
+`/constitution`, and Meet the council reaches the council heading 108px below the
+viewport top. Browser warnings/errors are empty. `npm run check`, all 88 tests and
+`npm run smoke` pass; the final prose adjustment was rechecked. Local guidance
+retrieval is still unavailable (missing dev-surfaces entrypoint); this uses native
+flex/grid and anchors.
+
+Production is READY on `regencommons.com`, deployment
+`dpl_9qYgbYV5iNgeFjzabCBMsAsnhpRB`, runtime commit
+`103fb9b6ff306172f85353e42ce28d8f4d2a37d6`. Live HTML matches the tested file
+byte-for-byte. Live desktop cards are all 282.57px high with identical link positions;
+light/dark visual checks pass. The new council link reaches its heading with 108px
+clearance. Browser warnings/errors are empty. Rollback target:
+`dpl_C8wcHsf7uVKFRWLPcTtr27SV81S5`. No CI run exists for this revision;
+local required checks passed. Branch is `codex/about-contact`; main is unchanged.
+
+## Remove unrequested council link — 11 November 2026
+
+Remove the added “Meet the council” link and its anchor-specific scroll margin.
+Keep the shortened Members description and the alignment of the two existing
+Members/Constitution links. The council card remains descriptive, as requested.
+Rendered fixture checks confirm the council card contains no links, while the
+Members and Constitution links have identical vertical positions at 1280px.
+All three card heights remain equal. At 390px there is no horizontal overflow.
+Browser warnings/errors are empty. `npm run check`, all 88 tests and
+`npm run smoke` pass.
+
+Correction is live and READY on `regencommons.com`, deployment
+`dpl_7FPCe94LLRNtCaytLJZAPdNxJtKe`, runtime commit
+`78fa932051b61893888cdc465d5e70fe3fc1eaf2`. The live HTML matches the corrected
+file exactly. Live rendered cards confirm no council link and identical positions
+for the two existing links. Rollback target: `dpl_9qYgbYV5iNgeFjzabCBMsAsnhpRB`.
+No CI run exists for this revision; local required checks passed. Branch is
+`codex/about-contact`; main is unchanged.

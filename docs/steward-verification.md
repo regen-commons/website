@@ -194,3 +194,56 @@ Dependency installation retained lockfile version 1 and pinned the Supabase SDK.
 tree (one high in `form-data`, four low). The new Supabase dependency was not
 named in those findings. Dependency remediation is separate from this slice;
 the existing `punycode` deprecation warning also remains.
+
+## Council usability — 11 November 2026
+
+The sign-in card now reserves the natural height of both forms in a shared grid
+row. The inactive form remains hidden from sight and keyboard/accessibility
+navigation. A three-line status area reserves space for loading and ordinary
+errors. This avoids a hard-coded card height or clipped messages. Native select
+controls have a theme-aware arrow inset 0.8rem from the edge and 2.5rem of end
+padding; forced-colors mode retains the platform arrow.
+
+Membership type and review-state changes apply immediately. Search applies after
+a 250ms typing pause or Enter. The Apply filters button is removed from the
+membership queue. Filter changes reset pagination, retain control focus and
+announce the result count. Pending search timers are cleared on navigation or
+sign-out, and existing generation guards continue rejecting stale read results.
+
+The code change does not alter authentication, authorization, membership rules
+or API contracts. Other content-management filters keep their existing behavior.
+No animation was introduced.
+
+`npm run check`, all 88 behavioral tests, and `npm run smoke` pass in the isolated
+dev machine. In-app Chromium rendered synthetic fixtures at desktop 1280px and
+mobile 390px. The desktop sign-in card stays at 512.36px and top 107.52px across
+email, code and invalid-code states. Mobile stays at 525.45px and top 160.68px
+across the same states. These figures include the closed fixture help panel.
+The inactive form is absent from the accessibility tree.
+
+Rendered filtering covered automatic organization selection, live name search,
+Enter, keyboard dropdown selection, search focus remaining in the field, clearing
+filters, no matches, a delayed read and a one-time 503 with a successful keyboard
+retry. Dark mobile and light desktop show padded arrows and no horizontal
+overflow. Local scenarios were reset to normal. The shared cached Modern Web
+Guidance entrypoint remains unavailable inside this machine; repository standards
+and rendered checks supplied the browser proof.
+
+### Hosted usability release
+
+Commit `5dd6b20baccfb629eeeaf0fbadadfcf94d4d01bc` on `codex/about-contact` is
+production READY as `dpl_M7scijv6VWicdTpBhTToAtfz4ehj`, with the existing
+`regencommons.com` alias. This is a website-only follow-up to the authorized
+release; no agent, schema or provider settings changed. The production HTML,
+`admin/app.js` and `admin/style.css` each returned 200 and matched the tested
+release bytes.
+
+After reloading the authenticated live dashboard, a deliberately unmatched search
+automatically showed the filtered-empty state, retained focus in Search and
+showed no Apply filters button. The dropdown end padding read back as 40px.
+Clearing search restored the existing full queue and kept focus in the field.
+The temporary verification search was removed. The live browser reported no
+warnings/errors, and its signed-in state was preserved. Existing tabs need one
+reload to replace their already-loaded script and stylesheet. Local geometry
+checks above establish the multi-step sign-in behavior; no further real sign-in
+codes or membership submissions were sent for this UI follow-up.

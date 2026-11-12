@@ -2,7 +2,7 @@
 export const pages = ["index.html", "learn.html", "map.html", "seeds.html", "join.html", "about.html", "constitution.html", "council.html", "feedback.html"];
 export const publicFiles = [...pages, "style.css", "theme-toggle.css", "design-tokens.css", "script.js", "canvas.js", "logo-canvas.js", "data-state.js", "seed-form.js", "admin/style.css", "admin/fonts.css", "admin/theme.js", "admin/app.js", "admin/membership.js",
   "fonts.css", "favicon.svg", "favicon-32.png", "apple-touch-icon.png", "robots.txt", "sitemap.xml",
-  "feedback-contract.js", "feedback-form.js",
+  "feedback-contract.js", "feedback-form.js", "contact-contract.js", "contact-form.js",
   "assets/share/home.png", "assets/share/learn.png", "assets/share/map.png",
   "assets/share/join.png", "assets/share/seeds.png", "assets/share/about.png", "assets/share/constitution.png",
   "assets/council/afolabi.webp", "assets/council/ellie.webp", "assets/council/eve.webp",

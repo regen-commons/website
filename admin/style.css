@@ -145,6 +145,19 @@ body:has(.login:not([hidden])) footer {
 body:has(.login:not([hidden])) .dev-banner {
   position: static;
 }
+/* Both sign-in steps contribute their natural height to one shared row. */
+.login-steps {
+  display: grid;
+}
+.login-steps > form {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+.login-steps > form[hidden] {
+  display: block !important;
+  visibility: hidden;
+  pointer-events: none;
+}
 .login .eyebrow {
   margin-bottom: 0.5rem;
 }
@@ -185,6 +198,23 @@ select {
   border-radius: var(--card-radius);
   background: var(--panel);
   color: var(--ink);
+}
+/* Keep the native select interaction, with room around a theme-aware arrow. */
+select {
+  appearance: none;
+  padding-inline-end: 2.5rem;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--ink-mid) 50%),
+    linear-gradient(135deg, var(--ink-mid) 50%, transparent 50%);
+  background-position: right 1.15rem center, right 0.8rem center;
+  background-size: 0.35rem 0.35rem;
+  background-repeat: no-repeat;
+}
+@media (forced-colors: active) {
+  select {
+    appearance: auto;
+    background-image: none;
+  }
 }
 input:user-invalid {
   border-color: var(--copper);
@@ -249,7 +279,6 @@ button:disabled {
 code {
   overflow-wrap: anywhere;
 }
-#login-message:empty,
 #load-message:empty {
   display: none;
 }
@@ -257,7 +286,8 @@ code {
   margin-top: 1rem;
 }
 .login #login-message {
-  margin-top: 0.75rem;
+  min-block-size: 4.5em;
+  margin: 0.75rem 0 0;
   font-size: 0.875rem;
   line-height: 1.5;
 }

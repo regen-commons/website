@@ -82,21 +82,22 @@
         private to the stewards. Please leave out passwords and other sensitive
         personal information.
       </p>
-      <form id="feedback-form" method="post" action="/api/feedback">
-        <fieldset>
-          <legend>
+      <form id="feedback-form" class="join-form-card" method="post" action="/api/feedback">
+        <fieldset class="join-field">
+          <legend class="join-label">
             What type of feedback is this?
             <span class="join-label-hint">(optional; select any)</span>
           </legend>
-          <div id="feedback-categories"></div>
+          <div id="feedback-categories" class="join-checkbox-grid"></div>
         </fieldset>
-        <div class="feedback-message">
-          <label for="feedback-message"
+        <div class="join-field">
+          <label class="join-label" for="feedback-message"
             >What’s your feedback?
             <span class="join-label-hint">(required)</span></label
           >
           <textarea
             id="feedback-message"
+            class="join-textarea"
             name="message"
             rows="6"
             required
@@ -104,7 +105,7 @@
             maxlength="5000"
             aria-describedby="feedback-help"
           ></textarea>
-          <p id="feedback-help" class="feedback-help">
+          <p id="feedback-help" class="join-hint feedback-help">
             Between 3 and 5,000 characters.
           </p>
         </div>
@@ -118,9 +119,9 @@
             autocomplete="off"
           />
         </div>
-        <p id="feedback-context" class="feedback-help"></p>
-        <button type="submit">
-          Send feedback <span aria-hidden="true">→</span>
+        <p id="feedback-context" class="join-hint feedback-help"></p>
+        <button type="submit" class="btn">
+          <span class="btn-label">Send feedback</span> <span aria-hidden="true">→</span>
         </button>
         <p id="feedback-status" role="status" aria-live="polite"></p>
         <noscript

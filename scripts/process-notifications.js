@@ -6,12 +6,13 @@ try {
     secret: process.env.SUPABASE_INTAKE_SECRET,
   });
   await provider.drain();
+  await provider.drainContact();
   console.log(
     "Notification batch completed. Delivery details remain in Supabase.",
   );
 } catch {
   console.error(
-    "Notification batch failed; inspect private.notification_jobs before retrying.",
+    "Notification batch failed; inspect private.notification_jobs and contact_messages delivery states before retrying.",
   );
   process.exitCode = 1;
 }

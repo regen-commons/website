@@ -178,6 +178,7 @@ export function createStewardFixtures({
   ]);
   const codes = new Map(),
     sessions = new Map();
+  const contactMessages = [];
   const notifications = [
     {
       id: "50000000-0000-4000-8000-000000000001",
@@ -405,6 +406,26 @@ export function createStewardFixtures({
             .map((m) => ({ id: m.id, name: m.name })),
         }));
     },
+    async messages(token, { offset = 0 } = {}) {
+      await this.authorize(token);
+      const items = [...contactMessages].sort(
+        (a, b) =>
+          b.submitted_at.localeCompare(a.submitted_at) ||
+          a.id.localeCompare(b.id),
+      );
+      return structuredClone({
+        items: items
+          .slice(offset, offset + 25)
+          .map(({ email, message, ...summary }) => summary),
+        total: items.length,
+      });
+    },
+    async message(token, id) {
+      await this.authorize(token);
+      const message = contactMessages.find((item) => item.id === id);
+      if (!message) throw new AdminError(404, "message_not_found");
+      return { message: structuredClone(message) };
+    },
     async submit(kind, requestId, payload, ip) {
       const prior = requests.get(requestId);
       if (prior) {
@@ -430,7 +451,14 @@ export function createStewardFixtures({
           revision: 1,
           created_at: new Date(now()).toISOString(),
         });
-      else if (kind === "feedback") {
+      else if (kind === "contact") {
+        contactMessages.push({
+          id,
+          ...payload,
+          submitted_at: new Date(now()).toISOString(),
+          notification_state: "pending",
+        });
+      } else if (kind === "feedback") {
         // Private fixture persistence is represented by the retained request payload.
       } else
         applications.push({

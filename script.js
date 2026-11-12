@@ -49,8 +49,7 @@
     document.querySelectorAll(".btn").forEach(function (btn) {
       // Don't double-inject
       if (btn.querySelector(".btn-blob")) return;
-      // Skip blob on buttons inside declaration cards and map page
-      if (btn.closest(".declaration-card")) return;
+      // Map controls use their own compact buttons.
       if (document.body.dataset.page === "map") return;
 
       // Wrap existing content in a label span

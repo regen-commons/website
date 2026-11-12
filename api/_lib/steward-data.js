@@ -123,6 +123,32 @@ export function createSupabaseProvider({
       if (!response.ok && ![401, 403, 404].includes(response.status))
         throw new AdminError(503, "sign_out_failed");
     },
+    async messages(token, { offset = 0 } = {}) {
+      const { data, count } = result(
+        await client(token)
+          .from("contact_messages")
+          .select("id,name,subject,submitted_at,notification_state", {
+            count: "exact",
+          })
+          .order("submitted_at", { ascending: false })
+          .order("id")
+          .range(offset, offset + 24),
+      );
+      return { items: data, total: count };
+    },
+    async message(token, id) {
+      const message = result(
+        await client(token)
+          .from("contact_messages")
+          .select(
+            "id,name,email,subject,message,submitted_at,notification_state",
+          )
+          .eq("id", id)
+          .maybeSingle(),
+      ).data;
+      if (!message) throw new AdminError(404, "message_not_found");
+      return { message };
+    },
     async applications(token, { search, state, type, offset }) {
       let query = client(token)
         .from("applications")

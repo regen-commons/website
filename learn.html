@@ -423,23 +423,8 @@
     /* Override the inverted text colors from the global declaration-card */
     .panel-inner.declaration-card .declaration-prompt { color: var(--ink); }
     .panel-inner.declaration-card .declaration-sub { color: var(--ink-mid); }
-    .panel-inner.declaration-card .declaration-textarea {
-      background: transparent;
-      color: var(--ink);
-      border-color: rgba(var(--copper-rgb), 0.30);
-    }
-    .panel-inner.declaration-card .declaration-textarea::placeholder {
-      color: var(--ink-dim);
-    }
     [data-theme="light"] .panel-inner.declaration-card .declaration-prompt { color: var(--ink); }
     [data-theme="light"] .panel-inner.declaration-card .declaration-sub { color: var(--ink-mid); }
-    [data-theme="light"] .panel-inner.declaration-card .declaration-textarea {
-      background: transparent;
-      color: var(--ink);
-    }
-    [data-theme="light"] .panel-inner.declaration-card .declaration-textarea::placeholder {
-      color: var(--ink-dim);
-    }
 
     /* ── RESPONSIVE ──────────────────────────────────────────────────────── */
 
@@ -606,7 +591,7 @@
           </p>
           <textarea
             id="learn-vision-input"
-            class="declaration-textarea"
+            class="join-textarea declaration-textarea"
             rows="3"
             required
             minlength="3"
