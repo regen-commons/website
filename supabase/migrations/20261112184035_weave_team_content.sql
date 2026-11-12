@@ -398,9 +398,9 @@ end $$;
 
 create function weave_workspace.content_command(
   p_actor uuid,p_session uuid,p_did text,p_id uuid,p_group_role text,p_cid text,p_action text,p_data jsonb
-) returns jsonb language plpgsql security definer set search_path = ''
-  set "request.jwt.claims" = '' set "request.jwt.claim.sub" = '' as $$
-declare link weave_workspace.project_links; access jsonb;
+) returns jsonb language plpgsql security definer set search_path = '' as $$
+declare link weave_workspace.project_links; access jsonb; result jsonb;
+  previous_claims text; previous_sub text;
 begin
   if p_did is null or weave_workspace.weave_project_actor(p_actor,p_session) is distinct from p_did then
     raise sqlstate 'PT401' using message='sign_in_required';
@@ -442,30 +442,44 @@ begin
 
   -- Only this restricted command can enter the old matching functions.
   -- They reuse the checked actor for locking and mutation receipts.
-  perform set_config('request.jwt.claims',jsonb_build_object('sub',p_actor,'session_id',p_session,
-    'role','authenticated','exp',extract(epoch from clock_timestamp()+interval '1 minute'))::text,true);
-  perform set_config('request.jwt.claim.sub',p_actor::text,true);
-  case p_action
-    when 'team_load' then
-      return jsonb_build_object('accessRole',access->>'accessRole','saved',
-        case when exists(select from weave.initiatives where team_workspace_id=p_id)
-          then weave.load_initiative(p_id) end);
-    when 'team_save' then
-      return private.weave_save_document(p_id,(p_data->>'expectedRevision')::integer,
-        (p_data->>'requestId')::uuid,p_data->'document',true);
-    when 'public_evidence' then
-      return private.weave_public_project_snapshot(link.project_uri) || jsonb_build_object('workspaceId',p_id);
-    when 'matching_state' then return private.weave_matching_state(p_id);
-    when 'matching_preview' then return private.weave_matching_preview(p_id,(p_data->>'p_revision')::integer,
-      p_data->'p_entries',(p_data->>'p_expires_at')::timestamptz);
-    when 'matching_change' then return private.weave_matching_change(p_id,p_data->>'p_action',
-      (p_data->>'p_request_id')::uuid,(p_data->>'p_review_id')::uuid,nullif(p_data->'p_entries','null'::jsonb));
-    when 'matching_shortlist' then return private.weave_matching_shortlist(p_id,nullif(p_data->'p_entries','null'::jsonb));
-    when 'matching_leads' then return private.weave_matching_leads(p_id);
-    when 'matching_set_lead' then return private.weave_matching_set_lead(p_id,p_data->'p_entry',
-      p_data->>'p_candidate_id',p_data->>'p_disposition',(p_data->>'p_request_id')::uuid);
-    else raise sqlstate 'PT400' using message='invalid_data';
-  end case;
+  previous_claims := current_setting('request.jwt.claims',true);
+  previous_sub := current_setting('request.jwt.claim.sub',true);
+  begin
+    perform set_config('request.jwt.claims',jsonb_build_object('sub',p_actor,'session_id',p_session,
+      'role','authenticated','exp',extract(epoch from clock_timestamp()+interval '1 minute'))::text,true);
+    perform set_config('request.jwt.claim.sub',p_actor::text,true);
+    case p_action
+      when 'team_load' then
+        result := jsonb_build_object('accessRole',access->>'accessRole','saved',
+          case when exists(select from weave.initiatives where team_workspace_id=p_id)
+            then weave.load_initiative(p_id) end);
+      when 'team_save' then
+        result := private.weave_save_document(p_id,(p_data->>'expectedRevision')::integer,
+          (p_data->>'requestId')::uuid,p_data->'document',true);
+      when 'public_evidence' then
+        result := private.weave_public_project_snapshot(link.project_uri) || jsonb_build_object('workspaceId',p_id);
+      when 'matching_state' then result := private.weave_matching_state(p_id);
+      when 'matching_preview' then result := private.weave_matching_preview(p_id,(p_data->>'p_revision')::integer,
+        p_data->'p_entries',(p_data->>'p_expires_at')::timestamptz);
+      when 'matching_change' then result := private.weave_matching_change(p_id,p_data->>'p_action',
+        (p_data->>'p_request_id')::uuid,(p_data->>'p_review_id')::uuid,nullif(p_data->'p_entries','null'::jsonb));
+      when 'matching_shortlist' then result := private.weave_matching_shortlist(p_id,nullif(p_data->'p_entries','null'::jsonb));
+      when 'matching_leads' then result := private.weave_matching_leads(p_id);
+      when 'matching_set_lead' then result := private.weave_matching_set_lead(p_id,p_data->'p_entry',
+        p_data->>'p_candidate_id',p_data->>'p_disposition',(p_data->>'p_request_id')::uuid);
+      else raise sqlstate 'PT400' using message='invalid_data';
+    end case;
+  exception when others then
+    perform set_config('request.jwt.claims',coalesce(previous_claims,''),true);
+    perform set_config('request.jwt.claim.sub',coalesce(previous_sub,''),true);
+    raise;
+  end;
+  -- Hosted migration roles cannot declare custom JWT parameters in proconfig.
+  -- Restore explicitly on both success and rejection; never leak the actor into
+  -- a later command on the same pooled connection or transaction.
+  perform set_config('request.jwt.claims',coalesce(previous_claims,''),true);
+  perform set_config('request.jwt.claim.sub',coalesce(previous_sub,''),true);
+  return result;
 end $$;
 
 revoke all on function weave_workspace.content_target(uuid,uuid,text,uuid),

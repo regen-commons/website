@@ -25,7 +25,8 @@ This does not change existing Platform logins or its migration records.
 
 ## New migrations
 
-These files match the candidates in Weave release `1914fe8` byte for byte:
+Five files match the candidates in Weave release `1914fe8` byte for byte. The
+team-content file includes the narrowly scoped, reviewed repair described below:
 
 1. `20261112184035_weave_team_content`: private team saving, checked-document
    validation and workspace-authorized matching. Closes direct client matching RPCs.
@@ -41,8 +42,20 @@ These files match the candidates in Weave release `1914fe8` byte for byte:
 
 ## Operator sequence
 
-The user approved this owner release and these six migrations on 12 November 2026.
-Apply only after the owner PR is reviewed, checks pass and it is merged. Use the
+The user approved the original owner release and six migrations on 12 November
+2026. Owner PR #21 merged as `0b68bf4`. Its first hosted application failed with
+SQLSTATE `42501`: Platform's non-superuser operator cannot declare custom JWT
+parameters in a function's `SET` clauses. The whole first migration rolled back;
+Platform still records the same 16 versions and none of these six new versions.
+
+The proposed repair captures the caller's JWT settings, uses transaction-local
+settings for the checked actor, then restores the caller's settings on success or
+rejection. It preserves the identity, session and workspace checks and grants no
+new database privileges. The Weave candidate must receive the same repair.
+The user separately approved the repair PRs, merges, release and hosted retry on
+12 November 2026. That approval includes synchronization of the Weave candidate.
+
+Apply only after owner review, passing checks and merge. Use the
 merged owner checkout and verify the project ref before each hosted command.
 
 The checked CLI version is 2.122.0; use its `--help` when using another version.
@@ -74,17 +87,21 @@ anonymous users. CI uses Supabase PostgreSQL 17 with pgvector and creates a clea
 database from `template0`, avoiding the image's preinstalled Auth schemas. All
 website SQL tests still run, including steward access and email-delivery boundaries.
 
-Local proof: all 22 migrations replayed; all nine owner SQL suites passed; website
-syntax checks, 88 fixture tests and HTTP smoke passed. The exact CI image, TCP
-password authentication and fresh-database bootstrap were exercised separately.
+Local proof for the repair: all 22 migrations replayed under a non-superuser
+migration owner, without JWT parameter grants; all ten owner SQL suites passed.
+The new context suite checks successful and rejected commands and empty caller
+context. Website syntax checks, 88 fixture tests and HTTP smoke passed for PR #21.
+The exact CI image, TCP password authentication and fresh-database bootstrap were
+exercised separately. CI now uses the non-superuser migration owner too.
 Weave's separate local PostgreSQL suites passed 28 tests covering discovery,
 invitations, private team saves, two-owner share/edit/withdraw, public snapshots,
 index retrieval and public support lifecycle. They use synthetic providers and
 identities; they are not real Certified or hosted Auth acceptance.
 
-An independent review read all 13 restored/new migration files and the fixture/CI
-changes without actionable findings. Hosted application and browser acceptance
-must be recorded separately after execution.
+Independent review covered the original 13 restored/new migrations and the repair's
+context restoration, failure paths, CI and regression proof. The remaining provenance
+documentation finding is addressed here. Revised hosted application and browser
+acceptance have not run.
 
 Each migration is transactional. A failed migration rolls back; diagnose it before
 retrying. After successful team writes, disable project actions and repair forward
