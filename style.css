@@ -95,6 +95,13 @@ p:last-child { margin-bottom: 0; }
   color: var(--accent, var(--gold));
 }
 
+/* Single-step forms share a right-aligned primary action. */
+.form-actions { display: flex; justify-content: flex-end; margin-top: 1.5rem; }
+.form-actions .btn { margin-top: 0; }
+@media (max-width: 540px) {
+  .form-actions .btn { padding-inline: 1rem; letter-spacing: 0.12em; }
+}
+
 /* ── ORGANIC BLOB BUTTONS (Symphony of Vines technique) ──────────────────── */
 .btn {
   display: inline-block;
@@ -2437,7 +2444,6 @@ p:last-child { margin-bottom: 0; }
 .declaration-card button[type="submit"] {
   --accent: currentColor;
   color: inherit;
-  align-self: center;
   flex-shrink: 0;
 }
 .declaration-card button:disabled { opacity: 0.65; cursor: wait; }
