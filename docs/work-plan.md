@@ -410,3 +410,19 @@ verified source, and the authenticated dashboard confirmed automatic search,
 focus retention, the removed button, padded arrows and recovery to the full
 queue after clearing the verification search. The existing session was retained.
 See the [hosted usability release](steward-verification.md#hosted-usability-release).
+
+
+## Contact form visual consistency — 11 November 2026
+
+Use the membership form’s existing card, field spacing, display labels, serif
+inputs, textarea and organic button on About. Move the card rules into the shared
+stylesheet so both forms use one definition, including mobile padding. Preserve
+contact validation, private submission and retry behavior.
+
+**Evidence:** check, all 88 tests and HTTP smoke pass. Rendered in-app Chromium
+fixtures at 1280px and 390px confirm the shared styles, both themes, no horizontal
+overflow, 16px input text, keyboard focus and required-field validation. A failed
+synthetic save retained the draft and succeeded on retry. Membership card padding
+and responsive layout are preserved. Local guidance retrieval remains unavailable;
+this change follows the existing native controls and repository styles without
+refreshing the online guidance package. Production publication is pending.
