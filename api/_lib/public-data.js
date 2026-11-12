@@ -4,6 +4,8 @@ import { AdminError } from "./steward-data.js";
 import { drainNotifications } from "./intake-notifications.js";
 import { uuid } from "./content-contract.js";
 import { feedbackPayload } from "../../feedback-contract.js";
+import { contactPayload } from "../../contact-contract.js";
+import { deliverContactNotifications } from "./contact-notifications.js";
 
 export function createPublicProvider({
   url,
@@ -45,12 +47,14 @@ export function createPublicProvider({
   const provider = {
     async recordEmailDelivery({ id, outcome, at }) {
       if (!secret) throw new AdminError(503, "data_not_configured");
-      checked(await db.rpc("record_email_delivery", {
-        p_secret: secret,
-        p_provider_message_id: id,
-        p_outcome: outcome,
-        p_occurred_at: at,
-      }));
+      checked(
+        await db.rpc("record_email_delivery", {
+          p_secret: secret,
+          p_provider_message_id: id,
+          p_outcome: outcome,
+          p_occurred_at: at,
+        }),
+      );
     },
     async notifySeed(text) {
       if (!process.env.NOTIFY_URL || !process.env.NOTIFY_WEBHOOK_SECRET) return;
@@ -110,12 +114,34 @@ export function createPublicProvider({
         if (page.length < 500) return rows;
       }
     },
+    async drainContact(messageId = null) {
+      return deliverContactNotifications({
+        request,
+        env,
+        claim: () =>
+          db
+            .rpc("claim_contact_notifications", {
+              p_secret: secret,
+              p_message_id: messageId,
+            })
+            .then(checked),
+        finish: (job, status) =>
+          db
+            .rpc("finish_contact_notification", {
+              p_secret: secret,
+              p_message_id: job.id,
+              p_lease: job.notification_lease,
+              p_status: status,
+            })
+            .then(checked),
+      });
+    },
     async submit(kind, requestId, payload, ip) {
       if (!secret) throw new AdminError(503, "data_not_configured");
       return checked(
-        await db.rpc("submit_intake", {
+        await db.rpc(kind === "contact" ? "submit_contact" : "submit_intake", {
           p_secret: secret,
-          p_kind: kind,
+          ...(kind === "contact" ? {} : { p_kind: kind }),
           p_request_id: requestId,
           p_payload: payload,
           p_actor_hash: createHmac("sha256", secret).update(ip).digest("hex"),
@@ -130,7 +156,7 @@ export function createWebsiteHandler(resource, { provider }) {
     res.setHeader("Cache-Control", "no-store");
     res.setHeader("Vercel-CDN-Cache-Control", "no-store");
     res.setHeader("X-Content-Type-Options", "nosniff");
-    const privateIntake = ["apply", "feedback"].includes(resource);
+    const privateIntake = ["apply", "feedback", "contact"].includes(resource);
     const writes = resource === "seeds" || privateIntake;
     const methods = privateIntake
       ? ["POST"]
@@ -173,6 +199,12 @@ export function createWebsiteHandler(resource, { provider }) {
           text: body.text.trim(),
           author: (body.author || "").trim(),
         };
+      } else if (resource === "contact") {
+        try {
+          payload = contactPayload(body);
+        } catch {
+          throw new AdminError(400, "invalid_contact");
+        }
       } else if (resource === "feedback") {
         try {
           payload = feedbackPayload(body);
@@ -225,8 +257,8 @@ export function createWebsiteHandler(resource, { provider }) {
       const saved = await db.submit(
         resource === "seeds"
           ? "seed"
-          : resource === "feedback"
-            ? "feedback"
+          : resource === "feedback" || resource === "contact"
+            ? resource
             : "application",
         requestId,
         payload,
@@ -236,6 +268,10 @@ export function createWebsiteHandler(resource, { provider }) {
         await db
           .notifySeed(payload.text)
           .catch(() => console.warn("seed_notification_failed"));
+      if (resource === "contact" && db.drainContact)
+        await db
+          .drainContact(saved.id)
+          .catch(() => console.warn("contact_notification_processing_failed"));
       if (resource === "apply" && db.drain)
         await db
           .drain(saved.id)

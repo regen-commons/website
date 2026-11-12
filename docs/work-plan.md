@@ -354,3 +354,27 @@ The separate draft PR owns publication and current-head CI results. The migratio
 is unapplied and automatic production dispatch remains a release verification step.
 
 Contract and release limits: [membership decision emails](membership-decision-emails.md).
+
+## About and contact messages — implemented locally, 11 November 2026
+
+Scope: one organization per line with verified links; a private contact form on
+About; Supabase persistence and retry identities; an authorized Messages inbox in
+`/council`; minimal Telegram alerts through the existing agent. Sender addresses
+and message bodies remain in the dashboard. Contact intake does not create a
+membership application or a public profile. The agent’s stale Notion link label
+will be corrected in its repository, with a separate review of Weave integration.
+
+Acceptance: validate and bound input, save before notifying, deduplicate retries,
+show truthful success/failure feedback, deny anonymous and non-steward reads,
+clear private UI on sign-out, and verify desktop/mobile keyboard flows. Delivery
+uncertainty must remain visible without an automatic duplicate Telegram send.
+Hosted migration, deployment and real delivery remain separate release steps.
+
+**Evidence:** website check, 88 tests and HTTP smoke pass. All migrations and
+nine SQL suites pass in disposable PostgreSQL 17. Rendered in-app Chromium
+fixtures cover desktop/mobile organization rows, contact submission and retry,
+and private inbox/detail. See [contract and verification](contact-messages.md).
+The companion agent adds accurate dashboard labels and contact alerts, fixes
+two installed-SDK failures, and records a review and Weave recommendations in
+its `docs/agent-review.md`. Hosted migration, publication and real Telegram
+delivery remain pending; local checks do not establish those outcomes.

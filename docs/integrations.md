@@ -112,3 +112,12 @@ The archive reports that Members was adapted from an OpenCivics application
 database. Ownership, consent/publication expectations, account access, email
 configuration, custom-domain status, Vercel linkage, and branch protection need
 current confirmation. They were not established by reading the supplied archive.
+
+## About contact messages
+
+`POST /api/contact` validates name, email, subject and message, then uses the
+server-held intake capability to save private correspondence. It does not create
+a membership application. Authenticated active stewards read the paginated
+Messages inbox through `/api/admin`; sender email and message text are returned
+only in the detail view. Telegram receives a notice and council link. The
+[contact guide](contact-messages.md) owns this contract and release requirements.

@@ -54,6 +54,7 @@
   let signedIn = false,
     loginEmail = "",
     offset = 0,
+    messageOffset = 0,
     generation = 0;
   const filters = { search: "", state: "", type: "" };
   const menuButton = $("workspace-menu-toggle");
@@ -204,12 +205,14 @@
       "queue-count",
       "load-message",
       "content-management",
+      "messages",
     ])
       $(id).replaceChildren();
     $("retry").hidden = true;
   }
   function showLogin(message = "") {
     signedIn = false;
+    messageOffset = 0;
     closeMenu();
     menuButton.hidden = true;
     clearPrivateData();
@@ -507,24 +510,45 @@
                   ? `${label(job.decision_state)} email · Revision ${job.decision_revision}`
                   : "Steward notification",
             list = node("dl");
-          const delivery = job.delivery_outcome === "delivered"
-            ? "Delivered"
-            : job.delivery_outcome === "bounced" ? "Bounced" : null;
+          const delivery =
+            job.delivery_outcome === "delivered"
+              ? "Delivered"
+              : job.delivery_outcome === "bounced"
+                ? "Bounced"
+                : null;
           entry.append(
             node("h3", title),
             node("span", delivery || states[job.status] || "Unknown", "badge"),
           );
           if (job.delivery_outcome === "bounced")
-            entry.append(node("p", "Check the recipient address and view the bounce details in Resend before arranging another email.", "help"));
+            entry.append(
+              node(
+                "p",
+                "Check the recipient address and view the bounce details in Resend before arranging another email.",
+                "help",
+              ),
+            );
           if (delivery && job.delivery_occurred_at)
             list.append(
-              node("dt", job.delivery_outcome === "bounced" ? "Bounced at" : "Delivered at"),
-              node("dd", new Intl.DateTimeFormat(undefined, {
-                dateStyle: "medium",
-                timeStyle: "short",
-              }).format(new Date(job.delivery_occurred_at))),
+              node(
+                "dt",
+                job.delivery_outcome === "bounced"
+                  ? "Bounced at"
+                  : "Delivered at",
+              ),
+              node(
+                "dd",
+                new Intl.DateTimeFormat(undefined, {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                }).format(new Date(job.delivery_occurred_at)),
+              ),
             );
-          if (job.status === "sent" && !delivery && ["receipt", "decision"].includes(job.channel))
+          if (
+            job.status === "sent" &&
+            !delivery &&
+            ["receipt", "decision"].includes(job.channel)
+          )
             entry.append(node("p", "No delivery or bounce reported.", "help"));
           if (["receipt", "decision"].includes(job.channel))
             entry.append(
@@ -1112,6 +1136,76 @@
     performWrite,
     loadView,
   });
+  function renderMessages(data, detail) {
+    const root = $("messages");
+    if (detail) {
+      const item = data.message;
+      root.append(link("← Back to messages", "#messages"));
+      const card = node("article", null, "detail-card");
+      card.append(
+        node("h2", item.subject),
+        node("p", `${item.name} · ${date(item.submitted_at)}`, "muted"),
+      );
+      const email = node("p", item.email);
+      const reply = link(
+        "Reply by email",
+        `mailto:${encodeURIComponent(item.email)}?subject=${encodeURIComponent("Re: " + item.subject)}`,
+      );
+      const message = node("p", item.message);
+      message.style.whiteSpace = "pre-wrap";
+      message.style.overflowWrap = "anywhere";
+      card.append(
+        email,
+        message,
+        reply,
+        node("p", "Telegram: " + label(item.notification_state), "help"),
+      );
+      root.append(card);
+      return;
+    }
+    root.append(
+      node(
+        "p",
+        `${data.total} ${data.total === 1 ? "message" : "messages"} · newest first`,
+        "help",
+      ),
+    );
+    if (!data.items.length) root.append(node("p", "No messages yet.", "empty"));
+    for (const item of data.items) {
+      const row = node("article", null, "application-row"),
+        identity = node("div");
+      identity.append(
+        link(item.subject, `#messages/${item.id}`),
+        node("p", item.name),
+      );
+      row.append(
+        identity,
+        node("span", "Telegram: " + label(item.notification_state), "badge"),
+        node("p", date(item.submitted_at), "muted"),
+      );
+      root.append(row);
+    }
+    if (data.total > 25) {
+      const controls = node("div", null, "pagination");
+      for (const [text, delta] of [
+        ["Previous", -25],
+        ["Next", 25],
+      ]) {
+        const button = node("button", text, "secondary");
+        button.type = "button";
+        button.disabled =
+          delta < 0
+            ? messageOffset === 0
+            : messageOffset + data.items.length >= data.total;
+        button.addEventListener("click", () => {
+          messageOffset += delta;
+          loadView();
+        });
+        controls.append(button);
+      }
+      root.append(controls);
+    }
+  }
   async function loadView() {
     if (!signedIn) return;
     closeMenu();
@@ -1120,35 +1214,63 @@
     const route = location.hash.slice(1),
       detailId = route.startsWith("applications/") ? route.split("/")[1] : null;
     const [resource, contentId, sourceApplicationId] = route.split("/");
+    const inbox = resource === "messages";
+    $("messages").hidden = !inbox;
     const members = resource === "members";
     const managing = ["seeds", "contributions"].includes(resource);
     $("content-management").hidden = !managing;
-    $("queue").hidden = managing || members || !!detailId;
+    $("queue").hidden = inbox || managing || members || !!detailId;
     $("members").hidden = !members;
     $("detail").hidden = !detailId;
     $("pagination").hidden = true;
-    $("view-title").textContent = managing
-      ? label(resource)
-      : members
-        ? "Members"
-        : detailId
-          ? "Membership request"
-          : "Membership requests";
-    $("view-description").textContent = managing
-      ? "New items publish immediately. Hide or restore them as needed."
-      : members
-        ? "Individuals and organizations in the commons."
-        : "Private membership requests from individuals and organizations.";
-    for (const section of ["applications", "members", "seeds", "contributions"])
+    $("view-title").textContent = inbox
+      ? contentId
+        ? "Contact message"
+        : "Messages"
+      : managing
+        ? label(resource)
+        : members
+          ? "Members"
+          : detailId
+            ? "Membership request"
+            : "Membership requests";
+    $("view-description").textContent = inbox
+      ? "Private messages sent through the About page. Reply using your email app."
+      : managing
+        ? "New items publish immediately. Hide or restore them as needed."
+        : members
+          ? "Individuals and organizations in the commons."
+          : "Private membership requests from individuals and organizations.";
+    for (const section of [
+      "applications",
+      "members",
+      "seeds",
+      "contributions",
+      "messages",
+    ])
       $("nav-" + section).removeAttribute("aria-current");
-    (managing
-      ? $("nav-" + resource)
-      : members
-        ? $("nav-members")
-        : $("nav-applications")
+    (inbox
+      ? $("nav-messages")
+      : managing
+        ? $("nav-" + resource)
+        : members
+          ? $("nav-members")
+          : $("nav-applications")
     ).setAttribute("aria-current", "page");
     $("load-message").textContent = "Loading…";
     try {
+      if (inbox) {
+        const data = await api(
+          contentId
+            ? { resource: "message", id: contentId }
+            : { resource: "messages", offset: messageOffset },
+        );
+        if (current !== generation || !signedIn) return;
+        renderMessages(data, !!contentId);
+        $("load-message").textContent = "";
+        if (!menuIsOpen()) $("view-title").focus();
+        return;
+      }
       if (members) {
         const [memberData, detail, source] = await Promise.all([
           api({ resource: "members" }),

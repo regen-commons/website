@@ -147,6 +147,19 @@ export function createAdminHandler({ provider, origin, secureCookies = true }) {
       const user = await db.authorize(token);
       const resource = params.get("resource") || "session";
       if (resource === "session") return res.status(200).json({ user });
+      if (resource === "messages") {
+        const value = params.get("offset") || "0";
+        if (!/^\d{1,7}$/.test(value))
+          throw new AdminError(400, "invalid_filter");
+        return res
+          .status(200)
+          .json(await db.messages(token, { offset: Number(value) }));
+      }
+      if (resource === "message") {
+        const id = params.get("id");
+        if (!uuid.test(id || "")) throw new AdminError(400, "invalid_id");
+        return res.status(200).json(await db.message(token, id));
+      }
       if (resource === "applications") {
         const search = params.get("search") || "",
           state = params.get("state") || "",

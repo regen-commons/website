@@ -75,7 +75,7 @@
         <h1>Steward sign-in</h1>
         <form id="email-form" method="post" action="/api/admin">
           <p class="muted login-description">
-            Manage membership requests, Seeds, and Contributions.
+            Manage membership requests, messages, Seeds, and Contributions.
           </p>
           <label for="email">Steward email</label>
           <input
@@ -160,6 +160,7 @@
             ><a id="nav-members" href="#members"
               >Members <span aria-hidden="true">→</span></a
             >
+            <a id="nav-messages" href="#messages">Messages <span aria-hidden="true">→</span></a>
             <a id="nav-seeds" href="#seeds"
               >Seeds <span aria-hidden="true">→</span></a
             >
@@ -238,6 +239,7 @@
               ><button id="next" class="secondary" type="button">Next</button>
             </div>
           </section>
+          <section id="messages" hidden aria-label="Contact messages"></section>
           <section id="detail" hidden aria-label="Application detail"></section>
           <section id="members" hidden aria-label="Member profiles">
             <div id="member-list" class="member-grid"></div>

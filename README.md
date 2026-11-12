@@ -85,3 +85,8 @@ start private and pending. New Seeds and Contributions publish immediately.
 Public members exclude contact and private review fields. The implementation owns exact Notion property
 names; [integration notes](docs/integrations.md) explain the known discrepancies
 in the inherited handover. Keep credentials and real application data out of Git.
+
+Contact messages from About are saved privately in Supabase and reviewed under
+Messages in `/council`. Telegram receives a short alert and a dashboard link. See
+[contact setup and verification](docs/contact-messages.md) for the migration,
+delivery states and release sequence.

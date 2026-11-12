@@ -37,6 +37,12 @@ try {
     body: JSON.stringify({ "full-name": "Smoke Applicant", email: "smoke@example.test" }),
   });
   assert.equal(application.status, 200);
+  const contact = await fetch(`${base}/api/contact`, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name: "Smoke Visitor", email: "contact@example.test", subject: "Smoke contact", message: "Synthetic private correspondence" }),
+  });
+  assert.equal(contact.status, 200);
+  assert.equal((await fetch(`${base}/api/admin?resource=messages`)).status, 401);
   const members = await (await fetch(`${base}/api/members`)).json();
   assert.ok(!members.members.some((item) => item.name === "Smoke Applicant"));
   assert.equal((await fetch(`${base}/api/admin?resource=applications`)).status, 401);
@@ -46,7 +52,10 @@ try {
   assert.equal(login.status, 200);
   const reviewed = await fetch(`${base}/api/admin?resource=applications`, { headers: { Cookie: login.headers.get("set-cookie").split(";")[0] } });
   assert.ok((await reviewed.json()).applications.some(row=>row.display_name === "Smoke Applicant"));
-  console.log(`Smoke passed: ${pages.length} pages, assets, public API reads/writes, publication gate, steward login and authorized queue.`);
+  const inbox = await fetch(`${base}/api/admin?resource=messages`, { headers: { Cookie: login.headers.get("set-cookie").split(";")[0] } });
+  const messages = await inbox.json();
+  assert.ok(messages.items.some(row => row.subject === "Smoke contact"));
+  console.log(`Smoke passed: ${pages.length} pages, assets, public API reads/writes, publication gate, steward login, authorized queue and private contact inbox.`);
   console.log("Evidence: local HTTP + actual handlers with fixture transport; external services and rendered UI are not covered.");
 } finally {
   server.closeAllConnections();

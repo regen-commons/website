@@ -34,7 +34,7 @@ export async function drainNotifications({
       try {
         const origin = env.ADMIN_ORIGIN;
         const url = origin
-          ? `${origin}/admin#applications/${job.application_id}`
+          ? `${origin}/council#applications/${job.application_id}`
           : null;
         if (job.channel === "telegram") {
           result.failure_code = "notification_not_configured";
