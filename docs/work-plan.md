@@ -463,4 +463,17 @@ that media query, rather than claiming a rendered reduced-motion check.
 
 Local guidance tooling still cannot resolve its dev-surfaces module; this uses
 repository styles and native controls without refreshing the online package.
-Final check, all 88 tests and HTTP smoke pass. Production release is pending.
+Final check, all 88 tests and HTTP smoke pass.
+
+**Released:** website `d29d7e1927a140f36aaea3237e16f3fb49cb4fa2` is production
+READY as `dpl_7kMCaa2itHbKwKzKGtPkEW3Kcn2x`, aliased to `regencommons.com`.
+All seven changed HTML/JS/CSS assets match the tested source byte for byte.
+Live in-app Chromium confirms Feedback’s shared controls, both seed cards with
+organic buttons, and the centered contact card at desktop/mobile widths with
+zero center offset and no horizontal overflow. Live console and runtime
+error/fatal scans are empty. No live submissions were made for this visual
+release; save/retry checks used isolated synthetic fixtures.
+
+Rollback target: `dpl_HpzZQDJB1D6zBbQfuLK45xL6GLDN`. This release remains on
+`codex/about-contact`; main is unchanged. No PR or CI run exists for this revision.
+
