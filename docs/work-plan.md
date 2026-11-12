@@ -601,4 +601,14 @@ constitution links retain same-tab navigation. Desktop (1280px) and mobile (390p
 render correctly, with no mobile overflow or browser warnings/errors. Required
 `npm run check`, all 88 tests, and `npm run smoke` pass. Local modern-web guidance
 retrieval remains unavailable due to the missing dev-surfaces entrypoint; this
-uses existing native anchor conventions. Production delivery is pending.
+uses existing native anchor conventions.
+
+Production is READY at `regencommons.com`, deployment
+`dpl_2LwvsV6oBGELeL65SmLbv81J1AfH`, runtime commit
+`59b561a33a3b2dcec548307b2441cefa8ef9f5fd`. Live keyboard/click activation
+opens OpenCivics and Greater Than in separate tabs with correct destination titles,
+while the original About tab remains open. The live HTML matches the released file
+byte-for-byte. Browser warnings/errors and deployment error/fatal logs are empty.
+Rollback target: `dpl_E6TmrMZXZ9htQyVik9Gjnm6igsQh`. No CI run exists for this
+revision; local required checks passed. Branch is `codex/about-contact`; main is
+unchanged.
