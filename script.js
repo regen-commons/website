@@ -449,7 +449,8 @@
       openModal(html);
     };
 
-    // Build a placeholder profile modal for a contributor / ecosystem node.
+    // Profile modal for a contributor / ecosystem node. Member profiles are
+    // not collected yet, so it says that plainly instead of showing scaffolding.
     window.openProfileModal = function (name, opts) {
       opts = opts || {};
       var role  = opts.role || "Member of the regenerative commons";
@@ -459,10 +460,7 @@
       html += '<span class="modal-eyebrow">' + kind + '</span>';
       html += '<h2 class="modal-name">' + name + '</h2>';
       html += '<p class="modal-meta">' + role + '</p>';
-      html += '<div class="modal-profile-section"><h4>About</h4><p>Profile content for <strong>' + name + '</strong> will live here once contributors complete their member onboarding.</p></div>';
-      html += '<div class="modal-profile-section"><h4>Contributions to the commons</h4><p>Library entries, governance work, and ongoing commitments authored or stewarded by ' + name + ' will be listed in this section.</p></div>';
-      html += '<div class="modal-profile-section"><h4>Connections</h4><p>Other members and organizations this profile is in active relationship with.</p></div>';
-      html += '<div class="modal-placeholder">Placeholder · profile schema TBD</div>';
+      html += '<div class="modal-profile-section"><p>This member hasn&rsquo;t added a profile yet.</p></div>';
       openModal(html);
     };
   }
