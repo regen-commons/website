@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Podcast · Regen Commons</title>
+  <meta name="description" content="Regen Commons is putting together a podcast of recorded working sessions that leave notes, terms and open questions behind. Tell us how you'd like to take part." />
+  <link rel="canonical" href="https://regencommons.com/podcast" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Regen Commons" />
+  <meta property="og:title" content="Conversations that leave something behind" />
+  <meta property="og:description" content="Regen Commons is putting together a podcast of recorded working sessions that leave notes, terms and open questions behind. Tell us how you'd like to take part." />
+  <meta property="og:url" content="https://regencommons.com/podcast" />
+  <meta property="og:image" content="https://regencommons.com/assets/share/home.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="The ground beneath the work. Regen Commons, common ground for the regenerative movement." />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="theme-color" content="#0D100A" />
+  <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="preload" href="/assets/fonts/fraunces-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/fonts.css" />
+  <link rel="stylesheet" href="/style.css" />
+  <script>(function(){try{var t=localStorage.getItem('rc-theme')||'dark';document.documentElement.setAttribute('data-theme',t)}catch(_){}})()</script>
+  <style>
+    .podcast-page {
+      position: relative;
+      z-index: 2;
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 8rem var(--pad) 5rem;
+    }
+    .podcast-hero { max-width: 760px; margin-bottom: 4.5rem; }
+    .podcast-hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.4rem, 5.5vw, 4rem);
+      font-weight: 300;
+      line-height: 1.08;
+      color: var(--ink);
+      margin: 1rem 0 1.4rem;
+      text-wrap: balance;
+    }
+    .podcast-hero h1 em { font-style: italic; color: var(--accent); }
+    .podcast-hero p {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: var(--ink-mid);
+      max-width: 62ch;
+    }
+    .podcast-hero .btn { margin-top: 0.6rem; }
+    .podcast-section {
+      padding: 3rem 0;
+      border-top: 1px solid rgba(var(--copper-rgb), 0.12);
+    }
+    .podcast-section h2 {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 3vw, 2.1rem);
+      font-weight: 300;
+      color: var(--ink);
+      margin: 0 0 0.8rem;
+    }
+    .podcast-section > p {
+      max-width: 62ch;
+      color: var(--ink-mid);
+      line-height: 1.75;
+      margin: 0 0 2.2rem;
+    }
+    .podcast-section > p:last-child { margin-bottom: 0; }
+    .podcast-page a:not(.btn) {
+      color: var(--ink);
+      text-decoration-color: rgba(var(--accent-rgb), 0.6);
+      text-underline-offset: 0.2em;
+    }
+
+    /* How an episode works */
+    .podcast-steps {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+      counter-reset: podcast-step;
+    }
+    .podcast-steps li {
+      counter-increment: podcast-step;
+      background: var(--parchment);
+      border: 1px solid rgba(var(--copper-rgb), 0.12);
+      padding: 1.5rem 1.6rem;
+    }
+    /* The list already carries the order; the printed number is decoration. */
+    .podcast-steps li::before {
+      content: counter(podcast-step, decimal-leading-zero);
+      content: counter(podcast-step, decimal-leading-zero) / "";
+      display: block;
+      font-family: var(--font-sans);
+      font-size: 0.66rem;
+      letter-spacing: 0.16em;
+      color: var(--accent);
+      margin-bottom: 0.9rem;
+    }
+    .podcast-steps h3,
+    .podcast-episodes h3 {
+      font-family: var(--font-display);
+      font-weight: 400;
+      color: var(--ink);
+    }
+    .podcast-steps h3 { font-size: 1.15rem; margin: 0 0 0.6rem; }
+    .podcast-steps p {
+      font-size: 0.92rem;
+      line-height: 1.7;
+      color: var(--ink-mid);
+      margin: 0;
+    }
+
+    /* The pilot's questions */
+    .podcast-episodes {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      max-width: 820px;
+    }
+    .podcast-episodes li {
+      display: grid;
+      grid-template-columns: 3.4rem 1fr;
+      column-gap: 1rem;
+      padding: 1.5rem 0;
+      border-top: 1px solid rgba(var(--copper-rgb), 0.12);
+    }
+    .podcast-episodes li:first-child { border-top: 0; padding-top: 0.2rem; }
+    .podcast-episode-number {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 2.3rem;
+      line-height: 1;
+      color: var(--accent);
+    }
+    .podcast-episodes h3 { font-size: 1.3rem; margin: 0 0 0.4rem; }
+    .podcast-episodes p {
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--ink-mid);
+      margin: 0;
+      max-width: 58ch;
+    }
+
+    /* Take part */
+    #take-part { scroll-margin-top: 4rem; }
+    .podcast-form { max-width: 640px; margin: 0 auto; text-align: left; }
+    .podcast-form-intro { color: var(--ink-mid); line-height: 1.75; margin: 0 0 2.2rem; }
+    .podcast-form fieldset { min-width: 0; border: 0; padding: 0; margin: 0 0 1.6rem; }
+    .podcast-form legend { padding: 0; }
+    .podcast-interests { display: grid; }
+    .podcast-interests .join-check {
+      padding-block: 0.75rem;
+      font-size: 0.95rem;
+      border-bottom: 1px solid rgba(var(--copper-rgb), 0.08);
+    }
+    .podcast-interests .join-check:last-child { border-bottom: 0; }
+    /* The shared checkbox outline is about 1.4:1 against the card; a box people must find needs more. */
+    .podcast-interests input[type="checkbox"]:not(:checked) { border-color: var(--ink-dim); }
+    .podcast-form .podcast-trap { position: absolute; left: -10000px; }
+    .podcast-form [role="status"] { min-height: 1.5em; color: var(--ink); margin: 1rem 0 0; }
+    .podcast-form button:disabled { opacity: 0.65; cursor: default; }
+
+    @media (max-width: 540px) {
+      .podcast-episodes li { grid-template-columns: 2.4rem 1fr; }
+      .podcast-episode-number { font-size: 1.8rem; }
+    }
+  </style>
+</head>
+<body data-page="podcast">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <a href="/" class="logo-mark" data-easter-egg>
+    <canvas aria-hidden="true" id="logo-canvas" width="76" height="76"></canvas>
+    <span class="logo-mark-label">Regen Commons</span>
+  </a>
+
+  <button class="theme-toggle" id="theme-toggle" aria-label="Toggle light/dark mode">
+    <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+
+  <nav class="page-nav" aria-label="Site navigation">
+    <a href="/" class="page-nav-dot" data-label="Home" aria-label="Home"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg></a>
+    <a href="/learn" class="page-nav-dot" data-label="Learn" aria-label="Learn"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></a>
+    <a href="/learn#plant" class="page-nav-dot" data-label="Plant" aria-label="Plant"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 22V8"/><path d="M5 12H2a10 10 0 0 0 10-10v3a7 7 0 0 1-7 7z"/><path d="M19 12h3a10 10 0 0 1-10-10v3a7 7 0 0 0 7 7z"/></svg></a>
+    <a href="/map" class="page-nav-dot" data-label="Map" aria-label="Map"><svg aria-hidden="true" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></a>
+    <a href="/podcast" class="page-nav-dot active" data-label="Podcast" aria-label="Podcast" aria-current="page"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></a>
+    <a href="/join" class="page-nav-dot" data-label="Join" aria-label="Join"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg></a>
+    <a href="/about" class="page-nav-dot" data-label="About" aria-label="About"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></a>
+  </nav>
+
+  <canvas aria-hidden="true" id="mycelium-canvas"></canvas>
+
+  <main id="main-content" class="podcast-page" tabindex="-1">
+    <header class="podcast-hero">
+      <span class="section-label mono">Podcast</span>
+      <h1>Conversations that <em>leave something behind</em></h1>
+      <p>We&rsquo;re putting together a podcast for Regen Commons. In each episode, two or three people doing regenerative work think through a question that sits between their fields. Afterwards we turn what they said into notes anyone can use.</p>
+      <p>The pilot is four episodes and it&rsquo;s still taking shape, so this is a good time to tell us what you&rsquo;d want from it.</p>
+      <a href="#take-part" class="btn"><span class="btn-label">Take part</span> &darr;</a>
+    </header>
+
+    <section class="podcast-section" aria-labelledby="format-title">
+      <h2 id="format-title">Working sessions, not interviews</h2>
+      <p>Nobody is being interviewed. Guests come from different organizations and work through a question together.</p>
+      <ol class="podcast-steps" role="list">
+        <li>
+          <h3>One question, two or three people</h3>
+          <p>Each episode takes a question where the guests&rsquo; work meets. They bring what they know and what they&rsquo;re stuck on. We record remotely for 45 to 90 minutes and edit lightly.</p>
+        </li>
+        <li>
+          <h3>Back to the commons</h3>
+          <p>The host keeps returning to what we hold in common. Every episode ends on the same question: what would you need from a commons like this to bring your work into it?</p>
+        </li>
+        <li>
+          <h3>Something left behind</h3>
+          <p>Each conversation becomes a summary, glossary terms, relationship map updates and open questions for the Regen Knowledge Commons, the shared knowledge base we&rsquo;re building. Guests review everything before it&rsquo;s published.</p>
+        </li>
+      </ol>
+    </section>
+
+    <section class="podcast-section" aria-labelledby="season-title">
+      <h2 id="season-title">Four questions for the pilot</h2>
+      <p>This is the current draft. The questions and their order may change as guests help shape them.</p>
+      <ol class="podcast-episodes" role="list">
+        <li>
+          <span class="podcast-episode-number" aria-hidden="true">1</span>
+          <div>
+            <h3>Where the ground is</h3>
+            <p>Why does it matter to have a knowledge commons that place-based initiatives can adopt, and what are we building?</p>
+          </div>
+        </li>
+        <li>
+          <span class="podcast-episode-number" aria-hidden="true">2</span>
+          <div>
+            <h3>The tools beneath</h3>
+            <p>What does a shared ontology need to hold, what stays free and forkable, and which web3 tools plug in?</p>
+          </div>
+        </li>
+        <li>
+          <span class="podcast-episode-number" aria-hidden="true">3</span>
+          <div>
+            <h3>Knowledge on the land</h3>
+            <p>What do land practitioners need from a commons, and how does practice become shared knowledge without being extracted?</p>
+          </div>
+        </li>
+        <li>
+          <span class="podcast-episode-number" aria-hidden="true">4</span>
+          <div>
+            <h3>Back to the ground</h3>
+            <p>What did the season add up to, what is live now, and what does it take for different groups to share one commons?</p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <section class="podcast-section" id="take-part" aria-labelledby="take-part-title">
+      <form id="podcast-form" class="podcast-form join-form-card" aria-labelledby="take-part-title" aria-describedby="podcast-privacy">
+        <h2 id="take-part-title">Take part</h2>
+        <p class="podcast-form-intro">Tell us how you&rsquo;d like to be involved, or what these conversations should cover. The series doesn&rsquo;t have a name yet, so ideas for that are welcome too.</p>
+        <fieldset aria-describedby="podcast-interests-hint">
+          <legend class="join-label">How would you like to take part?</legend>
+          <p class="join-hint" id="podcast-interests-hint">Select any that fit, or skip this and write a note.</p>
+          <div class="podcast-interests" id="podcast-interests"></div>
+        </fieldset>
+        <div class="join-field">
+          <label class="join-label" for="podcast-note">Your idea, question or what you&rsquo;d bring</label>
+          <p class="join-hint" id="podcast-note-hint">For example: someone we should invite, a question worth an episode, or what you&rsquo;d need from a commons like this to bring your work into it.</p>
+          <textarea class="join-textarea" id="podcast-note" name="note" rows="6" aria-describedby="podcast-note-hint"></textarea>
+        </div>
+        <div class="join-field">
+          <label class="join-label" for="podcast-name">Your name</label>
+          <input class="join-input" id="podcast-name" name="name" autocomplete="name" maxlength="200" required />
+        </div>
+        <div class="join-field">
+          <label class="join-label" for="podcast-email">Email address</label>
+          <input class="join-input" id="podcast-email" name="email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" maxlength="254" required />
+        </div>
+        <div class="podcast-trap" aria-hidden="true"><label for="podcast-website">Leave this blank</label><input id="podcast-website" name="website_confirm" tabindex="-1" autocomplete="off" /></div>
+        <p id="podcast-privacy" class="join-hint">Only the steward council can read this, and we&rsquo;ll reply by email.</p>
+        <div class="form-actions">
+          <button type="submit" class="btn"><span class="btn-label">Send message</span> &rarr;</button>
+        </div>
+        <p id="podcast-status" role="status" aria-live="polite"></p>
+        <noscript><p>This form needs JavaScript. You can also write to us on the <a href="https://hub.regencoordination.xyz/t/about-the-regen-commons-category/365" target="_blank" rel="noopener" aria-label="Regen Commons forum (opens in a new tab)">Regen Commons forum</a>.</p></noscript>
+      </form>
+    </section>
+
+    <section class="podcast-section" aria-labelledby="more-title">
+      <h2 id="more-title">More ways in</h2>
+      <p>You don&rsquo;t need to be on the podcast to be part of the commons. <a href="/join">Become a member</a> or <a href="/map">see who is already here</a>.</p>
+    </section>
+  </main>
+
+  <script src="/logo-canvas.js"></script>
+  <script src="/canvas.js"></script>
+  <script src="/script.js"></script>
+  <script type="module" src="/podcast-form.js"></script>
+  <script>initCanvas(2);</script>
+</body>
+</html>
