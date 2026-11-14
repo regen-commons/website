@@ -58,6 +58,12 @@ need that.
 `contact-submit.js` holds the submit, retry-identity and saved-state behavior
 for both forms.
 
+The podcast form declares `method="post"` and the contact endpoint as its
+action. If someone submits before the script has loaded, the browser posts a
+form-encoded body, the handler answers 415 and nothing is saved. Without those
+attributes the browser would reload the page with the name, email and note in
+the URL. The About, Join and seed forms do not declare them yet.
+
 ## Telegram delivery
 
 The saved row itself is the notification queue. `drainContact()` claims at most
@@ -190,10 +196,10 @@ correspondence rather than dropping data to roll back an application release.
 Not deployed. No hosted schema, environment or agent change is involved, and no
 live submission was made.
 
-`npm run check`, all 93 tests and `npm run smoke` pass. The five podcast tests
+`npm run check`, all 94 tests and `npm run smoke` pass. The six podcast tests
 cover the composed subject and message, the rejected cases, the length budget,
-a save through the actual contact handler into the fixture council inbox, and
-the page's scripts and navigation links.
+a save through the actual contact handler into the fixture council inbox, the
+refused form-encoded submit, and the page's scripts and navigation links.
 
 Rendered local fixtures in the Claude desktop app's built-in Chromium browser
 show the page at 1280px in both themes and at 390px in the dark theme. Measured
@@ -201,7 +207,9 @@ at 390px and 320px, nothing overflows horizontally. An empty submit moves focus 
 missing name moves it to the name field, and Enter submits. An injected 503
 keeps the draft and a second submit saves it. The fixture council inbox lists
 `Podcast: guest, question` and its detail shows the interests, the note and
-Reply by email. The About form saves and re-enables after an edit as before.
+Reply by email. A fourth message in the hour shows the rate-limit text, keeps
+the draft and leaves the URL unchanged. The About form saves and re-enables
+after an edit as before.
 Space toggles an interest and Tab reaches every control in order. The page adds
 no motion of its own; it uses the shared background canvas and button styles.
 Fixture mode sends no email or Telegram messages.

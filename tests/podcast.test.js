@@ -131,6 +131,26 @@ test("a podcast message reaches the private council inbox and no public listing"
   assert.equal(detail.message.message, body.message);
 });
 
+test("a submit made before the form script runs is refused and never placed in a URL", async () => {
+  // Without method and action a browser would GET the page with the name,
+  // email and note in the query string.
+  assert.match(
+    await (await fetch(base + "/podcast")).text(),
+    /<form id="podcast-form"[^>]*\smethod="post"[^>]*\saction="\/api\/contact"/,
+  );
+  const native = await fetch(base + "/api/contact", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      name: "Synthetic Listener",
+      email: "listener@example.test",
+      note: "Sent without the script",
+    }),
+  });
+  assert.equal(native.status, 415);
+  assert.deepEqual(await native.json(), { error: "json_required" });
+});
+
 test("the podcast page is served with its form scripts and linked from the site", async () => {
   const page = await (await fetch(base + "/podcast")).text();
   assert.match(page, /id="podcast-form"/);

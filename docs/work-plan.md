@@ -737,7 +737,7 @@ line and cannot be filtered or counted. See
 [podcast messages](contact-messages.md#podcast-messages). The About and Podcast
 forms now share `contact-submit.js`.
 
-**Verified locally:** check, 93 tests and smoke, plus rendered fixtures at
+**Verified locally:** check, 94 tests and smoke, plus rendered fixtures at
 desktop width in both themes and at mobile widths. The
 [verification record](contact-messages.md#podcast-form-verification--13-november-2026)
 lists the cases. Nothing is deployed and no live message was sent.
