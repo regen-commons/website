@@ -2,6 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
   "trailingSlash": false,
+  "ignoreCommand": "case \"$VERCEL_GIT_COMMIT_REF\" in main|develop|claude/podcast-proposal-integration-d1f166) exit 1 ;; *) exit 0 ;; esac",
   "redirects": [
     { "source": "/admin", "destination": "/council", "permanent": true },
     { "source": "/admin.html", "destination": "/council", "permanent": true }

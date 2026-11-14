@@ -744,6 +744,10 @@ lists the cases. Nothing is deployed and no live message was sent.
 
 **Pending before release:**
 
+- Remove the temporary `ignoreCommand` from `vercel.json` before merge. The
+  project's own rule builds only `main` and `develop`, so the PR had no preview.
+  The override keeps that rule and also builds this branch, at the maintainer's
+  request, so the council can open the page.
 - Council sign-off on the public copy. It is adapted from a draft: the four
   questions, the working-session format, the 45 to 90 minute recording, guest
   review before publication, and the line saying the series has no name yet.
