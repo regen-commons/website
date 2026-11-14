@@ -1238,7 +1238,7 @@
             ? "Membership request"
             : "Membership requests";
     $("view-description").textContent = inbox
-      ? "Private messages sent through the About page. Reply using your email app."
+      ? "Private messages sent through the About and Podcast pages. Reply using your email app."
       : managing
         ? "New items publish immediately. Hide or restore them as needed."
         : members

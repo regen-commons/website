@@ -723,3 +723,44 @@ Browser and deployment error/fatal scans are empty. Application and database CI
 passed for the runtime revision. No live form submissions were needed.
 Rollback target: `dpl_2cDKyugJ8kRaHgh8kgsBk1kbQ7xg`. Published branch:
 `codex/contact-subtext`; draft PR #19 targets main. Main is unchanged.
+
+## Podcast page and Take part form — 13 November 2026
+
+**Outcome:** `/podcast` presents the podcast pilot from the council's draft
+proposal and lets a visitor say how they want to take part or send an idea.
+The page is in the site navigation and the sitemap.
+
+**Decision:** podcast messages are saved as contact messages, so stewards read
+them in `/council#messages` and get the existing Telegram alert. This needs no
+migration and no agent release. The cost is that interests live in the subject
+line and cannot be filtered or counted. See
+[podcast messages](contact-messages.md#podcast-messages). The About and Podcast
+forms now share `contact-submit.js`.
+
+**Verified locally:** check, 94 tests and smoke, plus rendered fixtures at
+desktop width in both themes and at mobile widths. The
+[verification record](contact-messages.md#podcast-form-verification--13-november-2026)
+lists the cases. Nothing is deployed and no live message was sent.
+
+**Pending before release:**
+
+- Remove the temporary `ignoreCommand` from `vercel.json` before merge. The
+  project's own rule builds only `main` and `develop`, so the PR had no preview.
+  The override keeps that rule and also builds this branch, at the maintainer's
+  request, so the council can open the page.
+- Council sign-off on the public copy. It is adapted from a draft: the four
+  questions, the working-session format, the 45 to 90 minute recording, guest
+  review before publication, and the line saying the series has no name yet.
+- "Hear when the first episode is out" is one of the six interests. Keep it
+  only if a steward will write to those people at launch.
+- The page shares the home link-preview image. For its own, run
+  `sh scripts/share-images/render.sh` on the Mac (the template and loop already
+  include `podcast`), add `assets/share/podcast.png` to
+  `scripts/lib/site-files.js`, and point the page's `og:image` and its alt text
+  at it. Headless Brave produced no image from the agent sandbox.
+- After deployment, send one synthetic message from the live page and confirm
+  it in the council inbox, with authorization for the test.
+
+**Not in this change:** the podcast question in the membership application, a
+podcast mention on Home, Learn or the join confirmation, and episodes published
+as Contributions.

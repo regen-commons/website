@@ -51,6 +51,7 @@ checks; provider delivery needs a separately configured integration environment.
 | Member graph and contributions library | `map.html` |
 | Seed planting experience | `seeds.html` |
 | Six-step membership application | `join.html` |
+| Podcast page and its Take part form | `podcast.html`, `podcast-form.js`, `podcast-contract.js` |
 | Steward login, applications, and member review | `council.html`, `admin/`, `api/admin.js` |
 | Shared interactions and styling | `script.js`, `style.css` |
 | Canvas animations | `canvas.js`, `logo-canvas.js` |
@@ -86,7 +87,8 @@ Public members exclude contact and private review fields. The implementation own
 names; [integration notes](docs/integrations.md) explain the known discrepancies
 in the inherited handover. Keep credentials and real application data out of Git.
 
-Contact messages from About are saved privately in Supabase and reviewed under
-Messages in `/council`. Telegram receives a short alert and a dashboard link. See
+Contact messages from About and the Podcast page are saved privately in Supabase
+and reviewed under Messages in `/council`. Telegram receives a short alert and a
+dashboard link. See
 [contact setup and verification](docs/contact-messages.md) for the migration,
 delivery states and release sequence.

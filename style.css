@@ -14,6 +14,7 @@ body[data-page="seeds"]       { --accent: var(--gold);   --accent-rgb: 212, 160,
 body[data-page="join"]        { --accent: var(--copper); --accent-rgb: var(--copper-rgb); }
 body[data-page="map"]         { --accent: var(--teal);   --accent-rgb: 72, 184, 144; }
 body[data-page="about"]       { --accent: var(--forest); --accent-rgb: var(--forest-rgb); }
+body[data-page="podcast"]     { --accent: var(--copper); --accent-rgb: var(--copper-rgb); }
 body[data-page="constitution"] { --accent: var(--gold);  --accent-rgb: 212, 160, 48; }
 
 /* ── RESET ───────────────────────────────────────────────────────────────── */
