@@ -108,3 +108,18 @@ retrying. After successful team writes, disable project actions and repair forwa
 through a reviewed migration. Do not drop saved initiatives, grants or shared
 Platform data as a rollback. The prior preview's direct matching RPC path is
 intentionally revoked; the workspace-aware Weave API must accompany this schema.
+
+## Saved-card deletion release
+
+`20261117200140_weave_initiative_deletion` matches
+`supabase/candidates/weave-initiative-deletion.sql` in Weave `main` (`024d713`) byte
+for byte. It adds `weave.delete_initiative`, which lets an owner delete one personal
+saved card at the exact revision they saw, and a tombstone table so a deleted ID never
+returns. It refuses a card that anything else refers to, and it never deletes team
+documents. Weave's `POST /api/account` action `delete` calls it, and that API has been
+in production since `024d713`. Until this migration is applied, deleting a card fails there.
+
+The user approved applying it to Platform on 17 November 2026. Use the same commands
+as above. The dry run must list exactly this one version. Afterwards, check that
+`weave.delete_initiative(uuid, integer, uuid)` is executable by `authenticated` only
+and that `private.weave_deleted_initiatives` has row-level security and no client grants.
