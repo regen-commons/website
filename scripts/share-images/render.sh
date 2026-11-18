@@ -30,7 +30,7 @@ profile="$(mktemp -d)"
 trap 'rm -rf "$profile"' EXIT
 mkdir -p "$out"
 
-for page in home learn map join seeds about constitution; do
+for page in home learn map join seeds about constitution podcast; do
   "$BROWSER" --headless=new --disable-gpu --hide-scrollbars --no-first-run \
     --no-default-browser-check --user-data-dir="$profile" \
     --allow-file-access-from-files --force-device-scale-factor=1 \

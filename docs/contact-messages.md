@@ -1,6 +1,7 @@
 # Contact messages
 
-The About form saves private correspondence in `public.contact_messages`. Active
+The About form and the [Podcast page's Take part form](#podcast-messages) save
+private correspondence in `public.contact_messages`. Active
 stewards review it in `/council#messages`, open a message to see the sender’s
 email and full text, and use Reply by email in their own email app. The dashboard
 does not send a reply or track a response as completed.
@@ -27,6 +28,41 @@ never use a service-role key. Inbox summaries omit email and message bodies.
 The UI renders submitted text as text, clears it on sign-out or access loss, and
 ignores stale requests after navigation. The contact schema is separate from
 applications, curated member profiles and website feedback.
+
+## Podcast messages
+
+`/podcast` has a second form that saves through the same endpoint. It adds no
+table, RPC, environment variable or notification type, so it needs no migration
+and no agent release.
+
+The form asks for a name, an email, any of six interests and an optional note.
+`podcastMessage()` in `podcast-contract.js` turns that into an ordinary contact
+payload before the browser posts it:
+
+| Contact field | Podcast content |
+| --- | --- |
+| `subject` | `Podcast: ` and the short form of each chosen interest in listed order, or `Podcast: note` when none is chosen |
+| `message` | `Ways to take part: ` and the chosen labels, then the note |
+
+A message with no interest and a note under three characters is rejected in the
+browser. The note is capped at 4,500 characters so every label still fits the
+5,000-character contact message. The server applies only the contact contract.
+It cannot tell that a message came from the podcast page, so the subject prefix
+is a convention for stewards and not something the database enforces.
+
+Podcast and About messages share the inbox, the Telegram alert text and the
+quota of three saves per connection per clock hour. Stewards cannot filter or
+count by interest. Add a structured column or table if the council comes to
+need that.
+
+`contact-submit.js` holds the submit, retry-identity and saved-state behavior
+for both forms.
+
+The podcast form declares `method="post"` and the contact endpoint as its
+action. If someone submits before the script has loaded, the browser posts a
+form-encoded body, the handler answers 415 and nothing is saved. Without those
+attributes the browser would reload the page with the name, email and note in
+the URL. The About, Join and seed forms do not declare them yet.
 
 ## Telegram delivery
 
@@ -154,3 +190,26 @@ If an application rollback is needed, the prior website deployment is
 `dpl_ELNk2mmzUvBGF4VFsx5uxtWhkPqc` and prior agent deployment is
 `dpl_79m6J3G2J9wKGaqMoE8LJS2TWAfr`. Retain the contact table and saved
 correspondence rather than dropping data to roll back an application release.
+
+## Podcast form verification — 13 November 2026
+
+Not deployed. No hosted schema, environment or agent change is involved, and no
+live submission was made.
+
+`npm run check`, all 94 tests and `npm run smoke` pass. The six podcast tests
+cover the composed subject and message, the rejected cases, the length budget,
+a save through the actual contact handler into the fixture council inbox, the
+refused form-encoded submit, and the page's scripts and navigation links.
+
+Rendered local fixtures in the Claude desktop app's built-in Chromium browser
+show the page at 1280px in both themes and at 390px in the dark theme. Measured
+at 390px and 320px, nothing overflows horizontally. An empty submit moves focus to the first interest with a message, a
+missing name moves it to the name field, and Enter submits. An injected 503
+keeps the draft and a second submit saves it. The fixture council inbox lists
+`Podcast: guest, question` and its detail shows the interests, the note and
+Reply by email. A fourth message in the hour shows the rate-limit text, keeps
+the draft and leaves the URL unchanged. The About form saves and re-enables
+after an edit as before.
+Space toggles an interest and Tab reaches every control in order. The page adds
+no motion of its own; it uses the shared background canvas and button styles.
+Fixture mode sends no email or Telegram messages.
