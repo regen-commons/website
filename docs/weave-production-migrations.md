@@ -123,3 +123,19 @@ The user approved applying it to Platform on 17 November 2026. Use the same comm
 as above. The dry run must list exactly this one version. Afterwards, check that
 `weave.delete_initiative(uuid, integer, uuid)` is executable by `authenticated` only
 and that `private.weave_deleted_initiatives` has row-level security and no client grants.
+
+## Public project card facts release
+
+`20261120181830_weave_project_index_card_facts` matches
+`supabase/candidates/weave-project-index-card-facts.sql` in Weave
+([regen-commons/weave#114](https://github.com/regen-commons/weave/pull/114), `61b68cd`) byte for
+byte. It adds three columns to `private.weave_project_index_source`, the publisher's display name,
+the project's place label and the kinds of group its publisher names, so the public list's cards can
+say who shared a project and where. The columns are nullable or have a constant default, so adding
+them rewrites no rows, and the index job's existing table grants cover them. The Weave API from that
+pull request reads and writes them, so this migration must be applied before that API is deployed.
+The API deployed before it never names the columns and keeps working once they exist.
+
+The user approved applying it to Platform on 20 November 2026. Use the same commands as above. The
+dry run must list exactly this one version. Afterwards, check that the three columns exist with their
+check constraints, and that `weave_index_job` still holds only its table grants on the table.
