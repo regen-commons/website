@@ -49,7 +49,7 @@ test("the launcher reports an occupied port and preserves the existing server", 
 });
 
 test("public pages and clean routes work; private files and foreign origins do not", async () => {
-  for (const path of ["/", "/learn", "/map.html", "/seeds/", "/join?step=1"]) {
+  for (const path of ["/", "/learn", "/map.html", "/seeds/", "/join?step=1", "/claims-engine"]) {
     const response = await request(path);
     assert.equal(response.status, 200, path);
     assert.match(await response.text(), /Local demo · synthetic data/);
