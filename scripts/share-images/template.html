@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <title>Regen Commons share image</title>
-<!-- Draws one 1200x630 link-preview image on a canvas: ?page=home|learn|map|join|seeds|about|constitution.
+<!-- Draws one 1200x630 link-preview image on a canvas: ?page=home|learn|map|join|seeds|about|claims-engine|constitution.
      render.sh screenshots it with a headless browser; in a normal browser the
      canvas can also be saved directly. Same fonts and palette as the site, and
      the mycelium is seeded per page so re-rendering gives identical images. -->
@@ -26,6 +26,7 @@
     join: { lines: ["Become"], accent: ["a Member"] },
     seeds: { lines: ["I wish we would"], accent: ["common…"] },
     about: { lines: ["Who tends"], accent: ["the commons"] },
+    "claims-engine": { lines: ["Claims Engine"], accent: ["Trusted land stewardship", "claims, made with local AI"] },
     constitution: { lines: ["The Regen Commons"], accent: ["Constitution"] },
   };
   const page = new URLSearchParams(location.search).get("page") || "home";
