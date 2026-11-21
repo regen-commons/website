@@ -9,8 +9,11 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          # The migration manifest test compares with the base branch.
+          fetch-depth: 0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -47,7 +50,7 @@ jobs:
       PGDATABASE: regen_test
       PGPASSWORD: synthetic-local-test
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Apply migrations to disposable Postgres
         run: |
           PGDATABASE=postgres psql -v ON_ERROR_STOP=1 \
@@ -60,22 +63,39 @@ jobs:
           for migration in supabase/migrations/*.sql; do
             PGUSER=weave_migration_owner psql -v ON_ERROR_STOP=1 -1 -f "$migration"
           done
-      - name: Verify steward and public data boundaries
+      - name: Run every SQL suite
+        # Each file in supabase/tests runs, so a new suite needs no workflow
+        # edit. local-auth.sql is the auth stub applied before the migrations.
         run: |
-          psql -v ON_ERROR_STOP=1 -f supabase/tests/steward-access.sql
-          psql -v ON_ERROR_STOP=1 -f supabase/tests/content-access.sql
-          psql -v ON_ERROR_STOP=1 -f supabase/tests/feedback-access.sql
-          psql -v ON_ERROR_STOP=1 -f supabase/tests/contact-access.sql
-          psql -v ON_ERROR_STOP=1 -f supabase/tests/notification-access.sql
-          psql -v ON_ERROR_STOP=1 -f supabase/tests/membership-access.sql
-          psql -v ON_ERROR_STOP=1 -f supabase/tests/decision-email-access.sql
-          psql -v ON_ERROR_STOP=1 -f supabase/tests/weave-private-access.sql
-          psql -v ON_ERROR_STOP=1 -f supabase/tests/weave-workspace-context.sql
-          psql -v ON_ERROR_STOP=1 -f supabase/tests/email-delivery-outcomes.sql
-      - uses: actions/setup-node@v4
+          shopt -s nullglob
+          suites=(supabase/tests/*.sql)
+          ran=0
+          for suite in "${suites[@]}"; do
+            [ "$(basename "$suite")" = local-auth.sql ] && continue
+            echo "::group::$suite"
+            psql -v ON_ERROR_STOP=1 -f "$suite"
+            echo "::endgroup::"
+            ran=$((ran + 1))
+          done
+          echo "Ran $ran SQL suites"
+          [ "$ran" -gt 0 ]
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
       - name: Verify synthetic Notion import and replay
         env:
           REGEN_IMPORT_SQL_TEST: synthetic-local-only
         run: node scripts/verify-notion-import-replay.js
+  ci-gate:
+    # The single required check. It passes only when every gated job passed,
+    # so a red, cancelled or skipped job blocks the merge.
+    if: always()
+    needs: [check, database, agents-doctor]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every gated job to pass
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: |
+          echo "$NEEDS" | jq -r 'to_entries[] | "\(.key): \(.value.result)"'
+          echo "$NEEDS" | jq -e 'to_entries | length == 3 and all(.value.result == "success")' > /dev/null
