@@ -67,10 +67,17 @@
         "scripts/prepare-notion-import.js",
         "scripts/inspect-notion-export.js",
         "AGENTS.md",
-        "*/AGENTS.md",
+        "**/AGENTS.md",
         ".agents/adapter.md",
         ".agents/policy.json",
-        ".agents/skills/**"
+        ".agents/skills/**",
+        "CLAUDE.md",
+        ".claude/**",
+        ".gitignore",
+        ".github/pull_request_template.md",
+        "scripts/verify-notion-import-replay.js",
+        "scripts/sync-*.js",
+        "scripts/create-contributions-and-seeds-dbs.js"
       ],
       "requireCodeOwnerReview": false,
       "autoMerge": false

@@ -3,21 +3,21 @@
   "commands": [
     {
       "id": "vercel-deploy",
-      "pattern": "^(\\S*/)?((npx|bunx)( -\\S+)* |(pnpm|yarn) dlx |npm exec( --)? )?(vercel|vc)( --?[\\w-]+(=\\S+| [^-\\s]\\S*)?)*( (deploy|redeploy|promote|rollback|alias)( |$)| [./~]\\S*|$)|^(\\S*/)?((npx|bunx)( -\\S+)* |(pnpm|yarn) dlx |npm exec( --)? )?(vercel|vc)( .*)? --prod( |$)|^(\\S*/)?((npx|bunx)( -\\S+)* |(pnpm|yarn) dlx |npm exec( --)? )?(vercel|vc)( --?[\\w-]+(=\\S+| [^-\\s]\\S*)?)* env (add|rm|remove|update)( |$)",
+      "pattern": "^(\\S*/)?((npx|bunx)( -\\S+)* |(pnpm|yarn) dlx |npm exec( --)? )?(?!.* (--help|-h|--version|-v)( |$))(vercel|vc)( --?[\\w-]+(=\\S+| [^-\\s]\\S*)?)*( (deploy|redeploy|promote|rollback|alias|remove|rm|domains|dns|redirects|rolling-release|project (rm|remove)|git disconnect)( |$)| [./~]\\S*|$)|^(\\S*/)?((npx|bunx)( -\\S+)* |(pnpm|yarn) dlx |npm exec( --)? )?(?!.* (--help|-h|--version|-v)( |$))(vercel|vc)( .*)? --prod( |$)|^(\\S*/)?((npx|bunx)( -\\S+)* |(pnpm|yarn) dlx |npm exec( --)? )?(?!.* (--help|-h|--version|-v)( |$))(vercel|vc)( --?[\\w-]+(=\\S+| [^-\\s]\\S*)?)* env (add|rm|remove|update)( |$)",
       "action": "ask",
-      "message": "PRODUCTION: production comes only from the Vercel Git integration on main. A command-line deploy, promote, rollback or alias, and a change to Vercel environment variables, are afo's steps. Go ahead only on his explicit word in this session."
+      "message": "PRODUCTION: production comes only from the Vercel Git integration on main. A command-line deploy, promote, rollback, alias or removal, and changes to Vercel environment variables, domains, DNS, redirects or the Git connection, are afo's steps. Go ahead only on his explicit word in this session."
     },
     {
       "id": "npm-deploy-script",
-      "pattern": "^(\\S*/)?(npm|pnpm|yarn|bun)( --?[\\w-]+(=\\S+)?)*( run| run-script)?( --?[\\w-]+(=\\S+)?)* deploy( |$)",
+      "pattern": "^(\\S*/)?(npm|pnpm|yarn|bun)( --?[\\w-]+(=\\S+| [^-\\s]\\S*)?)*( run| run-script)?( --?[\\w-]+(=\\S+| [^-\\s]\\S*)?)* deploy( |$)",
       "action": "ask",
       "message": "PRODUCTION DEPLOYMENT: the deploy script runs vercel deploy --prod. Production comes only from the Vercel Git integration on main; a command-line deploy is afo's step. Go ahead only on his explicit word in this session."
     },
     {
       "id": "supabase-remote-write",
-      "pattern": "^(\\S*/)?((npx|bunx)( -\\S+)* |(pnpm|yarn) dlx |npm exec( --)? )?supabase( --?[\\w-]+(=\\S+| [^-\\s]\\S*)?)* (db push|migration repair|migration up|config push|secrets (set|unset)|db reset( .*)? --(linked|db-url))( |$)",
+      "pattern": "^(\\S*/)?((npx|bunx)( -\\S+)* |(pnpm|yarn) dlx |npm exec( --)? )?(?!.* --local( |$))supabase( --?[\\w-]+(=\\S+| [^-\\s]\\S*)?)* (db push|migration (repair|up)|config push|secrets (set|unset)|functions (deploy|delete)|storage (cp|rm|mv)|postgres-config (update|delete)|(projects|branches) delete|backups restore|db reset( .*)? --(linked|db-url)|migration squash( .*)? --(linked|db-url)|seed buckets( .*)? --linked)( |$)",
       "action": "ask",
-      "message": "HOSTED DATABASE: this changes the linked Supabase project (migrations, migration history, a reset, auth config or secrets), which holds real applicant data. Applying migrations to the hosted database is afo's step. Go ahead only on his explicit word in this session."
+      "message": "HOSTED DATABASE: this changes the linked Supabase project (migrations or their history, a reset, auth or Postgres config, secrets, functions, storage, branches or backups), which holds real applicant data. Applying migrations to the hosted database is afo's step. Go ahead only on his explicit word in this session."
     }
   ],
   "paths": [

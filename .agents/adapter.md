@@ -40,7 +40,7 @@ none. Choose tiers by hand from **Tiers**, then add every row of **Conditional c
 ### Criticality
 `.agents/merge-policy.json` owns the tiers and their paths.
 - Critical: the API handlers, intake and steward data modules and the root contracts, `supabase/migrations/**`, `supabase/tests/**`, `vercel.json`, `package.json`, `package-lock.json`, `.nvmrc`, `.github/workflows/**`, `.agents/merge-policy.json`, `.github/CODEOWNERS`. Merge on the full gate plus a fresh agent's adversarial review naming the head SHA, then wait for afo's go, because the merge is the production release.
-- Sensitive: `admin/**`, `council.html`, the intake pages and form scripts, the notification modules, email templates, the fixture server and providers, `tests/**`, `scripts/check.js`, `scripts/smoke.js`, the Notion import scripts, and agent guidance (`AGENTS.md`, `*/AGENTS.md`, `.agents/adapter.md`, `.agents/policy.json`, `.agents/skills/**`). Merge on the required checks plus that review.
+- Sensitive: `admin/**`, `council.html`, the intake pages and form scripts, the notification modules, email templates, the fixture server and providers, `tests/**`, `scripts/check.js`, `scripts/smoke.js`, the Notion import and sync scripts, `.gitignore`, the PR template, and agent guidance (`AGENTS.md`, `**/AGENTS.md`, `CLAUDE.md`, `.claude/**`, `.agents/adapter.md`, `.agents/policy.json`, `.agents/skills/**`). Merge on the required checks plus that review.
 - Routine: everything else. Merge on the required checks and a targeted check.
 
 ### CI

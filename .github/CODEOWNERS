@@ -34,6 +34,13 @@
 /.agents/adapter.md                   @Oba-One
 /.agents/policy.json                  @Oba-One
 /.agents/skills/                      @Oba-One
+/CLAUDE.md                            @Oba-One
+/.claude/                             @Oba-One
+/.gitignore                           @Oba-One
+/.github/pull_request_template.md     @Oba-One
+/scripts/verify-notion-import-replay.js@Oba-One
+/scripts/sync-*.js                    @Oba-One
+/scripts/create-contributions-and-seeds-dbs.js@Oba-One
 
 # Later lines win in CODEOWNERS, so the critical paths come last.
 # Critical: intake handlers and contracts, steward auth and data, migrations
