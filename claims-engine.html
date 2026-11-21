@@ -93,7 +93,7 @@
     }
     .ce-section > p:last-child { margin-bottom: 0; }
 
-    /* Cards: status columns, flow steps, community data, people */
+    /* Cards: flow steps, community data, people, sources */
     .ce-grid {
       list-style: none;
       margin: 1.4rem 0 0;
@@ -135,15 +135,87 @@
       font-size: 0.92rem;
     }
 
-    /* Where it stands: the top edge tells the three states apart without relying on colour. */
-    .ce-status--now { border-top: 3px solid var(--accent); }
-    .ce-status--building { border-top: 3px dashed var(--accent); }
-    .ce-status--not-yet { border-top: 3px dotted var(--ink-dim); }
-    .ce-status ul { list-style: none; margin: 0; padding: 0; }
-    .ce-status li + li {
-      margin-top: 0.9rem;
-      padding-top: 0.9rem;
+    /* Picture cards: team portraits and sources. The picture runs to the card's edges. */
+    .ce-card--media { padding: 0 0 1.5rem; }
+    .ce-card--media > img {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 40 / 21;
+      object-fit: cover;
+      margin-bottom: 1.3rem;
+    }
+    .ce-card--media > :not(img) { margin-left: 1.6rem; margin-right: 1.6rem; }
+    .ce-card--portrait > img { aspect-ratio: 4 / 5; }
+    /* A partner's logo sits on a light tile in both themes so its own colours stay legible. */
+    .ce-card--media > img.ce-logo { object-fit: contain; background: #F4EFE3; padding: 1.6rem; }
+    .ce-card-links { list-style: none; margin-top: 0.4rem; margin-bottom: 0; padding: 0; }
+    .ce-card-links li { padding: 0.5rem 0; border-top: 1px solid rgba(var(--copper-rgb), 0.12); }
+    .ce-section > .ce-grid + p { margin-top: 2.2rem; }
+
+    /* Where it stands: a track from today to not yet. The marker and the line style tell the
+       three states apart without relying on colour. Column widths follow the amount of text. */
+    .ce-track {
+      list-style: none;
+      margin: 2rem 0 0;
+      padding: 0;
+      display: grid;
+      gap: 2rem;
+    }
+    .ce-stage { position: relative; padding-left: 2.2rem; }
+    .ce-stage::before {
+      content: "";
+      position: absolute;
+      left: 0.47rem;
+      top: 0.4rem;
+      bottom: -2rem;
+      border-left: 1px solid rgba(var(--accent-rgb), 0.6);
+    }
+    .ce-stage:last-child::before { display: none; }
+    .ce-stage--building::before { border-left-style: dashed; }
+    .ce-stage-mark {
+      position: absolute;
+      left: 0;
+      top: 0.25rem;
+      width: 1rem;
+      height: 1rem;
+      border-radius: 50%;
+      border: 2px solid var(--accent);
+      background: var(--accent);
+    }
+    .ce-stage--building .ce-stage-mark { background: linear-gradient(90deg, var(--accent) 50%, var(--paper) 50%); }
+    .ce-stage--not-yet .ce-stage-mark { background: var(--paper); border: 2px dotted var(--ink-dim); }
+    .ce-stage h3 {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 400;
+      color: var(--ink);
+      margin: 0 0 0.7rem;
+    }
+    .ce-stage p {
+      font-size: 0.92rem;
+      line-height: 1.7;
+      color: var(--ink-mid);
+      margin: 0;
+    }
+    .ce-stage p + p {
+      margin-top: 0.8rem;
+      padding-top: 0.8rem;
       border-top: 1px solid rgba(var(--copper-rgb), 0.12);
+    }
+    @media (min-width: 900px) {
+      .ce-track { grid-template-columns: 2.1fr 1.4fr 1fr; gap: 2.2rem; }
+      .ce-stage { padding: 2.2rem 0 0; }
+      .ce-stage::before {
+        left: 0;
+        right: -2.2rem;
+        top: 0.48rem;
+        bottom: auto;
+        border-left: 0;
+        border-top: 1px solid rgba(var(--accent-rgb), 0.6);
+      }
+      .ce-stage--building::before { border-top-style: dashed; }
+      .ce-stage-mark { top: 0; }
     }
 
     /* How it works: four steps, stacked on a phone and in a row on wider screens. */
@@ -220,7 +292,98 @@
       }
     }
 
-    /* Open by default */
+    /* What runs where: two zones with the approval gate between them, stacked on a phone
+       and side by side on wider screens. */
+    .ce-map { margin-top: 1.8rem; display: grid; }
+    .ce-zone {
+      border: 1px solid rgba(var(--copper-rgb), 0.2);
+      background: var(--parchment);
+      padding: 1.3rem 1.5rem 1.6rem;
+    }
+    .ce-zone--shared {
+      background: rgba(var(--accent-rgb), 0.09);
+      border-color: rgba(var(--accent-rgb), 0.4);
+    }
+    .ce-zone h3 {
+      font-family: var(--font-sans);
+      font-size: 0.66rem;
+      font-weight: 400;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+      margin: 0 0 1.2rem;
+    }
+    .ce-node {
+      display: grid;
+      grid-template-columns: 2.8rem minmax(0, 1fr);
+      gap: 0.2rem 1rem;
+      align-items: start;
+    }
+    .ce-node + .ce-node { margin-top: 1.3rem; }
+    .ce-icon {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      color: var(--accent);
+    }
+    .ce-node .ce-icon {
+      width: 2.8rem;
+      height: 2.8rem;
+      padding: 0.65rem;
+      border: 1px solid rgba(var(--accent-rgb), 0.5);
+      border-radius: 50%;
+      grid-row: span 2;
+    }
+    .ce-node h4 {
+      font-family: var(--font-display);
+      font-size: 1.08rem;
+      font-weight: 400;
+      color: var(--ink);
+      margin: 0.1rem 0 0;
+    }
+    .ce-node p {
+      font-size: 0.88rem;
+      line-height: 1.6;
+      color: var(--ink-mid);
+      margin: 0;
+    }
+    .ce-map-gate {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      margin: 0;
+      padding: 0.9rem 1.5rem;
+      border-left: 1px dashed var(--accent);
+      border-right: 1px dashed var(--accent);
+      font-family: var(--font-display);
+      font-style: italic;
+      line-height: 1.4;
+      color: var(--ink);
+    }
+    .ce-map-gate .ce-icon { width: 1.2rem; height: 1.2rem; flex: none; }
+    @media (min-width: 900px) {
+      .ce-map { grid-template-columns: minmax(0, 1fr) 8.5rem minmax(0, 1fr); }
+      .ce-map-gate {
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        border: 0;
+        padding: 0 0.8rem;
+        font-size: 0.95rem;
+        line-height: 1.4;
+      }
+      /* The dashed line runs the height of the two zones, above and below the note. */
+      .ce-map-gate::before,
+      .ce-map-gate::after {
+        content: "";
+        flex: 1;
+        border-left: 1px dashed var(--accent);
+      }
+    }
+
+    /* Working in the open: the list style is kept for the two link slots below the cards. */
     .ce-links {
       list-style: none;
       margin: 1.2rem 0 2rem;
@@ -276,10 +439,10 @@
     To switch one on, paste its approved line at the slot and update "Last updated".
       PENDING SLOT 1: credit for the people who built the review agents (Who is building it)
       PENDING SLOT 2: credit for the landscape partner's two leads (Who is building it)
-      PENDING SLOT 3: the first test result (Small by design)
+      PENDING SLOT 3: the first test result (The smallest model that passes)
       PENDING SLOT 4: the fiscal sponsor line (Who is building it)
-      PENDING SLOT 5: the knowledge network line (Open by default)
-    Two links are also waiting, each with a one-line slot in "Open by default":
+      PENDING SLOT 5: the knowledge network line (Working in the open)
+    Two links are also waiting, in one slot below the cards in "Working in the open":
       LINK SLOT A: the small-model evaluation harness
       LINK SLOT B: the two-minute video
   -->
@@ -289,7 +452,7 @@
       <span class="section-label mono">A Regen Commons project</span>
       <h1>Claims Engine</h1>
       <p class="ce-line">Trusted land stewardship claims, made with local AI.</p>
-      <p class="ce-summary">Land stewards are paid only when their care is verified and trusted. Our AI-assisted workflow, used in soil-carbon reviews, matches evidence to requirements while people decide. We are moving it from commercial models to local ones communities own and govern, so stewards can make claims offline and keep their evidence.</p>
+      <p class="ce-summary">Land stewards are paid only when their care is verified and trusted. Our AI-assisted workflow, used in soil-carbon reviews, matches evidence to requirements while people decide. We will move it from commercial models to local ones that communities own and govern, so stewards can make claims offline and keep their evidence.</p>
       <p class="ce-updated">Last updated <time datetime="2026-11-20">20 November 2026</time></p>
     </header>
 
@@ -301,29 +464,26 @@
 
     <section class="ce-section" aria-labelledby="status-title">
       <h2 id="status-title">Where it stands</h2>
-      <div class="ce-grid ce-grid--3">
-        <article class="ce-card ce-status ce-status--now">
+      <ol class="ce-track">
+        <li class="ce-stage">
+          <span class="ce-stage-mark" aria-hidden="true"></span>
           <h3>In use today</h3>
-          <ul>
-            <li>Regen&rsquo;s registry team uses the AI-assisted review workflow in live registration and issuance reviews of soil-carbon projects. It sorts a project&rsquo;s documents, matches passages to each requirement, and drafts a finding that shows its sources. A human reviewer accepts, corrects or rejects every match.</li>
-            <li>Pilot communities record regenerative work in Green Goods, where the community reviews every submission and nobody approves their own work.</li>
-          </ul>
-        </article>
-        <article class="ce-card ce-status ce-status--building">
+          <p>Regen&rsquo;s registry team uses the AI-assisted review workflow in live reviews of soil-carbon projects. It sorts a project&rsquo;s documents, matches passages to each requirement, and drafts a finding that shows its sources. A human reviewer accepts, corrects or rejects every match.</p>
+          <p>Pilot communities record regenerative work in Green Goods, where the community reviews every submission and nobody approves their own work.</p>
+        </li>
+        <li class="ce-stage ce-stage--building">
+          <span class="ce-stage-mark" aria-hidden="true"></span>
           <h3>Being built</h3>
-          <ul>
-            <li>The Claims Engine, which will record each claim, its evidence, and every machine and human judgment, so anyone can verify the result.</li>
-            <li>Small local models, one for each review task.</li>
-          </ul>
-        </article>
-        <article class="ce-card ce-status ce-status--not-yet">
+          <p>The Claims Engine, which will record each claim, its evidence, and every machine and human judgment, so anyone can verify the result.</p>
+          <p>Small local models, one for each review task.</p>
+        </li>
+        <li class="ce-stage ce-stage--not-yet">
+          <span class="ce-stage-mark" aria-hidden="true"></span>
           <h3>Not yet</h3>
-          <ul>
-            <li>Stewards do not make claims themselves.</li>
-            <li>Small models are tested offline but not used in live reviews.</li>
-          </ul>
-        </article>
-      </div>
+          <p>Stewards do not make claims themselves.</p>
+          <p>Small models are tested offline but not used in live reviews.</p>
+        </li>
+      </ol>
     </section>
 
     <section class="ce-section" aria-labelledby="how-title">
@@ -334,7 +494,7 @@
           <span class="ce-step-num" aria-hidden="true">1</span>
           <h3>Capture</h3>
           <p class="ce-step-who">On a phone</p>
-          <p>A steward records work on a phone, with no connection needed.</p>
+          <p>A steward records the work. No connection is needed.</p>
         </li>
         <li class="ce-card ce-step">
           <span class="ce-step-num" aria-hidden="true">2</span>
@@ -358,10 +518,52 @@
       </ol>
     </section>
 
+    <section class="ce-section" aria-labelledby="where-title">
+      <h2 id="where-title">What runs where</h2>
+      <p>The same four steps, shown by where each one happens.</p>
+      <div class="ce-map">
+        <div class="ce-zone">
+          <h3>On the community&rsquo;s own devices</h3>
+          <div class="ce-node">
+            <svg class="ce-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+            <h4>A phone</h4>
+            <p>Where a steward records work.</p>
+          </div>
+          <div class="ce-node">
+            <svg class="ce-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="11" rx="1"/><path d="M2 19h20"/></svg>
+            <h4>A laptop</h4>
+            <p>Where a small local model drafts the claim and a person corrects it.</p>
+          </div>
+          <div class="ce-node">
+            <svg class="ce-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><path d="M16 10l2 2 4-4"/></svg>
+            <h4>A second person</h4>
+            <p>Approves or rejects the claim.</p>
+          </div>
+        </div>
+        <p class="ce-map-gate">
+          <svg class="ce-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          <span>Nothing leaves the device unapproved.</span>
+        </p>
+        <div class="ce-zone ce-zone--shared">
+          <h3>Shared by choice</h3>
+          <div class="ce-node">
+            <svg class="ce-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg>
+            <h4>A reviewer or funder</h4>
+            <p>Receives a claim only when the community sends it.</p>
+          </div>
+          <div class="ce-node">
+            <svg class="ce-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h11a3 3 0 0 1 3 3v15H8a3 3 0 0 1-3-3z"/><path d="M9 8h7M9 12h7M9 16h4"/></svg>
+            <h4>The Claims Engine record</h4>
+            <p>Each claim, its evidence, and every machine and human judgment, so anyone can verify the result.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="ce-section" aria-labelledby="small-title">
-      <h2 id="small-title">Small by design</h2>
+      <h2 id="small-title">The smallest model that passes</h2>
       <p>For each task we start with no model at all. Document sorting and requirement matching already work that way. We step up to a small model only where a comparison with human reviewers shows it is needed.</p>
-      <p>Models are trained from people&rsquo;s corrections, and only with approval that names training as the purpose.</p>
+      <p>People&rsquo;s corrections will train the models, and only with approval that names training as the purpose.</p>
       <!-- PENDING SLOT 3: first test result. Off. Paste the approved paragraph here. -->
     </section>
 
@@ -374,15 +576,15 @@
         </article>
         <article class="ce-card">
           <h3>Stored</h3>
-          <p>Today, approved work becomes a permanent public record. The new local path keeps work on its author&rsquo;s device until author and community approve a release.</p>
+          <p>Today, approved work becomes a permanent public record. The local path we are building keeps work on its author&rsquo;s device until the author and the community approve its release.</p>
         </article>
         <article class="ce-card">
           <h3>Used</h3>
-          <p>Reviewers&rsquo; decisions train the models. Community evidence does so only by opt-in.</p>
+          <p>Reviewers&rsquo; decisions train the models. A community&rsquo;s evidence is used only if it opts in.</p>
         </article>
         <article class="ce-card">
           <h3>Governed</h3>
-          <p>Communities choose what they record and release. Regen Commons&rsquo; steward council governs the engine&rsquo;s terms.</p>
+          <p>Communities will choose what they record and release. Regen Commons&rsquo; steward council governs the engine&rsquo;s terms.</p>
         </article>
       </div>
     </section>
@@ -390,20 +592,23 @@
     <section class="ce-section" aria-labelledby="team-title">
       <h2 id="team-title">Who is building it</h2>
       <p>Regen Commons brings together the teams behind two open projects: Regen Network, which builds the Claims Engine, and Green Goods, an independent open-source stewardship app.</p>
-      <p>SecondMuse is prototyping an outcome-claims dashboard on the Claims Engine schema for a cacao landscape in Central Sulawesi, Indonesia.</p>
+      <p>SecondMuse is prototyping a dashboard of outcome claims, built on the Claims Engine&rsquo;s schema, for a cacao landscape in Central Sulawesi, Indonesia.</p>
       <!-- PENDING SLOT 4: fiscal sponsor line. Off. Paste the approved paragraph here. -->
       <ul class="ce-grid ce-grid--3">
-        <li class="ce-card">
+        <li class="ce-card ce-card--media ce-card--portrait">
+          <img src="/assets/council/gregory.webp" alt="" width="320" height="320" loading="lazy" decoding="async" />
           <h3>Gregory Landua</h3>
           <p>Co-founder of Regen Network and a Regen Commons steward. Leads Claims Engine architecture and product.</p>
           <a href="https://www.linkedin.com/in/gregory-landua-4953b29/" target="_blank" rel="noopener" aria-label="Gregory Landua on LinkedIn (opens in a new tab)">Gregory Landua on LinkedIn</a>
         </li>
-        <li class="ce-card">
+        <li class="ce-card ce-card--media ce-card--portrait">
+          <img src="/assets/council/afolabi.webp" alt="" width="320" height="320" loading="lazy" decoding="async" />
           <h3>Afolabi Aiyeloja</h3>
           <p>Regen Commons steward. Leads Green Goods and the steward-facing tools.</p>
           <a href="https://www.linkedin.com/in/afolabi-aiyeloja/" target="_blank" rel="noopener" aria-label="Afolabi Aiyeloja on LinkedIn (opens in a new tab)">Afolabi Aiyeloja on LinkedIn</a>
         </li>
-        <li class="ce-card">
+        <li class="ce-card ce-card--media ce-card--portrait">
+          <img src="/assets/council/ellie.webp" alt="" width="320" height="320" loading="lazy" decoding="async" />
           <h3>Ellie Rennie</h3>
           <p>Professor at RMIT University, Research Director of Metagov, and a Regen Commons steward. Leads evaluation and governance design.</p>
           <a href="https://www.linkedin.com/in/ellie-rennie-0597595/" target="_blank" rel="noopener" aria-label="Ellie Rennie on LinkedIn (opens in a new tab)">Ellie Rennie on LinkedIn</a>
@@ -414,29 +619,49 @@
     </section>
 
     <section class="ce-section" aria-labelledby="open-title">
-      <h2 id="open-title">Open by default</h2>
-      <!-- PENDING SLOT 5: knowledge network line. Off. Paste the approved paragraph here, and its link in the list. -->
-      <ul class="ce-links">
-        <li><a href="https://github.com/regen-network/regen-data-standards" target="_blank" rel="noopener" aria-label="Claim and evidence schemas (opens in a new tab)">Claim and evidence schemas</a>, Apache-2.0</li>
-        <li><a href="https://greengoods.app" target="_blank" rel="noopener" aria-label="Green Goods (opens in a new tab)">Green Goods</a>, the stewardship app</li>
-        <li><a href="https://github.com/greenpill-dev-guild/green-goods" target="_blank" rel="noopener" aria-label="Green Goods code (opens in a new tab)">Green Goods code</a>, MIT</li>
-        <li><a href="https://docs.greengoods.app" target="_blank" rel="noopener" aria-label="Green Goods documentation (opens in a new tab)">Green Goods documentation</a></li>
-        <li><a href="https://forum.regen.network/t/announcing-regen-ai/553" target="_blank" rel="noopener" aria-label="Announcing the review workflow (opens in a new tab)">Announcing the review workflow</a> (November 2025)</li>
-        <li><a href="https://www.regen.network" target="_blank" rel="noopener" aria-label="Regen Network (opens in a new tab)">Regen Network</a></li>
-        <li><a href="https://www.secondmuse.com" target="_blank" rel="noopener" aria-label="SecondMuse (opens in a new tab)">SecondMuse</a></li>
-        <!-- LINK SLOT A: small-model evaluation harness. Not public yet. Replace the address and uncomment this line:
-        <li><a href="https://REPLACE-WITH-HARNESS-ADDRESS" target="_blank" rel="noopener" aria-label="Small-model evaluation harness (opens in a new tab)">Small-model evaluation harness</a></li>
-        -->
-        <!-- LINK SLOT B: two-minute video. Not ready yet. Replace the address and uncomment this line:
-        <li><a href="https://REPLACE-WITH-VIDEO-ADDRESS" target="_blank" rel="noopener" aria-label="Two-minute video (opens in a new tab)">Two-minute video</a></li>
-        -->
+      <h2 id="open-title">Working in the open</h2>
+      <!-- PENDING SLOT 5: knowledge network line. Off. Paste the approved paragraph here, and its link in the Regen Network card. -->
+      <ul class="ce-grid ce-grid--3">
+        <li class="ce-card ce-card--media">
+          <img src="/assets/claims-engine/green-goods.webp" alt="" width="800" height="420" loading="lazy" decoding="async" />
+          <h3>Green Goods</h3>
+          <ul class="ce-card-links">
+            <li><a href="https://greengoods.app" target="_blank" rel="noopener" aria-label="Green Goods (opens in a new tab)">Green Goods</a>, the stewardship app</li>
+            <li><a href="https://github.com/greenpill-dev-guild/green-goods" target="_blank" rel="noopener" aria-label="Green Goods code (opens in a new tab)">Green Goods code</a>, MIT</li>
+            <li><a href="https://docs.greengoods.app" target="_blank" rel="noopener" aria-label="Green Goods documentation (opens in a new tab)">Green Goods documentation</a></li>
+          </ul>
+        </li>
+        <li class="ce-card ce-card--media">
+          <img src="/assets/claims-engine/regen-network.webp" alt="" width="800" height="420" loading="lazy" decoding="async" />
+          <h3>Regen Network</h3>
+          <ul class="ce-card-links">
+            <li><a href="https://www.regen.network" target="_blank" rel="noopener" aria-label="Regen Network (opens in a new tab)">Regen Network</a></li>
+            <li><a href="https://github.com/regen-network/regen-data-standards" target="_blank" rel="noopener" aria-label="Claim and evidence schemas (opens in a new tab)">Claim and evidence schemas</a>, Apache-2.0</li>
+            <li><a href="https://forum.regen.network/t/announcing-regen-ai/553" target="_blank" rel="noopener" aria-label="Announcing the review workflow (opens in a new tab)">Announcing the review workflow</a> (November 2025)</li>
+          </ul>
+        </li>
+        <li class="ce-card ce-card--media">
+          <img class="ce-logo" src="/assets/claims-engine/secondmuse.webp" alt="" width="600" height="382" loading="lazy" decoding="async" />
+          <h3>SecondMuse</h3>
+          <ul class="ce-card-links">
+            <li><a href="https://www.secondmuse.com" target="_blank" rel="noopener" aria-label="SecondMuse (opens in a new tab)">SecondMuse</a></li>
+          </ul>
+        </li>
       </ul>
+      <!-- LINK SLOT A: small-model evaluation harness. Not public yet.
+           LINK SLOT B: two-minute video. Not ready yet.
+           Replace the address of each one that is ready, delete the other line, and uncomment this list:
+      <ul class="ce-links">
+        <li><a href="https://REPLACE-WITH-HARNESS-ADDRESS" target="_blank" rel="noopener" aria-label="Small-model evaluation harness (opens in a new tab)">Small-model evaluation harness</a></li>
+        <li><a href="https://REPLACE-WITH-VIDEO-ADDRESS" target="_blank" rel="noopener" aria-label="Two-minute video (opens in a new tab)">Two-minute video</a></li>
+      </ul>
+      -->
       <p>The engine&rsquo;s own repository is private while it is rebuilt. We intend to publish it for anyone to read, under commons terms that are still in draft.</p>
     </section>
 
     <section class="ce-section" aria-labelledby="closing-title">
       <h2 id="closing-title">Get in touch</h2>
-      <p>Have a question, or work that connects with this? We would like to hear from you.</p>
+      <p>Have a question, or work that connects with this? We&rsquo;d like to hear about it.</p>
       <div class="ce-actions">
         <a href="/about#contact-form" class="btn"><span class="btn-label">Write to the steward council</span> &rarr;</a>
         <a href="/join">Become a member &rarr;</a>
