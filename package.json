@@ -3,14 +3,15 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Regen Commons public site — static frontend + Supabase-backed Vercel functions and steward dashboard.",
+  "description": "Regen Commons public site \u2014 static frontend + Supabase-backed Vercel functions and steward dashboard.",
   "scripts": {
     "dev": "node scripts/dev.js",
     "dev:live": "vercel dev --listen 3502",
     "check": "node scripts/check.js",
+    "lint": "node scripts/lint/run.mjs",
+    "lint:shrink": "node scripts/lint/run.mjs shrink",
     "test": "node --test",
-    "smoke": "node scripts/smoke.js",
-    "deploy": "vercel deploy --prod"
+    "smoke": "node scripts/smoke.js"
   },
   "dependencies": {
     "@notionhq/client": "^2.2.15",
@@ -20,5 +21,9 @@
   },
   "engines": {
     "node": "22.x"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.6.8",
+    "oxlint": "1.94.0"
   }
 }

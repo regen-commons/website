@@ -1,0 +1,15 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [],
+  "env": { "browser": true, "es2022": true, "node": true },
+  "ignorePatterns": ["node_modules/**", "artifacts/**", "supabase/**"],
+  "rules": {
+    "no-console": "warn",
+    "no-debugger": "error",
+    "no-unused-vars": "warn",
+    "prefer-const": "error",
+    "no-var": "error",
+    "eqeqeq": "error",
+    "no-duplicate-imports": "error"
+  }
+}

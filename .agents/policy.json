@@ -35,9 +35,6 @@
     }
   ],
   "proof": {
-    "commands": [
-      "^npm (run )?(check|test|smoke)\\b",
-      "^node --test\\b"
-    ]
+    "commands": ["^npm (run )?(check|test|smoke)\\b", "^node --test\\b"]
   }
 }

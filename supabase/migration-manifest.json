@@ -1,0 +1,136 @@
+{
+  "version": 1,
+  "about": "Every migration in supabase/migrations with the SHA-256 of its bytes and who supplies it. website: written for this site in this repository. platform: Weave's schema on the shared Platform database, copied here from a reviewed Weave candidate (docs/weave-production-migrations.md). The hosted project records these versions, so an applied migration's bytes never change: add a new migration instead. tests/migration-manifest.test.js fails when a file's bytes differ from its entry, when a file has no entry, or when an entry has no file; a new migration needs its entry in the same pull request, and each new Platform copy gets its own pull request.",
+  "migrations": [
+    {
+      "file": "20261029214914_steward_dashboard.sql",
+      "owner": "website",
+      "sha256": "2ed9056240cef6aaa39ddd2fa73ff325b9897dc201c897a2ca13c0b4941a2925"
+    },
+    {
+      "file": "20261030030022_content_management.sql",
+      "owner": "website",
+      "sha256": "7e6a25303ada862a6557e6e14726018e30ad76050521548f3072b63319cde1de"
+    },
+    {
+      "file": "20261030044355_website_feedback.sql",
+      "owner": "website",
+      "sha256": "dc4a652b851e212426e8e2d68b8251c7b1f3749edb1242a7f1186686c57d670f"
+    },
+    {
+      "file": "20261031001734_steward_email_delivery.sql",
+      "owner": "website",
+      "sha256": "f15e60cc8c01a49649d8cad5ebbe9df1e445c98bfc5c15e83e709ba3de70b66a"
+    },
+    {
+      "file": "20261031024410_membership_management.sql",
+      "owner": "website",
+      "sha256": "b74ffe250cfff8a66cd2eb7a7401d7241ad61cfc1bcdb2bbbb3ddfc580fdd5f4"
+    },
+    {
+      "file": "20261031040400_membership_decision_emails.sql",
+      "owner": "website",
+      "sha256": "d7be49b33f4952cd8cbdd657b592bb03b66e6903a0fb24e1863d8c7410d0cf24"
+    },
+    {
+      "file": "20261105082413_weave_private_accounts.sql",
+      "owner": "platform",
+      "sha256": "d33c3cfe12a2e1d3c811ba3148665d73196ce5e3fc330d4eb93fcc141686f8d9"
+    },
+    {
+      "file": "20261106072143_resend_delivery_webhooks.sql",
+      "owner": "website",
+      "sha256": "ef9812b87e2c85bd7e669a9e360b15addd201cce5f621953f7a88fa170a614fc"
+    },
+    {
+      "file": "20261108031732_weave_certified_private_access.sql",
+      "owner": "platform",
+      "sha256": "eb9af7d08661eb469c6a81cf4b384257ceb7993656c99af21bd13f0e6c6ab1d4"
+    },
+    {
+      "file": "20261108032041_weave_platform_runtime_logins.sql",
+      "owner": "platform",
+      "sha256": "b781c8c959c2a30fecdafeaa7b6b68ff3ae1f7f785138734439e57d2aa02bcdb"
+    },
+    {
+      "file": "20261109045842_weave_matching.sql",
+      "owner": "platform",
+      "sha256": "1f7a6b070bdd29d91895229266c4c679844d0a8526ca7137cc1477e25c507856"
+    },
+    {
+      "file": "20261109050006_weave_project_index.sql",
+      "owner": "platform",
+      "sha256": "57f1811f8c5c1aa430181d76f734d9367b3b4cdecf72d75af1042ee732b5ad12"
+    },
+    {
+      "file": "20261109050112_weave_matching_vectors.sql",
+      "owner": "platform",
+      "sha256": "15c7f0eafce8400617ee21545ec07202f5749ccbf052dac4a8fba1166904543a"
+    },
+    {
+      "file": "20261110040828_weave_project_oauth.sql",
+      "owner": "platform",
+      "sha256": "b278eca75f1ec096ad3d759a41bca5427ed81c2caf419e0a6a8b486fa887f270"
+    },
+    {
+      "file": "20261110040924_weave_project_workspaces.sql",
+      "owner": "platform",
+      "sha256": "48f87654ec92186807bac00e3b969321ade899f67607f8e921a7a31b5b00d949"
+    },
+    {
+      "file": "20261112013204_contact_messages.sql",
+      "owner": "website",
+      "sha256": "965e05487cae45b20cc2a9cf4b017e9d53d77d223e390c00fd7a1000032c5a9a"
+    },
+    {
+      "file": "20261112184035_weave_team_content.sql",
+      "owner": "platform",
+      "sha256": "2b0250ad463b193a04067a00f9d9a6f5ed4c8db7cede3f58c70a2598d9b2a677"
+    },
+    {
+      "file": "20261112184037_weave_public_evidence_snapshot.sql",
+      "owner": "platform",
+      "sha256": "06971e2aeeaaadea52f9f86559ff0f3616e4972c516865ae6947133704368e58"
+    },
+    {
+      "file": "20261112184038_weave_project_discovery.sql",
+      "owner": "platform",
+      "sha256": "6ff7f8e396eec259fdb01c69b9195e5b5360f62264b28777dc313d38289aafb0"
+    },
+    {
+      "file": "20261112184040_weave_workspace_invites.sql",
+      "owner": "platform",
+      "sha256": "09d5c1f6b7debdb424594554010eb3ade4ea69ae0172a775d125f04c3fadbb01"
+    },
+    {
+      "file": "20261112184042_weave_support_publication.sql",
+      "owner": "platform",
+      "sha256": "ae0203021ed60e8e15b9676d33d8d7804b56348c2efcf987cef7eb2cb43810d2"
+    },
+    {
+      "file": "20261112184045_weave_open_ended_sharing.sql",
+      "owner": "platform",
+      "sha256": "0fcac2cbe3aef49999562969d00d2ffbc8435aacd73f4703f3ad09900804c0b1"
+    },
+    {
+      "file": "20261117200140_weave_initiative_deletion.sql",
+      "owner": "platform",
+      "sha256": "36ffdbd377d0df6886e6bd3f9143595629fc931b5a46dc67a120549fc7d36336"
+    },
+    {
+      "file": "20261120181830_weave_project_index_card_facts.sql",
+      "owner": "platform",
+      "sha256": "935d05e2789caebf2627a91ca7bdf370d5acbe52e2c8e4d8bd488b63ffeb514a"
+    },
+    {
+      "file": "20261121204212_weave_project_index_work_scope.sql",
+      "owner": "platform",
+      "sha256": "bacd35ebb6c547fd2ea708e77ec6dd800bba4d437d2525928547136f5cf44a1b"
+    },
+    {
+      "file": "20261121204219_weave_project_index_organization_description.sql",
+      "owner": "platform",
+      "sha256": "409c3542cdca923782ae8448b8d87763fab29b10254f1abc0e6ecd0993e9384c"
+    }
+  ]
+}

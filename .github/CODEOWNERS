@@ -41,6 +41,10 @@
 /scripts/verify-notion-import-replay.js   @Oba-One
 /scripts/sync-*.js                        @Oba-One
 /scripts/create-contributions-and-seeds-dbs.js @Oba-One
+/scripts/lint/                            @Oba-One
+/biome.json                               @Oba-One
+/.oxlintrc.json                           @Oba-One
+/.agents/lint-baseline.json               @Oba-One
 
 # Later lines win in CODEOWNERS, so the critical paths come last.
 # Critical: intake handlers and contracts, steward auth and data, migrations
@@ -55,6 +59,10 @@
 /supabase/migrations/                     @Oba-One
 /supabase/tests/                          @Oba-One
 /vercel.json                              @Oba-One
+/.vercelignore                            @Oba-One
+/scripts/lib/vercel-ignore.js             @Oba-One
+/scripts/lib/site-files.js                @Oba-One
+/supabase/migration-manifest.json         @Oba-One
 /package.json                             @Oba-One
 /package-lock.json                        @Oba-One
 /.nvmrc                                   @Oba-One

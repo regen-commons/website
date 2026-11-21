@@ -43,7 +43,7 @@ dependency manager so there is one lockfile.
 
 | Command | Evidence |
 |---|---|
-| `npm run check` | JS/inline-script syntax, local page link targets, JSON parsing |
+| `npm run check` | JS/inline-script syntax, local page link targets, JSON parsing, then oxlint, Biome formatting and the project rules (HTML sinks, provider timeouts, API log contents) against the shrink-only `.agents/lint-baseline.json` |
 | `npm test` | HTTP behavior, credential isolation, public data filtering, validation, body limits, rate limiting, seed/save and list state transitions |
 | `npm run smoke` | Six pages/assets, public API reads/writes, pending application exclusion, steward sign-in and authorized queue |
 
@@ -121,8 +121,8 @@ have none of this and use their own Node 22.
 
 The quick start and the three checks above work unchanged. Anything that needs
 the Vercel CLI, a live provider, Docker, or `psql` does not: that covers
-`npm run dev:live`, `npm run deploy`, `scripts/sync-*`, and the disposable SQL
-suites, which CI runs. The machine can reach only package and toolchain hosts.
+`npm run dev:live`, `scripts/sync-*`, and the disposable SQL suites, which CI
+runs. The machine can reach only package and toolchain hosts.
 Inside it, a command can change files but cannot create or remove folders outside
 `node_modules`, so make a new folder on the Mac first.
 
@@ -137,6 +137,25 @@ When working on that Mac:
 - A Codex chat reaches the machine only with **Custom (config.toml)** selected in
   the permissions control below the composer, or with approval to run the command
   outside the sandbox. Either way the command still runs in the machine.
+
+## Production deploys
+
+Production comes only from the Vercel Git integration: every merge into `main`
+deploys the site and its API. There is no deploy script, and no one deploys
+production from a branch or the command line; `.agents/policy.json` makes the
+agent guards ask before `vercel deploy`. Task branches get no preview: the
+project's Ignored Build Step builds only `main` and `develop`.
+
+`.vercelignore` limits the upload to the public files the fixture server serves
+(`scripts/lib/site-files.js`), the API, the root contracts the API imports, the
+font licenses, and `package.json`, `package-lock.json` and `vercel.json`.
+`scripts/lib/vercel-ignore.js` generates it, and `tests/vercelignore.test.js`
+fails when the two drift apart or when docs, migrations, tests or tooling would
+be uploaded. Add a new public file to `site-files.js`, then regenerate:
+
+```sh
+node -e 'import("./scripts/lib/vercel-ignore.js").then((m) => process.stdout.write(m.vercelIgnore()))' > .vercelignore
+```
 
 ## Live integration workflow
 

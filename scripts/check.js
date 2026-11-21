@@ -3,6 +3,7 @@ import { spawnSync } from "node:child_process";
 import { Script } from "node:vm";
 import { fileURLToPath } from "node:url";
 import { pages, resolvePublicFile } from "./lib/site-files.js";
+import { main as lint } from "./lint/run.mjs";
 
 const root = new URL("../", import.meta.url);
 let count = 0;
@@ -12,7 +13,9 @@ async function checkDirectory(directory) {
     const path = new URL(entry.name + (entry.isDirectory() ? "/" : ""), directory);
     if (entry.isDirectory()) await checkDirectory(path);
     else if (entry.name.endsWith(".js")) {
-      const result = spawnSync(process.execPath, ["--check", fileURLToPath(path)], { encoding: "utf8" });
+      const result = spawnSync(process.execPath, ["--check", fileURLToPath(path)], {
+        encoding: "utf8",
+      });
       if (result.error) throw result.error;
       if (result.status !== 0) throw new Error(result.stderr);
       count++;
@@ -37,7 +40,9 @@ for (const file of pages) {
     await access(new URL(filePath, root));
   }
   // Link previews name absolute URLs; the image must ship with the site.
-  for (const match of html.matchAll(/<meta property="og:image" content="https:\/\/regencommons\.com(\/[^"]+)"/g)) {
+  for (const match of html.matchAll(
+    /<meta property="og:image" content="https:\/\/regencommons\.com(\/[^"]+)"/g
+  )) {
     const filePath = resolvePublicFile(match[1]);
     if (!filePath) throw new Error(`${file}: share image is not served: ${match[1]}`);
     await access(new URL(filePath, root));
@@ -46,4 +51,8 @@ for (const file of pages) {
 for (const file of ["package.json", "package-lock.json", "vercel.json"]) {
   JSON.parse(await readFile(new URL(file, root), "utf8"));
 }
-console.log(`Checked ${count} JavaScript files/inline scripts, local page links, and JSON configuration.`);
+console.log(
+  `Checked ${count} JavaScript files/inline scripts, local page links, and JSON configuration.`
+);
+// oxlint, Biome formatting and the project rules, against the shrink-only baseline.
+process.exitCode = lint("check");

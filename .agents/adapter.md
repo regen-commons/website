@@ -23,7 +23,7 @@ none. Choose tiers by hand from **Tiers**, then add every row of **Conditional c
 | Tier | Use | Command |
 |---|---|---|
 | targeted | the smallest proof of one changed behavior | `node --test tests/<name>.test.js` |
-| style | non-mutating static checks: JavaScript and inline scripts parse, local links and share images resolve, JSON parses (no formatter or linter yet) | `npm run check` |
+| style | non-mutating static checks and lint: JavaScript and inline scripts parse, local links and share images resolve, JSON parses, then oxlint, Biome formatting and the project rules against `.agents/lint-baseline.json` | `npm run check` (lint alone: `npm run lint`) |
 | checkpoint | a coherent cross-surface batch or shared-contract change | `npm run check && npm test` |
 | push | ready-for-CI gate on the committed tree before a push | `npm run check && npm test && npm run smoke` |
 | readiness | explicit production-readiness review; non-mutating full local gate | the push tier, plus CI's `database` job green at the head SHA, plus rendered proof for UI changes |
@@ -32,8 +32,11 @@ none. Choose tiers by hand from **Tiers**, then add every row of **Conditional c
 
 ### Conditional checks
 - Handler, provider adapter or fixture → `node --test tests/<surface>.test.js` for the owning suite, and `npm run smoke`.
+- A new migration → its entry in `supabase/migration-manifest.json` (the failing test prints it), in the same pull request.
 - `supabase/migrations/**` or `supabase/tests/**` → CI `database` (applies every migration to a disposable Postgres and runs the SQL suites). It cannot run on the dev machine, which has no Postgres.
 - Page, `script.js`, `style.css` or `admin/**` → rendered proof per **Rendered proof**.
+- A new public file → add it to `scripts/lib/site-files.js` and regenerate `.vercelignore` (`docs/development.md` § Production deploys).
+- A lint count that went down → `npm run lint:shrink` to lock it in; never raise the baseline to pass.
 - Agent guidance, skills or `.agents/**` → `dev agents doctor regen-commons-site` (reads `origin/main`) or `node ~/Code/dev-surfaces/agents/kit/doctor/agents-doctor.mjs <worktree>`, plus CI `agents-doctor / Agents doctor`.
 - A production claim → afo's deployed evidence; never inferred from fixture tests.
 
@@ -44,7 +47,7 @@ none. Choose tiers by hand from **Tiers**, then add every row of **Conditional c
 - Routine: everything else. Merge on the required checks and a targeted check.
 
 ### CI
-GitHub Actions, `.github/workflows/ci.yml`. Required at the PR's current head SHA: `.agents/merge-policy.json` `requiredChecks`. CI owns the SQL suites, the Notion import replay and the doctor; a local run never stands in for pending CI.
+GitHub Actions, `.github/workflows/ci.yml`. Required at the PR's current head SHA: `.agents/merge-policy.json` `requiredChecks` (`ci-gate`, which passes only when `check`, `database` and `agents-doctor` pass). CI owns the SQL suites, the Notion import replay and the doctor; a local run never stands in for pending CI.
 
 ### Rendered proof
 Use the fixture server (`npm run dev`, synthetic data, a **Local demo** banner). Label each capture with browser, viewport (375 and 1280 wide) and color scheme, and as rendered local fixtures. `/council` signs in as `steward@example.test` with code `123456`. Fixtures do not prove Vercel routing, email delivery, Telegram delivery or hosted auth; record those as pending.
