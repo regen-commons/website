@@ -1,0 +1,38 @@
+# Owners for the critical and sensitive merge tiers (.agents/merge-policy.json).
+# No tier requires a code owner's review: agents merge on proof, and GitHub
+# refuses approval of one's own pull request. This file routes review requests
+# and names who answers for each gated path; routine paths have no owner here.
+
+# Sensitive: steward dashboard UI, notifications and email, fixture providers
+/admin/                               @Oba-One
+/council.html                         @Oba-One
+/api/_lib/intake-notifications.js     @Oba-One
+/api/_lib/contact-notifications.js    @Oba-One
+/api/_lib/membership-email.js         @Oba-One
+/api/_lib/notification-result.js      @Oba-One
+/api/_lib/notify.js                   @Oba-One
+/scripts/process-notifications.js     @Oba-One
+/supabase/templates/                  @Oba-One
+/scripts/dev.js                       @Oba-One
+/scripts/lib/                         @Oba-One
+/.agents/policy.json                  @Oba-One
+
+# Later lines win in CODEOWNERS, so the critical paths come last.
+# Critical: intake handlers and contracts, steward auth and data, migrations
+# and SQL suites, what Vercel serves and installs, CI and the merge policy
+/api/*.js                             @Oba-One
+/api/_lib/public-data.js              @Oba-One
+/api/_lib/steward-data.js             @Oba-One
+/api/_lib/membership-contract.js      @Oba-One
+/api/_lib/content-contract.js         @Oba-One
+/contact-contract.js                  @Oba-One
+/feedback-contract.js                 @Oba-One
+/supabase/migrations/                 @Oba-One
+/supabase/tests/                      @Oba-One
+/vercel.json                          @Oba-One
+/package.json                         @Oba-One
+/package-lock.json                    @Oba-One
+/.nvmrc                               @Oba-One
+/.github/workflows/                   @Oba-One
+/.github/CODEOWNERS                   @Oba-One
+/.agents/merge-policy.json            @Oba-One

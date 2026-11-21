@@ -66,7 +66,7 @@ implementation. Use the fixture environment for this task, make a bounded
 change, and report check/test/smoke results plus any browser or live-service gaps.
 ```
 
-- [Agent guide](AGENTS.md) and [site-development skill](skills/site-development/SKILL.md)
+- [Agent guide](AGENTS.md) and [site-development skill](.agents/skills/site-development/SKILL.md)
 - [Architecture and integration contracts](docs/integrations.md)
 - [Initial assessment](docs/assessment-2026-10-29.md)
 - [Prioritized initial work](docs/work-plan.md)

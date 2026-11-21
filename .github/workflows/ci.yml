@@ -18,6 +18,16 @@ jobs:
       - run: npm run check
       - run: npm test
       - run: npm run smoke
+  agents-doctor:
+    # Checks the shared agent kit: AGENTS.md as the guide, CLAUDE.md importing
+    # it, one skills folder, valid .agents policy files, the PR template,
+    # CODEOWNERS and the skill adapter. No path filter, so a gate can depend on
+    # it. Pinned to a guild commit; doctor-ref matches, so the workflow and the
+    # doctor script it runs come from the same commit.
+    uses: greenpill-dev-guild/.github/.github/workflows/agents-doctor.yml@d5bab15ee152be8fe289257826b28655090e4d05
+    with:
+      mode: ci
+      doctor-ref: d5bab15ee152be8fe289257826b28655090e4d05
   database:
     runs-on: ubuntu-latest
     services:

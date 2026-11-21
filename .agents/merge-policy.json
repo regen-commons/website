@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "mergeMethod": "merge",
+  "autoMerge": false,
+  "deleteBranchOnMerge": true,
+  "adminBypass": false,
+  "requiredChecks": [
+    "check"
+  ],
+  "release": {
+    "about": "main is both the integration branch and production: the Vercel Git integration deploys the site and its API from every merge into main, and nothing else deploys production (no branch deploys, no command-line deploys). afo decided on 21 Nov 2026 to accept live from main for routine and sensitive changes merged on proof. A critical change merges on the full gate plus a fresh agent's adversarial review, then waits for afo's go in the session before an agent merges it, because that merge is the production release. Auto-merge stays off: agents merge by hand on the reviewed head with gh pr merge --merge --match-head-commit <sha>. Applying a migration to the hosted Supabase project (supabase db push, supabase migration repair) and any vercel deploy are afo's steps; .agents/policy.json makes the shared guards ask first on afo's machine. There is no Merge Gate check: each pull request records its tier and its proof in its Verification section.",
+    "approvalAt": [
+      "merging a pull request that touches a critical path",
+      "supabase db push and supabase migration repair against the hosted project",
+      "vercel deploy, promote, rollback or alias"
+    ]
+  },
+  "tiers": {
+    "critical": {
+      "about": "Intake handlers and their contracts, steward auth and data, migrations and SQL suites, what Vercel serves and installs, CI and this policy. Merges once three things hold on the current head: every required check is green, the full gate has passed (CI's check and database jobs, plus rendered proof for UI changes), and a fresh agent's adversarial review naming the head SHA is addressed. Then it waits for afo's go, and the agent merges by hand with that SHA as the expected head (gh pr merge --merge --match-head-commit <sha>), stopping if the head has moved. Code-owner review cannot gate this tier, because GitHub refuses approval of one's own pull request.",
+      "paths": [
+        "api/*.js",
+        "api/_lib/public-data.js",
+        "api/_lib/steward-data.js",
+        "api/_lib/membership-contract.js",
+        "api/_lib/content-contract.js",
+        "contact-contract.js",
+        "feedback-contract.js",
+        "supabase/migrations/**",
+        "supabase/tests/**",
+        "vercel.json",
+        "package.json",
+        "package-lock.json",
+        ".nvmrc",
+        ".github/workflows/**",
+        ".github/CODEOWNERS",
+        ".agents/merge-policy.json"
+      ],
+      "requireCodeOwnerReview": false,
+      "autoMerge": false
+    },
+    "sensitive": {
+      "about": "The steward dashboard UI, notifications and email, and the fixture providers that stand in for live services. Merges once the required checks are green and a fresh agent's adversarial review naming the head SHA is addressed, merged by hand with gh pr merge --merge --match-head-commit <sha>.",
+      "paths": [
+        "admin/**",
+        "council.html",
+        "api/_lib/intake-notifications.js",
+        "api/_lib/contact-notifications.js",
+        "api/_lib/membership-email.js",
+        "api/_lib/notification-result.js",
+        "api/_lib/notify.js",
+        "scripts/process-notifications.js",
+        "supabase/templates/**",
+        "scripts/dev.js",
+        "scripts/lib/**",
+        ".agents/policy.json"
+      ],
+      "requireCodeOwnerReview": false,
+      "autoMerge": false
+    },
+    "routine": {
+      "about": "Everything else: public pages and styles, docs, tests, tooling and guidance. Merges by hand once the required checks are green and a targeted check for the change has passed.",
+      "paths": [
+        "**"
+      ],
+      "requireCodeOwnerReview": false,
+      "autoMerge": false
+    }
+  }
+}
