@@ -139,3 +139,27 @@ The API deployed before it never names the columns and keeps working once they e
 The user approved applying it to Platform on 20 November 2026. Use the same commands as above. The
 dry run must list exactly this one version. Afterwards, check that the three columns exist with their
 check constraints, and that `weave_index_job` still holds only its table grants on the table.
+
+## Work scope and organization description release
+
+`20261121204212_weave_project_index_work_scope` and
+`20261121204219_weave_project_index_organization_description` match
+`supabase/candidates/weave-project-index-work-scope.sql` and
+`supabase/candidates/weave-project-index-organization-description.sql` in Weave
+([regen-commons/weave#134](https://github.com/regen-commons/weave/pull/134), `31e30ef`) byte for
+byte. They add two columns to `private.weave_project_index_source`. `work_scope` holds the keys of
+the work scope tags a project's own Certified activity uses, which the public list filters on as
+Focus. `organization_description` holds the opening sentences of the publisher's organization
+description, which the list searches but never shows and matching never reads. One has a constant
+default and the other is nullable, so adding them rewrote no rows, and the index job's existing table
+grants cover them. The Weave API from that pull request reads and writes them. The API deployed
+before it never names the columns and keeps working now that they exist.
+
+The user approved applying them to Platform on 21 November 2026. The Supabase CLI was not available,
+so, with the user's agreement, they were applied through the Supabase connector before this pull
+request merged, and the files take the versions the connector recorded. The SQL recorded in
+Platform's history matches each file byte for byte. Before applying, every migration in this
+repository and both new ones replayed on the CI image as the non-superuser migration owner, and all
+ten SQL suites passed. Afterwards, both columns existed with their check constraints, all 1,021 rows
+read as empty until the next refresh, and `weave_index_job` still held only its table grants on the
+table.
