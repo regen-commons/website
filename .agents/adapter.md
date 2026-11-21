@@ -23,7 +23,7 @@ none. Choose tiers by hand from **Tiers**, then add every row of **Conditional c
 | Tier | Use | Command |
 |---|---|---|
 | targeted | the smallest proof of one changed behavior | `node --test tests/<name>.test.js` |
-| style | path-scoped, non-mutating format and lint | `npm run check` |
+| style | non-mutating static checks: JavaScript and inline scripts parse, local links and share images resolve, JSON parses (no formatter or linter yet) | `npm run check` |
 | checkpoint | a coherent cross-surface batch or shared-contract change | `npm run check && npm test` |
 | push | ready-for-CI gate on the committed tree before a push | `npm run check && npm test && npm run smoke` |
 | readiness | explicit production-readiness review; non-mutating full local gate | the push tier, plus CI's `database` job green at the head SHA, plus rendered proof for UI changes |
@@ -40,7 +40,7 @@ none. Choose tiers by hand from **Tiers**, then add every row of **Conditional c
 ### Criticality
 `.agents/merge-policy.json` owns the tiers and their paths.
 - Critical: the API handlers, intake and steward data modules and the root contracts, `supabase/migrations/**`, `supabase/tests/**`, `vercel.json`, `package.json`, `package-lock.json`, `.nvmrc`, `.github/workflows/**`, `.agents/merge-policy.json`, `.github/CODEOWNERS`. Merge on the full gate plus a fresh agent's adversarial review naming the head SHA, then wait for afo's go, because the merge is the production release.
-- Sensitive: `admin/**`, `council.html`, the notification modules, email templates and the fixture providers. Merge on the required checks plus that review.
+- Sensitive: `admin/**`, `council.html`, the intake pages and form scripts, the notification modules, email templates, the fixture server and providers, `tests/**`, `scripts/check.js`, `scripts/smoke.js`, the Notion import scripts, and agent guidance (`AGENTS.md`, `*/AGENTS.md`, `.agents/adapter.md`, `.agents/policy.json`, `.agents/skills/**`). Merge on the required checks plus that review.
 - Routine: everything else. Merge on the required checks and a targeted check.
 
 ### CI
@@ -246,7 +246,7 @@ none locally; CI is the gate.
 `.github/pull_request_template.md` (Why, Measured, Verification, Not verified). Verification names the merge tier from `.agents/merge-policy.json` and the proof that tier needs. The repository is public: no real applicant data, contact details or private captures in a PR.
 
 ### Merge
-`.agents/merge-policy.json`: merge commits only, auto-merge off. Merge by hand on the reviewed head with `gh pr merge <n> --repo regen-commons/website --merge --match-head-commit <sha>`. Critical changes wait for afo's go.
+`.agents/merge-policy.json`: merge commits only, auto-merge off. An agent merges routine and sensitive changes itself once their proof holds (afo's standing decision of 21 November 2026, which is the authorization the ship skill asks for); a critical change waits for afo's go in the session. Merge by hand on the reviewed head with `gh pr merge <n> --repo regen-commons/website --merge --match-head-commit <sha>`, never squash or rebase, even where GitHub still allows them.
 
 ### After merge
 Vercel deploys `main` to production. afo checks the deployment; agents send no request to the live site.

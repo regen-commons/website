@@ -3,15 +3,21 @@
   "commands": [
     {
       "id": "vercel-deploy",
-      "pattern": "^(\\S*/)?((npx|bunx)( -\\S+)* |(pnpm|yarn) dlx |npm exec( --)? )?vercel( --?[\\w-]+(=\\S+| [^-\\s]\\S*)?)*( (deploy|redeploy|promote|rollback|alias)( |$)|$)|^(\\S*/)?((npx|bunx)( -\\S+)* |(pnpm|yarn) dlx |npm exec( --)? )?vercel( .*)? --prod( |$)",
+      "pattern": "^(\\S*/)?((npx|bunx)( -\\S+)* |(pnpm|yarn) dlx |npm exec( --)? )?(vercel|vc)( --?[\\w-]+(=\\S+| [^-\\s]\\S*)?)*( (deploy|redeploy|promote|rollback|alias)( |$)| [./~]\\S*|$)|^(\\S*/)?((npx|bunx)( -\\S+)* |(pnpm|yarn) dlx |npm exec( --)? )?(vercel|vc)( .*)? --prod( |$)|^(\\S*/)?((npx|bunx)( -\\S+)* |(pnpm|yarn) dlx |npm exec( --)? )?(vercel|vc)( --?[\\w-]+(=\\S+| [^-\\s]\\S*)?)* env (add|rm|remove|update)( |$)",
       "action": "ask",
-      "message": "PRODUCTION DEPLOYMENT: production comes only from the Vercel Git integration on main. A command-line deploy, promote, rollback or alias is afo's step. Go ahead only on his explicit word in this session."
+      "message": "PRODUCTION: production comes only from the Vercel Git integration on main. A command-line deploy, promote, rollback or alias, and a change to Vercel environment variables, are afo's steps. Go ahead only on his explicit word in this session."
+    },
+    {
+      "id": "npm-deploy-script",
+      "pattern": "^(\\S*/)?(npm|pnpm|yarn|bun)( --?[\\w-]+(=\\S+)?)*( run| run-script)?( --?[\\w-]+(=\\S+)?)* deploy( |$)",
+      "action": "ask",
+      "message": "PRODUCTION DEPLOYMENT: the deploy script runs vercel deploy --prod. Production comes only from the Vercel Git integration on main; a command-line deploy is afo's step. Go ahead only on his explicit word in this session."
     },
     {
       "id": "supabase-remote-write",
-      "pattern": "^(\\S*/)?((npx|bunx)( -\\S+)* |(pnpm|yarn) dlx |npm exec( --)? )?supabase( --?[\\w-]+(=\\S+| [^-\\s]\\S*)?)* (db push|migration repair)( |$)",
+      "pattern": "^(\\S*/)?((npx|bunx)( -\\S+)* |(pnpm|yarn) dlx |npm exec( --)? )?supabase( --?[\\w-]+(=\\S+| [^-\\s]\\S*)?)* (db push|migration repair|migration up|config push|secrets (set|unset)|db reset( .*)? --(linked|db-url))( |$)",
       "action": "ask",
-      "message": "HOSTED DATABASE: supabase db push and supabase migration repair change the linked Supabase project, which holds real applicant data. Applying migrations to the hosted database is afo's step. Go ahead only on his explicit word in this session."
+      "message": "HOSTED DATABASE: this changes the linked Supabase project (migrations, migration history, a reset, auth config or secrets), which holds real applicant data. Applying migrations to the hosted database is afo's step. Go ahead only on his explicit word in this session."
     }
   ],
   "paths": [

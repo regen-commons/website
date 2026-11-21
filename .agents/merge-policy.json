@@ -40,26 +40,43 @@
       "autoMerge": false
     },
     "sensitive": {
-      "about": "The steward dashboard UI, notifications and email, and the fixture providers that stand in for live services. Merges once the required checks are green and a fresh agent's adversarial review naming the head SHA is addressed, merged by hand with gh pr merge --merge --match-head-commit <sha>.",
+      "about": "The steward dashboard UI, the public intake pages and their form scripts, notifications and email, the fixture server and providers that stand in for live services, the tests and check scripts that enforce critical rules, the Notion import scripts that read real exports, and the agent guidance that states the merge procedure. Merges once the required checks are green and a fresh agent's adversarial review naming the head SHA is addressed, merged by hand with gh pr merge --merge --match-head-commit <sha>.",
       "paths": [
         "admin/**",
         "council.html",
+        "join.html",
+        "seeds.html",
+        "feedback.html",
+        "about.html",
+        "seed-form.js",
+        "contact-form.js",
+        "feedback-form.js",
         "api/_lib/intake-notifications.js",
         "api/_lib/contact-notifications.js",
         "api/_lib/membership-email.js",
         "api/_lib/notification-result.js",
         "api/_lib/notify.js",
+        "api/_lib/notion.js",
         "scripts/process-notifications.js",
         "supabase/templates/**",
         "scripts/dev.js",
         "scripts/lib/**",
-        ".agents/policy.json"
+        "tests/**",
+        "scripts/check.js",
+        "scripts/smoke.js",
+        "scripts/prepare-notion-import.js",
+        "scripts/inspect-notion-export.js",
+        "AGENTS.md",
+        "*/AGENTS.md",
+        ".agents/adapter.md",
+        ".agents/policy.json",
+        ".agents/skills/**"
       ],
       "requireCodeOwnerReview": false,
       "autoMerge": false
     },
     "routine": {
-      "about": "Everything else: public pages and styles, docs, tests, tooling and guidance. Merges by hand once the required checks are green and a targeted check for the change has passed.",
+      "about": "Everything else: the other public pages and styles, docs, and scripts and tooling not named above. Merges by hand once the required checks are green and a targeted check for the change has passed.",
       "paths": [
         "**"
       ],

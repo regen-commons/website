@@ -3,19 +3,37 @@
 # refuses approval of one's own pull request. This file routes review requests
 # and names who answers for each gated path; routine paths have no owner here.
 
-# Sensitive: steward dashboard UI, notifications and email, fixture providers
+# Sensitive: steward UI, intake pages and forms, notifications and email,
+# fixture providers, tests and check scripts, Notion import scripts, guidance
 /admin/                               @Oba-One
 /council.html                         @Oba-One
+/join.html                            @Oba-One
+/seeds.html                           @Oba-One
+/feedback.html                        @Oba-One
+/about.html                           @Oba-One
+/seed-form.js                         @Oba-One
+/contact-form.js                      @Oba-One
+/feedback-form.js                     @Oba-One
 /api/_lib/intake-notifications.js     @Oba-One
 /api/_lib/contact-notifications.js    @Oba-One
 /api/_lib/membership-email.js         @Oba-One
 /api/_lib/notification-result.js      @Oba-One
 /api/_lib/notify.js                   @Oba-One
+/api/_lib/notion.js                   @Oba-One
 /scripts/process-notifications.js     @Oba-One
 /supabase/templates/                  @Oba-One
 /scripts/dev.js                       @Oba-One
 /scripts/lib/                         @Oba-One
+/tests/                               @Oba-One
+/scripts/check.js                     @Oba-One
+/scripts/smoke.js                     @Oba-One
+/scripts/prepare-notion-import.js     @Oba-One
+/scripts/inspect-notion-export.js     @Oba-One
+/AGENTS.md                            @Oba-One
+/**/AGENTS.md                         @Oba-One
+/.agents/adapter.md                   @Oba-One
 /.agents/policy.json                  @Oba-One
+/.agents/skills/                      @Oba-One
 
 # Later lines win in CODEOWNERS, so the critical paths come last.
 # Critical: intake handlers and contracts, steward auth and data, migrations

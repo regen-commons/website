@@ -112,9 +112,10 @@ must hold for them belongs in the repository and CI.
 | Migrations apply in order to a fresh Postgres | CI `database` (not yet a required check) | `.github/workflows/ci.yml` |
 | Never rewrite an applied migration | none yet; shared guard notice (local only) | `.agents/policy.json` |
 | Use npm and the lockfile | CI `check` (`npm ci` fails on a lockfile mismatch) | `.github/workflows/ci.yml` |
-| `CLAUDE.md` imports this file; one skills folder; valid policy files; PR template; CODEOWNERS; the skill adapter | `dev agents doctor` (local); CI from the doctor job | `.agents/`, `.github/` |
-| `vercel deploy`, `supabase db push` and `supabase migration repair` are afo's | shared guards ask first (local only); review for cloud agents | `.agents/policy.json` |
+| `CLAUDE.md` imports this file; one skills folder; policy files parse with the right shape; a PR template with four sections; a CODEOWNERS file; the skill adapter | `dev agents doctor` (local); CI `agents-doctor / Agents doctor` (checks existence and shape only, not path coverage; not yet a required check) | `.agents/`, `.github/` |
+| Command-line Vercel deploys and env changes, and Supabase commands that write the hosted project (`db push`, `migration repair`, `migration up`, a linked `db reset`, `config push`, `secrets`), are afo's | shared guards ask first (local only); review for cloud agents | `.agents/policy.json` |
 | Critical changes merge on the full gate and a fresh adversarial review, then afo's go | review only (no merge gate check) | `.agents/merge-policy.json` |
+| Merge commits only, branches deleted on merge, auto-merge off | none yet: GitHub still allows squash and rebase and keeps branches until afo applies `dev merge-settings apply --execute regen-commons-site` | `.agents/merge-policy.json` |
 | Keep `.env*`, real applications, contact details and credentials out of commits | `.gitignore` for `.env*`; shared guards (local only); review for the rest | `.gitignore` |
 | Submitted text renders as text; link protocols are validated | none yet | `admin/AGENTS.md` |
 | Provider calls have a timeout; logs carry no raw provider bodies or personal data | none yet | `api/AGENTS.md` |
