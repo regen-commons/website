@@ -66,17 +66,41 @@ begin
 
   -- A view runs with its owner's rights unless it is security_invoker, so a view
   -- the anon or authenticated role may select can bypass row-level security.
-  select string_agg(format('%I.%I', n.nspname, c.relname), ', ' order by 1) into new_gaps
-  from pg_class c
-  join pg_namespace n on n.oid = c.relnamespace
-  where c.relkind in ('v', 'm')
-    and n.nspname <> all (managed)
-    and (has_table_privilege('anon', c.oid, 'SELECT')
-      or has_table_privilege('authenticated', c.oid, 'SELECT'))
-    and (c.relkind = 'm'
-      or not coalesce((select option_value::boolean from pg_options_to_table(c.reloptions)
-        where option_name = 'security_invoker'), false))
-    and format('%I.%I', n.nspname, c.relname) <> all (known_definer_views);
+  with readable_definer_views as (
+    select format('%I.%I', n.nspname, c.relname) as name
+    from pg_class c
+    join pg_namespace n on n.oid = c.relnamespace
+    where c.relkind in ('v', 'm')
+      and n.nspname <> all (managed)
+      -- Column grants count: a role granted select on some columns can read them.
+      and (has_any_column_privilege('anon', c.oid, 'SELECT')
+        or has_any_column_privilege('authenticated', c.oid, 'SELECT'))
+      and (c.relkind = 'm'
+        or not coalesce((select option_value::boolean from pg_options_to_table(c.reloptions)
+          where option_name = 'security_invoker'), false))
+  )
+  select string_agg(name, ', ' order by name) into new_gaps
+  from readable_definer_views
+  where name <> all (known_definer_views);
+
+  select string_agg(gap, ', ' order by gap) into stale
+  from unnest(known_definer_views) as gap
+  where not exists (
+    select 1
+    from pg_class c
+    join pg_namespace n on n.oid = c.relnamespace
+    where format('%I.%I', n.nspname, c.relname) = gap
+      and c.relkind in ('v', 'm')
+      and (has_any_column_privilege('anon', c.oid, 'SELECT')
+        or has_any_column_privilege('authenticated', c.oid, 'SELECT'))
+      and (c.relkind = 'm'
+        or not coalesce((select option_value::boolean from pg_options_to_table(c.reloptions)
+          where option_name = 'security_invoker'), false))
+  );
+
+  if stale is not null then
+    raise exception 'Remove from known_definer_views in supabase/tests/row-level-security.sql, now security_invoker, unreadable or gone: %', stale;
+  end if;
 
   if new_gaps is not null then
     raise exception 'Views the anon or authenticated role can read run with their owner''s rights, bypassing row-level security: %. Recreate them with (security_invoker = true), or revoke select and expose a narrow function instead.', new_gaps;

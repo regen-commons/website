@@ -56,14 +56,24 @@ test("manifest entries are unique and in version order", () => {
 // Editing a migration together with its hash passes the tests above, so CI also
 // compares with the base branch: recorded entries never change or disappear,
 // and a new migration sorts after every recorded one, as the Supabase CLI
-// expects. CI's checkout fetches the base; a checkout without it skips.
+// expects. CI's checkout fetches the base and fails without it; elsewhere it skips.
 test("the manifest only gains newer entries compared with the base branch", (t) => {
   const base = process.env.MANIFEST_BASE || `origin/${process.env.GITHUB_BASE_REF || "main"}`;
   const shown = spawnSync("git", ["show", `${base}:supabase/migration-manifest.json`], {
     cwd: root,
     encoding: "utf8",
   });
-  if (shown.status !== 0) return t.skip(`no manifest at ${base}: ${shown.stderr.trim()}`);
+  if (shown.status !== 0) {
+    const reason = shown.stderr.trim();
+    // Only a base without a manifest yet may skip in CI; a missing base is a failure there.
+    if (/exists on disk, but not in|does not exist in/.test(reason))
+      return t.skip(`no manifest at ${base} yet`);
+    assert.ok(
+      !process.env.CI,
+      `cannot read the manifest at ${base}: ${reason}. CI's check job must fetch the base branch.`
+    );
+    return t.skip(`git cannot read ${base} here: ${reason}`);
+  }
   const before = JSON.parse(shown.stdout).migrations;
   const now = new Map(manifest.migrations.map((entry) => [entry.file, entry]));
   for (const entry of before) {

@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { htmlSinks, nonLiteralLogs, untimedProviderCalls } from "../scripts/lint/project-rules.mjs";
+import {
+  htmlSinks,
+  nonLiteralLogs,
+  untimedProviderCalls,
+  withoutComments,
+} from "../scripts/lint/project-rules.mjs";
 
 test("html-sink flags markup written into the page and allows text", () => {
   assert.equal(htmlSinks('card.innerHTML = "<b>" + name + "</b>";'), 1);
@@ -65,4 +70,20 @@ test("the rules see past common variants and comments", () => {
   assert.equal(nonLiteralLogs('console["error"](err);'), 1);
   assert.equal(nonLiteralLogs("console.trace(error);"), 1);
   assert.equal(nonLiteralLogs("// console.log(error);"), 0);
+});
+
+test("regex literals and template expressions do not confuse the scanner", () => {
+  assert.equal(htmlSinks('s.replace(/^\\//, ""); el.innerHTML = p;'), 1);
+  assert.equal(htmlSinks("const re = /[&<>\"']/g; el.innerHTML = p;"), 1);
+  assert.equal(htmlSinks("const half = a / b; // el.innerHTML = p;\nx = c / d;"), 0);
+  assert.equal(
+    untimedProviderCalls(
+      'const re = /["\']/g; await fetch("https://x", { signal: AbortSignal.timeout(8000) });'
+    ),
+    0
+  );
+  assert.equal(nonLiteralLogs("const re = /[\"']/g;\n// console.log(err);"), 0);
+  assert.equal(nonLiteralLogs("const t = `a ${b ? `c` : d} e`; console.log(err);"), 1);
+  assert.equal(htmlSinks("const t = `${x}`; // el.innerHTML = p"), 0);
+  assert.equal(withoutComments("return /a\\/b/.test(x) // note"), "return /a\\/b/.test(x)        ");
 });

@@ -36,77 +36,162 @@ const LOG =
   /\bconsole\s*(?:\.\s*(?:log|info|warn|error|debug|trace)|\[\s*["'`](?:log|info|warn|error|debug|trace)["'`]\s*\])\s*\(/g;
 const TIMEOUT = /\bsignal\s*:\s*(?!undefined\b|null\b|void\b)\S/;
 
-// Source with comments blanked out (strings kept), so a comment can neither
-// trigger a rule nor satisfy one.
-export function withoutComments(source) {
-  let out = "";
-  let quote = null;
-  for (let i = 0; i < source.length; i++) {
+const REGEX_AFTER_WORD = new Set([
+  "return",
+  "typeof",
+  "instanceof",
+  "in",
+  "of",
+  "new",
+  "delete",
+  "void",
+  "throw",
+  "case",
+  "do",
+  "else",
+  "yield",
+  "await",
+]);
+
+// One pass over JavaScript source that returns two views of the same length:
+// `code`, with comments blanked and strings kept, and `mask`, which also
+// blanks the inside of strings, template text and regex literals. Rules find
+// calls and match parentheses in `mask`, then read the text from `code`. It
+// tells a regex literal from division by the token before the slash, and
+// follows `${}` inside template literals.
+export function scan(source) {
+  const code = source.split("");
+  const mask = source.split("");
+  const blank = (from, to, view) => {
+    for (let k = from; k < to; k++) if (view[k] !== "\n") view[k] = " ";
+  };
+  const templates = []; // brace depth at each open `${`
+  let braces = 0;
+  let previous = ""; // last significant character, or a keyword marker
+  let i = 0;
+  const readString = (quote) => {
+    let j = i + 1;
+    while (j < source.length && source[j] !== quote && source[j] !== "\n")
+      j += source[j] === "\\" ? 2 : 1;
+    blank(i + 1, j, mask);
+    i = j + 1;
+    previous = "a";
+  };
+  const readTemplateText = () => {
+    // From just after ` or } up to the closing ` or the next ${.
+    let j = i;
+    while (
+      j < source.length &&
+      source[j] !== "`" &&
+      !(source[j] === "$" && source[j + 1] === "{")
+    ) {
+      j += source[j] === "\\" ? 2 : 1;
+    }
+    blank(i, j, mask);
+    if (source[j] === "`") {
+      i = j + 1;
+      previous = "a";
+    } else {
+      templates.push(braces);
+      braces++;
+      i = j + 2;
+      previous = "{";
+    }
+  };
+  while (i < source.length) {
     const ch = source[i];
-    if (quote) {
-      out += ch;
-      if (ch === "\\") out += source[++i] ?? "";
-      else if (ch === quote) quote = null;
-    } else if (ch === '"' || ch === "'" || ch === "`") {
-      quote = ch;
-      out += ch;
-    } else if (ch === "/" && source[i + 1] === "/") {
-      while (i < source.length && source[i] !== "\n") i++;
-      out += "\n";
-    } else if (ch === "/" && source[i + 1] === "*") {
+    const next = source[i + 1];
+    if (ch === "/" && next === "/") {
+      const end = source.indexOf("\n", i) === -1 ? source.length : source.indexOf("\n", i);
+      blank(i, end, code);
+      blank(i, end, mask);
+      i = end;
+    } else if (ch === "/" && next === "*") {
       const close = source.indexOf("*/", i + 2);
       const end = close === -1 ? source.length : close + 2;
-      out += source.slice(i, end).replace(/[^\n]/g, " ");
-      i = end - 1;
-    } else out += ch;
+      blank(i, end, code);
+      blank(i, end, mask);
+      i = end;
+    } else if (ch === '"' || ch === "'") {
+      readString(ch);
+    } else if (ch === "`") {
+      i++;
+      readTemplateText();
+    } else if (ch === "}" && templates.length && templates.at(-1) === braces - 1) {
+      templates.pop();
+      braces--;
+      i++;
+      readTemplateText();
+    } else if (
+      ch === "/" &&
+      (previous === "" || previous === "kw" || "(,=:[!&|?{};+-*%<>~^".includes(previous))
+    ) {
+      let j = i + 1;
+      let inClass = false;
+      while (j < source.length && source[j] !== "\n") {
+        if (source[j] === "\\") j++;
+        else if (source[j] === "[") inClass = true;
+        else if (source[j] === "]") inClass = false;
+        else if (source[j] === "/" && !inClass) break;
+        j++;
+      }
+      blank(i + 1, j, mask);
+      i = j + 1;
+      while (/[a-z]/i.test(source[i] ?? "")) i++;
+      previous = "a";
+    } else if (/[A-Za-z_$]/.test(ch)) {
+      let j = i;
+      while (/[\w$]/.test(source[j] ?? "")) j++;
+      previous = REGEX_AFTER_WORD.has(source.slice(i, j)) ? "kw" : "a";
+      i = j;
+    } else {
+      if (ch === "{") braces++;
+      else if (ch === "}") braces--;
+      if (!/\s/.test(ch)) previous = /[\w$)\].]/.test(ch) ? "a" : ch;
+      i++;
+    }
   }
-  return out;
+  return { code: code.join(""), mask: mask.join("") };
 }
 
-// The text between an opening parenthesis at `open` and its match, skipping
-// strings, template literals and comments well enough for these checks.
-export function argumentsAt(source, open) {
+export function withoutComments(source) {
+  return scan(source).code;
+}
+
+// The text between an opening parenthesis at `open` and its match, found in
+// the masked view and read from the comment-free one.
+function argumentsAt({ code, mask }, open) {
   let depth = 0;
-  let quote = null;
-  for (let i = open; i < source.length; i++) {
-    const ch = source[i];
-    if (quote) {
-      if (ch === "\\") i++;
-      else if (ch === quote) quote = null;
-      continue;
-    }
-    if (ch === '"' || ch === "'" || ch === "`") quote = ch;
-    else if (ch === "/" && source[i + 1] === "/")
-      i = source.indexOf("\n", i) === -1 ? source.length : source.indexOf("\n", i);
-    else if (ch === "/" && source[i + 1] === "*")
-      i = source.indexOf("*/", i + 2) + 1 || source.length;
-    else if (ch === "(") depth++;
-    else if (ch === ")" && --depth === 0) return source.slice(open + 1, i);
+  for (let i = open; i < mask.length; i++) {
+    if (mask[i] === "(") depth++;
+    else if (mask[i] === ")" && --depth === 0) return code.slice(open + 1, i);
   }
-  return source.slice(open + 1);
+  return code.slice(open + 1);
 }
 
 const STRING_LITERAL = /^\s*(?:"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\$]|\\.)*`)\s*$/;
 
 export function htmlSinks(source) {
-  return [...withoutComments(source).matchAll(SINK)].length;
+  return [...scan(source).code.matchAll(SINK)].length;
 }
 
-export function untimedProviderCalls(text) {
-  const source = withoutComments(text);
+export function untimedProviderCalls(source) {
+  const views = scan(source);
   let count = 0;
-  for (const match of source.matchAll(CALL)) {
-    const args = argumentsAt(source, match.index + match[0].length - 1);
+  for (const match of views.code.matchAll(CALL)) {
+    if (views.mask[match.index] !== views.code[match.index]) continue; // inside a string
+    const args = argumentsAt(views, match.index + match[0].length - 1);
     if (!TIMEOUT.test(args)) count++;
   }
   return count;
 }
 
-export function nonLiteralLogs(text) {
-  const source = withoutComments(text);
+export function nonLiteralLogs(source) {
+  const views = scan(source);
   let count = 0;
-  for (const match of source.matchAll(LOG)) {
-    const args = argumentsAt(source, match.index + match[0].length - 1);
+  for (const match of views.code.matchAll(LOG)) {
+    if (views.mask[match.index] !== views.code[match.index]) continue; // inside a string
+    const args = argumentsAt(views, match.index + match[0].length - 1);
     if (!STRING_LITERAL.test(args)) count++;
   }
   return count;
