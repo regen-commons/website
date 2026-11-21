@@ -7,6 +7,8 @@ export const publicFiles = [...pages, "style.css", "theme-toggle.css", "design-t
   "assets/share/join.png", "assets/share/seeds.png", "assets/share/about.png", "assets/share/constitution.png",
   "assets/council/afolabi.webp", "assets/council/ellie.webp", "assets/council/eve.webp",
   "assets/council/gregory.webp", "assets/council/monty.webp",
+  "assets/claims-engine/green-goods.webp", "assets/claims-engine/regen-network.webp",
+  "assets/claims-engine/secondmuse.webp",
   "assets/fonts/fraunces-latin.woff2", "assets/fonts/fraunces-italic-latin.woff2",
   "assets/fonts/source-serif-4-latin.woff2", "assets/fonts/source-serif-4-italic-latin.woff2",
   "assets/fonts/space-grotesk-latin.woff2",
