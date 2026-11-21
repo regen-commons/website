@@ -62,6 +62,7 @@ test("the manifest only gains newer entries compared with the base branch", (t) 
   const shown = spawnSync("git", ["show", `${base}:supabase/migration-manifest.json`], {
     cwd: root,
     encoding: "utf8",
+    env: { ...process.env, LC_ALL: "C" },
   });
   if (shown.status !== 0) {
     const reason = shown.stderr.trim();

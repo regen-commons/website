@@ -87,3 +87,14 @@ test("regex literals and template expressions do not confuse the scanner", () =>
   assert.equal(htmlSinks("const t = `${x}`; // el.innerHTML = p"), 0);
   assert.equal(withoutComments("return /a\\/b/.test(x) // note"), "return /a\\/b/.test(x)        ");
 });
+
+test("postfix operators, strings and truncated input stay in step", () => {
+  const source =
+    "const pct = done++ / total; const url = `${base}/x`;\nawait fetch(url);\nconsole.log(err);";
+  assert.equal(untimedProviderCalls(source), 1);
+  assert.equal(nonLiteralLogs(source), 1);
+  assert.equal(htmlSinks("s = 'el.innerHTML = x';"), 0);
+  assert.equal(untimedProviderCalls('await fetch(u, { body: "signal: x" });'), 1);
+  const truncated = 's = "abc\\';
+  assert.equal(withoutComments(truncated).length, truncated.length);
+});

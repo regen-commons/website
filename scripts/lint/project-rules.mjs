@@ -63,7 +63,7 @@ export function scan(source) {
   const code = source.split("");
   const mask = source.split("");
   const blank = (from, to, view) => {
-    for (let k = from; k < to; k++) if (view[k] !== "\n") view[k] = " ";
+    for (let k = from; k < Math.min(to, view.length); k++) if (view[k] !== "\n") view[k] = " ";
   };
   const templates = []; // brace depth at each open `${`
   let braces = 0;
@@ -144,6 +144,9 @@ export function scan(source) {
       while (/[\w$]/.test(source[j] ?? "")) j++;
       previous = REGEX_AFTER_WORD.has(source.slice(i, j)) ? "kw" : "a";
       i = j;
+    } else if ((ch === "+" || ch === "-") && next === ch && previous === "a") {
+      // Postfix ++ or -- ends an operand, so a following slash divides.
+      i += 2;
     } else {
       if (ch === "{") braces++;
       else if (ch === "}") braces--;
@@ -160,19 +163,20 @@ export function withoutComments(source) {
 
 // The text between an opening parenthesis at `open` and its match, found in
 // the masked view and read from the comment-free one.
-function argumentsAt({ code, mask }, open) {
+function argumentsAt({ code, mask }, open, view = code) {
   let depth = 0;
   for (let i = open; i < mask.length; i++) {
     if (mask[i] === "(") depth++;
-    else if (mask[i] === ")" && --depth === 0) return code.slice(open + 1, i);
+    else if (mask[i] === ")" && --depth === 0) return view.slice(open + 1, i);
   }
-  return code.slice(open + 1);
+  return view.slice(open + 1);
 }
 
 const STRING_LITERAL = /^\s*(?:"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\$]|\\.)*`)\s*$/;
 
 export function htmlSinks(source) {
-  return [...scan(source).code.matchAll(SINK)].length;
+  const { code, mask } = scan(source);
+  return [...code.matchAll(SINK)].filter((match) => mask[match.index] === code[match.index]).length;
 }
 
 export function untimedProviderCalls(source) {
@@ -180,7 +184,8 @@ export function untimedProviderCalls(source) {
   let count = 0;
   for (const match of views.code.matchAll(CALL)) {
     if (views.mask[match.index] !== views.code[match.index]) continue; // inside a string
-    const args = argumentsAt(views, match.index + match[0].length - 1);
+    // Read the masked text, so "signal:" inside a string does not count.
+    const args = argumentsAt(views, match.index + match[0].length - 1, views.mask);
     if (!TIMEOUT.test(args)) count++;
   }
   return count;
