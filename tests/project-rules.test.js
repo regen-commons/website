@@ -47,3 +47,22 @@ test("log-literal-only flags API logs that could carry provider bodies or person
   assert.equal(nonLiteralLogs("console.warn('contact_notification_processing_failed')"), 0);
   assert.equal(nonLiteralLogs("console.info(`resend_delivery_record_failed`);"), 0);
 });
+
+test("the rules see past common variants and comments", () => {
+  assert.equal(htmlSinks('el["innerHTML"] = x;'), 1);
+  assert.equal(htmlSinks("frame.srcdoc = page;"), 1);
+  assert.equal(htmlSinks("el.setHTMLUnsafe(x);"), 1);
+  assert.equal(htmlSinks("range.createContextualFragment(x);"), 1);
+  assert.equal(htmlSinks("Object.assign(el, { innerHTML: x });"), 1);
+  assert.equal(htmlSinks("// card.innerHTML = old;\ncard.textContent = name;"), 0);
+  assert.equal(untimedProviderCalls('await globalThis.fetch(url, { method: "POST" });'), 1);
+  assert.equal(
+    untimedProviderCalls('await fetch(url, { /* signal: later */ method: "POST" });'),
+    1
+  );
+  assert.equal(untimedProviderCalls("await fetch(url, { signal: undefined });"), 1);
+  assert.equal(untimedProviderCalls("// fetch(url)\nconst x = 1;"), 0);
+  assert.equal(nonLiteralLogs('console["error"](err);'), 1);
+  assert.equal(nonLiteralLogs("console.trace(error);"), 1);
+  assert.equal(nonLiteralLogs("// console.log(error);"), 0);
+});

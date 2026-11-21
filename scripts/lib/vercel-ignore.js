@@ -30,14 +30,26 @@ function apiFiles(directory = join(root, "api")) {
   });
 }
 
-// Root modules the API imports with a relative path that leaves api/.
+// Relative module specifiers in static, side-effect and dynamic imports.
+const IMPORT = /\b(?:from|import)\s*\(?\s*["'](\.{1,2}\/[^"']+)["']/g;
+
+export function relativeImports(file) {
+  const source = readFileSync(join(root, file), "utf8");
+  return [...source.matchAll(IMPORT)].map((match) => normalize(join(dirname(file), match[1])));
+}
+
+// Root modules the API reaches through relative imports, followed through the
+// root modules' own imports.
 export function apiRootImports() {
   const found = new Set();
-  for (const file of apiFiles().filter((name) => name.endsWith(".js"))) {
-    const source = readFileSync(join(root, file), "utf8");
-    for (const match of source.matchAll(/\bfrom\s+["'](\.{1,2}\/[^"']+)["']/g)) {
-      const target = normalize(join(dirname(file), match[1]));
+  const queue = apiFiles().filter((name) => name.endsWith(".js"));
+  const seen = new Set(queue);
+  while (queue.length) {
+    for (const target of relativeImports(queue.shift())) {
+      if (seen.has(target)) continue;
+      seen.add(target);
       if (!target.startsWith("api/")) found.add(target);
+      queue.push(target);
     }
   }
   return [...found].sort();

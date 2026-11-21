@@ -112,21 +112,21 @@ must hold for them belongs in the repository and CI.
 | Local fixtures never reach a live provider; the fixture server serves no private files | CI `check` (`npm test`) | `tests/local-server.test.js` |
 | Steward reads verify the user and role on every request, token-scoped; sessions use secure cookies; POST is same-origin; private responses are no-store | CI `check` (`npm test`) | `tests/steward.test.js` |
 | Row-level security, grants and steward roles hold in the database; a linked profile is not acceptance | CI `database` (every SQL suite, through `ci-gate`) | `supabase/tests/*.sql` |
-| Every table in an exposed schema has row-level security on | CI `database` (through `ci-gate`), shrink-only exceptions | `supabase/tests/row-level-security.sql` |
+| Every table in an exposed schema has row-level security on; no view anon or authenticated can read runs with its owner's rights | CI `database` (through `ci-gate`), shrink-only exceptions | `supabase/tests/row-level-security.sql` |
 | Migrations apply in order to a fresh Postgres | CI `database` (through `ci-gate`) | `.github/workflows/ci.yml` |
-| Never rewrite an applied migration; every migration has a manifest entry with its owner (website or Platform) | CI `check` (`npm test`) | `supabase/migration-manifest.json`, `tests/migration-manifest.test.js` |
+| Never rewrite an applied migration; every migration has a manifest entry with its owner (website or Platform); entries only grow, newest last, compared with the base branch | CI `check` (`npm test`) | `supabase/migration-manifest.json`, `tests/migration-manifest.test.js` |
 | Use npm and the lockfile | CI `check` (`npm ci` fails on a lockfile mismatch) | `.github/workflows/ci.yml` |
-| `CLAUDE.md` imports this file; one skills folder; policy files parse with the right shape; a PR template with four sections; a CODEOWNERS file; the skill adapter | `dev agents doctor` (local); CI `agents-doctor / Agents doctor` (checks existence and shape only, not path coverage; not yet a required check) | `.agents/`, `.github/` |
+| `CLAUDE.md` imports this file; one skills folder; policy files parse with the right shape; a PR template with four sections; a CODEOWNERS file; the skill adapter | `dev agents doctor` (local); CI `agents-doctor / Agents doctor` through `ci-gate` (checks existence and shape only, not path coverage) | `.agents/`, `.github/` |
 | Command-line Vercel deploys and env changes, and Supabase commands that write the hosted project (`db push`, `migration repair`, `migration up`, a linked `db reset` or `migration squash`, `config push`, `secrets`, functions, storage, branches, backups), are afo's | shared guards ask first (local only); review for cloud agents | `.agents/policy.json` |
 | One required check covers the code, database and kit gates | CI `ci-gate` (needs `check`, `database`, `agents-doctor`); required once afo applies the merge settings | `.github/workflows/ci.yml` |
-| Production deploys only from `main`; the deployment uploads only what the site serves | no deploy script; CI `check` (`npm test`) keeps `.vercelignore` in step and proves docs, migrations and tooling stay out | `.vercelignore`, `tests/vercelignore.test.js` |
+| Production deploys only from `main`; the deployment uploads only what the site serves | no deploy script; CI `check` keeps `.vercelignore` in step, proves docs, migrations and tooling stay out, and that every module the API imports and every file pages and stylesheets reference is uploaded | `.vercelignore`, `tests/vercelignore.test.js` |
 | Critical changes merge on the full gate and a fresh adversarial review, then afo's go | review only (no merge gate check) | `.agents/merge-policy.json` |
 | Merge commits only, branches deleted on merge, auto-merge off | none yet: GitHub still allows squash and rebase and keeps branches until afo applies `dev merge-settings apply --execute regen-commons-site` | `.agents/merge-policy.json` |
 | Keep `.env*`, real applications, contact details and credentials out of commits | `.gitignore` for `.env*`; shared guards (local only); review for the rest | `.gitignore` |
-| Submitted text renders as text | CI `check` (`regen(html-sink)`: no new `innerHTML`, `outerHTML`, `insertAdjacentHTML` or `document.write` in browser code) | `scripts/lint/project-rules.mjs` |
+| Submitted text renders as text | CI `check` (`regen(html-sink)`, a text heuristic: no new `innerHTML`, `outerHTML`, `srcdoc`, `insertAdjacentHTML`, `setHTMLUnsafe`, `createContextualFragment` or `document.write` in browser code); review for the rest | `scripts/lint/project-rules.mjs` |
 | External link protocols are validated before creating links | none yet | `admin/AGENTS.md` |
-| Provider calls have a timeout | CI `check` (`regen(provider-timeout)` over `api/`) | `scripts/lint/project-rules.mjs` |
-| API logs carry no raw provider bodies or personal data | CI `check` (`regen(log-literal-only)`: API logs take one string literal) | `scripts/lint/project-rules.mjs` |
+| Provider calls have a timeout | CI `check` (`regen(provider-timeout)`, a text heuristic over `fetch` and injected `request` calls in `api/`); review for other clients | `scripts/lint/project-rules.mjs` |
+| API logs carry no raw provider bodies or personal data | CI `check` (`regen(log-literal-only)`, a text heuristic: API `console` calls take one string literal) | `scripts/lint/project-rules.mjs` |
 | UI changes are proved in a rendered browser at desktop and mobile widths | none yet | `admin/AGENTS.md`, this file |
 | Credentials, codes and private answers stay out of browser storage and URLs; private UI state clears on sign-out | none yet | `admin/AGENTS.md` |
 | Keep the plain HTML/CSS/JavaScript architecture; provider code stays in `api/` | none yet | this file |

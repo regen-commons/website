@@ -1,4 +1,5 @@
--- Every table in an exposed schema has row-level security on.
+-- Every table in an exposed schema has row-level security on, and no view the
+-- anon or authenticated role can read runs with its owner's rights.
 --
 -- A schema is exposed when the anon or authenticated role may use it: a table
 -- there is one grant away from the Data API, so row-level security must already
@@ -13,6 +14,8 @@ begin;
 do $$
 declare
   known_gaps constant text[] := array[]::text[];
+  -- Shrink-only, like known_gaps: readable views that run as their owner.
+  known_definer_views constant text[] := array[]::text[];
   managed constant text[] := array[
     'pg_catalog', 'information_schema', 'pg_toast',
     'auth', 'storage', 'realtime', '_realtime', 'extensions', 'graphql',
@@ -61,7 +64,25 @@ begin
     raise exception 'Remove from known_gaps in supabase/tests/row-level-security.sql, now protected, unexposed or gone: %', stale;
   end if;
 
-  raise notice 'Row-level security is on for all % exposed tables.', checked;
+  -- A view runs with its owner's rights unless it is security_invoker, so a view
+  -- the anon or authenticated role may select can bypass row-level security.
+  select string_agg(format('%I.%I', n.nspname, c.relname), ', ' order by 1) into new_gaps
+  from pg_class c
+  join pg_namespace n on n.oid = c.relnamespace
+  where c.relkind in ('v', 'm')
+    and n.nspname <> all (managed)
+    and (has_table_privilege('anon', c.oid, 'SELECT')
+      or has_table_privilege('authenticated', c.oid, 'SELECT'))
+    and (c.relkind = 'm'
+      or not coalesce((select option_value::boolean from pg_options_to_table(c.reloptions)
+        where option_name = 'security_invoker'), false))
+    and format('%I.%I', n.nspname, c.relname) <> all (known_definer_views);
+
+  if new_gaps is not null then
+    raise exception 'Views the anon or authenticated role can read run with their owner''s rights, bypassing row-level security: %. Recreate them with (security_invoker = true), or revoke select and expose a narrow function instead.', new_gaps;
+  end if;
+
+  raise notice 'Row-level security is on for all % exposed tables, and no readable view bypasses it.', checked;
 end
 $$;
 

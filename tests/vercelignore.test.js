@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
+import { dirname, join, normalize, relative } from "node:path";
 import test from "node:test";
 import {
   deployedFiles,
@@ -52,4 +53,34 @@ test("Vercel uploads the site and API, never docs, migrations or tooling", (t) =
     migrations.length > 0 && migrations.every((file) => ignored.has(file)),
     "supabase/ must not be uploaded"
   );
+});
+
+// Independent of the generator's scan: any relative .js or .mjs string the API
+// or the root modules it reaches contain must name an uploaded file, or the
+// function fails in production with "module not found".
+test("every module the API reaches is uploaded", () => {
+  const uploaded = new Set(deployedFiles());
+  const walk = (dir) =>
+    readdirSync(join(root, dir), { withFileTypes: true }).flatMap((entry) =>
+      entry.isDirectory() ? walk(join(dir, entry.name)) : [join(dir, entry.name)]
+    );
+  const queue = walk("api").filter((file) => /\.m?js$/.test(file));
+  const seen = new Set(queue);
+  while (queue.length) {
+    const file = queue.shift();
+    const source = readFileSync(join(root, file), "utf8");
+    for (const match of source.matchAll(/["'](\.{1,2}\/[^"'\s]+\.m?js)["']/g)) {
+      const target = normalize(join(dirname(file), match[1]));
+      if (!target.startsWith("api/")) {
+        assert.ok(
+          uploaded.has(target),
+          `${file} imports ${relative(".", target)}, which .vercelignore leaves out`
+        );
+      }
+      if (!seen.has(target)) {
+        seen.add(target);
+        queue.push(target);
+      }
+    }
+  }
 });

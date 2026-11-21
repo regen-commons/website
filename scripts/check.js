@@ -2,7 +2,7 @@ import { readdir, readFile, access } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import { Script } from "node:vm";
 import { fileURLToPath } from "node:url";
-import { pages, resolvePublicFile } from "./lib/site-files.js";
+import { pages, publicFiles, resolvePublicFile } from "./lib/site-files.js";
 import { main as lint } from "./lint/run.mjs";
 
 const root = new URL("../", import.meta.url);
@@ -46,6 +46,25 @@ for (const file of pages) {
     const filePath = resolvePublicFile(match[1]);
     if (!filePath) throw new Error(`${file}: share image is not served: ${match[1]}`);
     await access(new URL(filePath, root));
+  }
+}
+// Stylesheets load fonts and other stylesheets; each must ship with the site.
+for (const file of publicFiles.filter((name) => name.endsWith(".css"))) {
+  const css = await readFile(new URL(file, root), "utf8");
+  const targets = [
+    // A quoted url() is taken whole, so a data URL's inner url(#id) is skipped.
+    ...[...css.matchAll(/url\(\s*(?:"([^"]*)"|'([^']*)'|([^"')\s]+))\s*\)/g)].map(
+      (match) => match[1] ?? match[2] ?? match[3]
+    ),
+    ...[...css.matchAll(/@import\s+["']([^"']+)["']/g)].map((match) => match[1]),
+  ];
+  for (const target of targets) {
+    if (/^(?:[a-z]+:|\/\/|#)/i.test(target)) continue;
+    const resolved = new URL(target.split(/[?#]/)[0], new URL(file, "https://site.test/")).pathname;
+    const filePath = resolvePublicFile(resolved);
+    if (!filePath) throw new Error(`${file}: stylesheet reference is not served: ${target}`);
+    await access(new URL(filePath, root));
+    count++;
   }
 }
 for (const file of ["package.json", "package-lock.json", "vercel.json"]) {

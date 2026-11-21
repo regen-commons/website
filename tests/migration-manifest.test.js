@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -50,4 +51,38 @@ test("applied migrations keep their exact bytes", () => {
 test("manifest entries are unique and in version order", () => {
   const names = manifest.migrations.map((entry) => entry.file);
   assert.deepEqual(names, [...new Set(names)].sort());
+});
+
+// Editing a migration together with its hash passes the tests above, so CI also
+// compares with the base branch: recorded entries never change or disappear,
+// and a new migration sorts after every recorded one, as the Supabase CLI
+// expects. CI's checkout fetches the base; a checkout without it skips.
+test("the manifest only gains newer entries compared with the base branch", (t) => {
+  const base = process.env.MANIFEST_BASE || `origin/${process.env.GITHUB_BASE_REF || "main"}`;
+  const shown = spawnSync("git", ["show", `${base}:supabase/migration-manifest.json`], {
+    cwd: root,
+    encoding: "utf8",
+  });
+  if (shown.status !== 0) return t.skip(`no manifest at ${base}: ${shown.stderr.trim()}`);
+  const before = JSON.parse(shown.stdout).migrations;
+  const now = new Map(manifest.migrations.map((entry) => [entry.file, entry]));
+  for (const entry of before) {
+    assert.deepEqual(
+      now.get(entry.file),
+      entry,
+      `${entry.file}: its manifest entry changed or disappeared since ${base}. Applied migrations and their entries never change; add a new migration instead.`
+    );
+  }
+  const last = before
+    .map((entry) => entry.file)
+    .sort()
+    .at(-1);
+  for (const entry of manifest.migrations.filter(
+    (entry) => !before.some((b) => b.file === entry.file)
+  )) {
+    assert.ok(
+      !last || entry.file > last,
+      `${entry.file} sorts before ${last}, the newest migration on ${base}. Give it a newer version.`
+    );
+  }
 });

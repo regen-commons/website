@@ -20,10 +20,48 @@ export const RULES = {
   },
 };
 
-const SINK =
-  /\.(?:innerHTML|outerHTML)\s*\+?=(?!=)|\.insertAdjacentHTML\s*\(|\bdocument\.write(?:ln)?\s*\(/g;
-const CALL = /(?<![\w.$])(fetch|request)\s*\(/g;
-const LOG = /\bconsole\.(?:log|info|warn|error|debug)\s*\(/g;
+// These are heuristics over source text, not a parser: they catch the usual
+// spellings and their common variants, and review still owns the rest.
+const SINK = new RegExp(
+  [
+    String.raw`(?:\.\s*(?:innerHTML|outerHTML|srcdoc)|\[\s*["'\x60](?:innerHTML|outerHTML|srcdoc)["'\x60]\s*\])\s*\+?=(?!=)`,
+    String.raw`\.\s*(?:insertAdjacentHTML|setHTMLUnsafe|createContextualFragment)\s*\(`,
+    String.raw`\bdocument\s*\.\s*write(?:ln)?\s*\(`,
+    String.raw`\b(?:innerHTML|outerHTML|srcdoc)\s*:`,
+  ].join("|"),
+  "g"
+);
+const CALL = /(?:\b(?:globalThis|window|self)\s*\.\s*|(?<![\w.$]))(?:fetch|request)\s*\(/g;
+const LOG =
+  /\bconsole\s*(?:\.\s*(?:log|info|warn|error|debug|trace)|\[\s*["'`](?:log|info|warn|error|debug|trace)["'`]\s*\])\s*\(/g;
+const TIMEOUT = /\bsignal\s*:\s*(?!undefined\b|null\b|void\b)\S/;
+
+// Source with comments blanked out (strings kept), so a comment can neither
+// trigger a rule nor satisfy one.
+export function withoutComments(source) {
+  let out = "";
+  let quote = null;
+  for (let i = 0; i < source.length; i++) {
+    const ch = source[i];
+    if (quote) {
+      out += ch;
+      if (ch === "\\") out += source[++i] ?? "";
+      else if (ch === quote) quote = null;
+    } else if (ch === '"' || ch === "'" || ch === "`") {
+      quote = ch;
+      out += ch;
+    } else if (ch === "/" && source[i + 1] === "/") {
+      while (i < source.length && source[i] !== "\n") i++;
+      out += "\n";
+    } else if (ch === "/" && source[i + 1] === "*") {
+      const close = source.indexOf("*/", i + 2);
+      const end = close === -1 ? source.length : close + 2;
+      out += source.slice(i, end).replace(/[^\n]/g, " ");
+      i = end - 1;
+    } else out += ch;
+  }
+  return out;
+}
 
 // The text between an opening parenthesis at `open` and its match, skipping
 // strings, template literals and comments well enough for these checks.
@@ -51,19 +89,21 @@ export function argumentsAt(source, open) {
 const STRING_LITERAL = /^\s*(?:"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\$]|\\.)*`)\s*$/;
 
 export function htmlSinks(source) {
-  return [...source.matchAll(SINK)].length;
+  return [...withoutComments(source).matchAll(SINK)].length;
 }
 
-export function untimedProviderCalls(source) {
+export function untimedProviderCalls(text) {
+  const source = withoutComments(text);
   let count = 0;
   for (const match of source.matchAll(CALL)) {
     const args = argumentsAt(source, match.index + match[0].length - 1);
-    if (!/\bsignal\s*:/.test(args)) count++;
+    if (!TIMEOUT.test(args)) count++;
   }
   return count;
 }
 
-export function nonLiteralLogs(source) {
+export function nonLiteralLogs(text) {
+  const source = withoutComments(text);
   let count = 0;
   for (const match of source.matchAll(LOG)) {
     const args = argumentsAt(source, match.index + match[0].length - 1);

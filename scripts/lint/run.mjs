@@ -96,7 +96,8 @@ export function biomeFindings(doc) {
 export function collectFindings() {
   const scripts = inlineScripts();
   const rootScripts = fs.readdirSync(root).filter((name) => name.endsWith(".js"));
-  const temp = fs.mkdtempSync(path.join(os.tmpdir(), "regen-lint-"));
+  // realpath: macOS reports /var/folders through /private/var, and names must match.
+  const temp = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), "regen-lint-")));
   try {
     const names = new Map();
     scripts.forEach(({ file, text }, i) => {
@@ -104,7 +105,14 @@ export function collectFindings() {
       fs.writeFileSync(name, text);
       names.set(name, file);
     });
-    const rename = (file) => names.get(path.resolve(root, file)) ?? file;
+    const rename = (file) => {
+      const absolute = path.resolve(root, file);
+      return (
+        names.get(absolute) ??
+        names.get(fs.existsSync(absolute) ? fs.realpathSync(absolute) : absolute) ??
+        file
+      );
+    };
     const oxlint = oxlintFindings(
       runJson(bin("oxlint"), ["--format=json", ...rootScripts, ...OXLINT_TARGETS, ...names.keys()]),
       rename
