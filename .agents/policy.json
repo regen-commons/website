@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "commands": [
+    {
+      "id": "vercel-deploy",
+      "pattern": "^(\\S*/)?((npx|bunx)( -\\S+)* |(pnpm|yarn) dlx |npm exec( --)? )?(?!.* (--help|-h|--version|-v)$)(vercel|vc)( --?[\\w-]+(=\\S+| [^-\\s]\\S*)?)*( (deploy|redeploy|promote|rollback|remove|rm|(domains|dns|redirects|rolling-release|alias|certs)(?! (ls|list|inspect|fetch)( |$))|project (rm|remove)|git disconnect|blob (del|rm)|cache purge|integration (remove|rm))( |$)| [./~]\\S*|$)|^(\\S*/)?((npx|bunx)( -\\S+)* |(pnpm|yarn) dlx |npm exec( --)? )?(?!.* (--help|-h|--version|-v)$)(vercel|vc)( .*)? --prod( |$)|^(\\S*/)?((npx|bunx)( -\\S+)* |(pnpm|yarn) dlx |npm exec( --)? )?(?!.* (--help|-h|--version|-v)$)(vercel|vc)( --?[\\w-]+(=\\S+| [^-\\s]\\S*)?)* env (add|rm|remove|update)( |$)",
+      "action": "ask",
+      "message": "PRODUCTION: production comes only from the Vercel Git integration on main. A command-line deploy, promote, rollback, alias or removal, and changes to Vercel environment variables, domains, DNS, redirects or the Git connection, are afo's steps. Go ahead only on his explicit word in this session."
+    },
+    {
+      "id": "npm-deploy-script",
+      "pattern": "^(\\S*/)?(npm|pnpm|yarn|bun)( --?[\\w-]+(=\\S+| [^-\\s]\\S*)?)*( run| run-script)?( --?[\\w-]+(=\\S+| [^-\\s]\\S*)?)* deploy( |$)",
+      "action": "ask",
+      "message": "PRODUCTION DEPLOYMENT: the deploy script runs vercel deploy --prod. Production comes only from the Vercel Git integration on main; a command-line deploy is afo's step. Go ahead only on his explicit word in this session."
+    },
+    {
+      "id": "supabase-remote-write",
+      "pattern": "^(\\S*/)?((npx|bunx)( -\\S+)* |(pnpm|yarn) dlx |npm exec( --)? )?(?!.* --local$)supabase( --?[\\w-]+(=\\S+| [^-\\s]\\S*)?)* (db push|migration (repair|up)|config push|secrets (set|unset)|functions (deploy|delete)|storage (cp|rm|mv)|postgres-config (update|delete)|projects delete|branches (create|update|delete)|(domains|vanity-subdomains|network-restrictions|ssl-enforcement|sso)(?! (get|list|ls|show|info)( |$))|backups restore|db reset( .*)? --(linked|db-url)|migration squash( .*)? --(linked|db-url)|seed buckets( .*)? --linked)( |$)",
+      "action": "ask",
+      "message": "HOSTED DATABASE: this changes the linked Supabase project (migrations or their history, a reset, auth or Postgres config, secrets, functions, storage, branches or backups), which holds real applicant data. Applying migrations to the hosted database is afo's step. Go ahead only on his explicit word in this session."
+    }
+  ],
+  "paths": [
+    {
+      "id": "critical-migrations",
+      "glob": "supabase/migrations/**",
+      "action": "notice",
+      "message": "Critical tier (.agents/merge-policy.json): never edit an applied migration; add a new one with its SQL suite assertions. Platform copies come from Weave (supabase/AGENTS.md). The merge waits for afo's go."
+    },
+    {
+      "id": "critical-workflows",
+      "glob": ".github/workflows/**",
+      "action": "notice",
+      "message": "Critical tier: CI workflow. Keep required check names stable (.agents/merge-policy.json requiredChecks), pin actions, and never weaken a check as a workaround. The merge waits for afo's go."
+    }
+  ],
+  "proof": {
+    "commands": [
+      "^npm (run )?(check|test|smoke)\\b",
+      "^node --test\\b"
+    ]
+  }
+}
