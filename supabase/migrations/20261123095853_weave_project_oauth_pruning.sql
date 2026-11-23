@@ -23,7 +23,11 @@
 -- name, schedule and command keep one job with its existing jobid.
 do $migration$
 begin
-  if current_database() is distinct from current_setting('cron.database_name', true) then
+  -- pg_settings, unlike current_setting, leaves out a superuser-only setting the role cannot read
+  -- instead of raising, so a role that cannot see it also takes this path. Check cron.job afterwards.
+  if not exists (
+    select from pg_settings where name = 'cron.database_name' and setting = current_database()
+  ) then
     raise notice 'weave-project-oauth-prune not scheduled: % is not the pg_cron database', current_database();
     return;
   end if;
