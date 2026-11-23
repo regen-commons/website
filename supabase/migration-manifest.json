@@ -131,6 +131,11 @@
       "file": "20261121204219_weave_project_index_organization_description.sql",
       "owner": "platform",
       "sha256": "409c3542cdca923782ae8448b8d87763fab29b10254f1abc0e6ecd0993e9384c"
+    },
+    {
+      "file": "20261123095853_weave_project_oauth_pruning.sql",
+      "owner": "platform",
+      "sha256": "88407c7bab2879ccdef3c96ad0ba1ab328a2de34c09c82350a8817c3b3811c51"
     }
   ]
 }

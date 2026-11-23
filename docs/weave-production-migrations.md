@@ -163,3 +163,30 @@ repository and both new ones replayed on the CI image as the non-superuser migra
 ten SQL suites passed. Afterwards, both columns existed with their check constraints, all 1,021 rows
 read as empty until the next refresh, and `weave_index_job` still held only its table grants on the
 table.
+
+## Project grant pruning record
+
+`20261123095853_weave_project_oauth_pruning` records
+`supabase/candidates/weave-project-oauth-pruning.sql` in Weave `develop` (`239398e`). It schedules
+the pg_cron job `weave-project-oauth-prune`, which deletes expired rows from
+`weave_project_oauth.records` daily at 03:17 UTC, so a lapsed session's encrypted grant does not stay in
+the database.
+
+The job was applied to Platform on 23 November 2026 as plain SQL, as `postgres`, before this file
+existed, so Platform runs it (job 1, active) while its migration history does not list this version.
+The file differs from the candidate in one way: its statements sit in a block that schedules nothing
+outside the database pg_cron serves, because pg_cron refuses to install anywhere else and CI replays
+migrations into `regen_test`. The block also refuses to schedule the job as a role that is neither
+the table's owner nor exempt from row-level security, whose job would delete nothing, and checks that
+exactly one job has the name afterwards. On Platform, `cron.schedule` with the same name and role
+updates job 1 in place, so applying the file again changes nothing.
+
+To record it, either apply it with the commands above (the dry run must list exactly this one
+version), or mark it applied without running it:
+
+```sh
+supabase migration repair --project-ref ztygpuzldujfsqrubxic --status applied 20261123095853
+```
+
+Afterwards, `select jobid, schedule, command, username, active from cron.job where jobname =
+'weave-project-oauth-prune'` must return one row: job 1, `17 3 * * *`, run as `postgres`, active.
