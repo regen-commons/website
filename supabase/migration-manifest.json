@@ -136,6 +136,11 @@
       "file": "20261123095853_weave_project_oauth_pruning.sql",
       "owner": "platform",
       "sha256": "b01030d12dfb9214aa9348ca9da2474c8638f5fb15e9475444a1e5b922ea24c4"
+    },
+    {
+      "file": "20261125092055_weave_speech_quota.sql",
+      "owner": "platform",
+      "sha256": "c8a1bca982273e6e5298b291ef18def6c6874c5d8f68202da4c8ffb6e3a4e8ec"
     }
   ]
 }
