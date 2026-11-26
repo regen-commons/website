@@ -190,3 +190,32 @@ supabase migration repair --project-ref ztygpuzldujfsqrubxic --status applied 20
 
 Afterwards, `select jobid, schedule, command, username, active from cron.job where jobname =
 'weave-project-oauth-prune'` must return one row: job 1, `17 3 * * *`, run as `postgres`, active.
+
+## Saved-card deletion: stale references release
+
+`20261126041522_weave_initiative_deletion_stale_references` matches
+`supabase/candidates/weave-initiative-deletion-stale-references.sql` in Weave
+([regen-commons/weave#274](https://github.com/regen-commons/weave/pull/274), `7cb0b24`) byte for
+byte. It replaces `private.weave_delete_initiative` with `create or replace`, so the function keeps
+its owner and grants, and it refuses to run before `20261117200140_weave_initiative_deletion`.
+Weave's matching API serves project workspaces only, so a personal saved card can no longer withdraw
+its sharing, clear its saved partners or let its query vectors be pruned first. These references no
+longer stop an owner deleting a personal card; each is deleted with it:
+
+- A project setup that finished (`linked`) or was marked `group_rejected`. A setup still under way is
+  refused as before. `group_rejected` also follows a timeout or server error, after which a group may
+  exist on Certified under the setup's handle; deleting the card removes that record of the handle.
+- The card's own needs and offers shared for matching. A personal card is never in matching, which
+  needs a project link, so other people see no change: their saved partners naming an entry already
+  read as unavailable, and their rows stay.
+- The owner's saved and dismissed partners for the card, and the query vectors derived from its entries.
+
+Every other refusal and the owner, revision and retry checks are unchanged. Platform's function
+matched `20261117200140_weave_initiative_deletion` exactly on 26 November 2026. The Weave API needs
+no change; the app's refusal message from the same pull request no longer names sharing or partners.
+
+Applying it to Platform is not yet approved. Merge only after regen-commons/weave#274 has had its
+second review, and apply only with the user's separate approval, using the same commands as above.
+The dry run must list exactly this one version. Afterwards, check that
+`private.weave_delete_initiative(uuid, integer, uuid)` is still executable by `authenticated`
+only and that `weave.delete_initiative(uuid, integer, uuid)` is unchanged.
