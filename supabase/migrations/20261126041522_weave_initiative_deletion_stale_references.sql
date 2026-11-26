@@ -7,11 +7,13 @@
 -- - A project setup that finished (linked) or that Weave marked group_rejected. A finished setup's
 --   project lives in its own workspace, so its record is only a receipt. group_rejected follows a
 --   refused registration, but also a timeout or server error, after which a group may exist on
---   Certified; nothing recovers from that record, but deleting it removes the only row tying such a
---   group to this card. A setup still under way (prepared, group_pending, group_confirmed,
---   project_pending, project_confirmed) is still refused, because it reads the card again to finish.
--- - The card's own needs and offers shared for matching. Removing them stops the sharing: other
---   people's partners naming an entry read as unavailable, as after a withdrawal.
+--   Certified under the setup's handle; nothing recovers from that record, and deleting it removes
+--   the handle's record with the card. A setup still under way (prepared, group_pending,
+--   group_confirmed, project_pending, project_confirmed) is still refused, because it reads the card
+--   again to finish.
+-- - The card's own needs and offers shared for matching. A personal card is never in matching (it
+--   needs a project link, which is still refused), so removing them changes nothing other people see:
+--   their partners naming an entry already read as unavailable, and their rows stay.
 -- - The owner's saved and dismissed partners for the card (private.weave_matching_leads), and the
 --   query vectors derived from its entries (private.weave_matching_query_vectors).
 -- Everything else is unchanged. Production's function matched weave-initiative-deletion exactly on
@@ -77,7 +79,7 @@ begin
     where initiative_id = p_id and status in ('linked', 'group_rejected');
   delete from private.weave_matching_leads where initiative_id = p_id;
   delete from private.weave_matching_query_vectors where initiative_id = p_id;
-  -- Shared entries go too: removing them stops their sharing, as a withdrawal would.
+  -- Shared entries go too. A personal card is never in matching, so no one else sees a change.
   delete from weave.needs where initiative_id = p_id;
   delete from weave.offers where initiative_id = p_id;
   delete from private.weave_save_requests where actor_id = actor and initiative_id = p_id;

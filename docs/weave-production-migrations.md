@@ -195,7 +195,7 @@ Afterwards, `select jobid, schedule, command, username, active from cron.job whe
 
 `20261126041522_weave_initiative_deletion_stale_references` matches
 `supabase/candidates/weave-initiative-deletion-stale-references.sql` in Weave
-([regen-commons/weave#274](https://github.com/regen-commons/weave/pull/274), `4719bdb`) byte for
+([regen-commons/weave#274](https://github.com/regen-commons/weave/pull/274), `7cb0b24`) byte for
 byte. It replaces `private.weave_delete_initiative` with `create or replace`, so the function keeps
 its owner and grants, and it refuses to run before `20261117200140_weave_initiative_deletion`.
 Weave's matching API serves project workspaces only, so a personal saved card can no longer withdraw
@@ -204,9 +204,10 @@ longer stop an owner deleting a personal card; each is deleted with it:
 
 - A project setup that finished (`linked`) or was marked `group_rejected`. A setup still under way is
   refused as before. `group_rejected` also follows a timeout or server error, after which a group may
-  exist on Certified; the setup record is the only row tying that group to the card.
-- The card's own needs and offers shared for matching. Other people's saved partners naming them read
-  as unavailable, as after a withdrawal.
+  exist on Certified under the setup's handle; deleting the card removes that record of the handle.
+- The card's own needs and offers shared for matching. A personal card is never in matching, which
+  needs a project link, so other people see no change: their saved partners naming an entry already
+  read as unavailable, and their rows stay.
 - The owner's saved and dismissed partners for the card, and the query vectors derived from its entries.
 
 Every other refusal and the owner, revision and retry checks are unchanged. Platform's function
