@@ -190,3 +190,27 @@ supabase migration repair --project-ref ztygpuzldujfsqrubxic --status applied 20
 
 Afterwards, `select jobid, schedule, command, username, active from cron.job where jobname =
 'weave-project-oauth-prune'` must return one row: job 1, `17 3 * * *`, run as `postgres`, active.
+
+## Saved-card deletion: stale references release
+
+`20261126041522_weave_initiative_deletion_stale_references` matches
+`supabase/candidates/weave-initiative-deletion-stale-references.sql` in Weave
+([regen-commons/weave#274](https://github.com/regen-commons/weave/pull/274), `ae77ad7`) byte for
+byte. It replaces `private.weave_delete_initiative` with `create or replace`, so the function keeps
+its owner and grants. Two references no longer stop an owner deleting a personal saved card:
+
+- A project setup that finished (`linked`) or that Certified refused (`group_rejected`). It is
+  deleted with the card. A setup still under way is refused as before.
+- The card's own needs and offers shared for matching. They are deleted with the card, which other
+  people see as a withdrawal. Weave's matching API serves project workspaces only, so a personal save
+  cannot withdraw them first.
+
+Every other refusal and the owner, revision and retry checks are unchanged. Platform's function
+matched `20261117200140_weave_initiative_deletion` exactly on 26 November 2026. The Weave API needs
+no change: it already reports a deletion the same way.
+
+Applying it to Platform is not yet approved. Merge only after regen-commons/weave#274 has had its
+second review, and apply only with the user's separate approval, using the same commands as above.
+The dry run must list exactly this one version. Afterwards, check that
+`private.weave_delete_initiative(uuid, integer, uuid)` is still executable by `authenticated`
+only and that `weave.delete_initiative(uuid, integer, uuid)` is unchanged.

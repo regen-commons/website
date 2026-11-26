@@ -141,6 +141,11 @@
       "file": "20261125092055_weave_speech_quota.sql",
       "owner": "platform",
       "sha256": "c8a1bca982273e6e5298b291ef18def6c6874c5d8f68202da4c8ffb6e3a4e8ec"
+    },
+    {
+      "file": "20261126041522_weave_initiative_deletion_stale_references.sql",
+      "owner": "platform",
+      "sha256": "924800720a18b1a2dcd1a325ab01450e7ddcc6b67c79d32ade3b35cde502a0f1"
     }
   ]
 }
