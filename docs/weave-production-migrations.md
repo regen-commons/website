@@ -332,3 +332,79 @@ Afterwards:
 
 Merging regen-commons/weave#279, which deploys the API and app that use this, needs the user's separate
 approval.
+
+## Retire private saves release
+
+`20261127222941_weave_retire_private_saves` matches `supabase/candidates/weave-retire-private-saves.sql`
+in Weave (branch `claude/stop-private-saves`, commit `c09f8a3`) byte for byte. It is the database half of step 4 of
+the DL-155 removal plan: nothing new is saved privately or shared for matching. Weave's API refuses both
+in [regen-commons/weave#280](https://github.com/regen-commons/weave/pull/280), but a signed-in session
+can still call `weave.save_initiative` through PostgREST with its own access token. This makes the
+database refuse it too, with the API's names. It refuses to run before `weave_team_content` and
+`weave_publish_from_draft`, and every function it replaces uses
+`create or replace`, so each keeps its owner and grants. What it changes:
+
+- `private.weave_save_initiative`, behind `weave.save_initiative`, raises `PT410 private_saves_retired`
+  for every personal save: a new card, an update and a replay of an earlier request. It reads and
+  writes nothing, so it now runs as the caller. A team workspace's save calls
+  `private.weave_save_document` from `weave_workspace.content_command` and is unchanged until step 6.
+- `private.weave_matching_preview` raises `PT410 matching_shares_retired` for every review, for a
+  personal card or a team's. A review exists only to share. It also now runs as the caller.
+- `private.weave_matching_change` raises `PT410 matching_shares_retired` for `share` and `renew` once
+  the command is checked and is not a replay, so a malformed one is still `PT400 invalid_data` and one
+  that committed before answers with the recorded state, as any replay does. `withdraw` is unchanged.
+
+Unchanged: loading, listing and deleting the private saves already here, which Weave's Download reads
+(D49), matching
+state, partner search, saved partners and leads. `weave_team_content` already took the matching
+wrappers away from `authenticated`, so only `weave_workspace_runtime` reaches matching; this checks
+that too. `weave.save_initiative` stays executable by `authenticated`, so the caller hears the refusal
+by name.
+
+On 27 November 2026 the bodies of the three functions on Platform matched `weave_team_content` and
+`weave_open_ended_sharing` byte for byte, from a read-only hash of each. `weave.save_initiative` and
+`private.weave_save_initiative` were executable by `authenticated`; the matching wrappers and their
+private functions by `postgres` only.
+
+`supabase/tests/weave-retire-private-saves.sql` proves these on the CI image:
+- a new card, an update and a replay refused by name with nothing written;
+- the save made before loading, listing and deleting as before;
+- review, share and renewal refused for a personal card and through the workspace runtime for a team,
+  with malformed commands still invalid data, a share that committed before answering as recorded when
+  replayed, and a reused request ID conflicting;
+- a share made before withdrawn by its owner and not by someone else, a replay changing nothing and a
+  stale version conflicting;
+- a team workspace saving and loading through the runtime, with no actor left in the session.
+
+`weave-private-access.sql` and `weave-publish-from-draft.sql` now set up their saves through the save
+logic directly, as saves made before step 4. `weave-private-access.sql` also checks that a signed-in
+save is refused.
+
+Order: the Weave API and app in regen-commons/weave#280 already send none of these, so this can be
+applied before or after that deploys. Applied while an older Weave build is live, that build's Save
+Privately and Share For Matching fail with these errors and save or share nothing new. A share that
+committed just before, whose answer was lost, answers as it did when the build retries it; a save's
+retry is refused, and the save it repeats is already kept.
+
+The user approved shipping step 4 on 27 November 2026: merging regen-commons/weave#280, then applying
+and merging this. #280 merged as `c9d05c0`, and its production deploy on Vercel completed before this
+was applied, so the API's refusals were live first. The Supabase CLI was not available, so it was
+applied through the Supabase connector, as for the releases above, and the file takes the version the
+connector recorded.
+
+Before applying, Platform's history held exactly the 31 versions here, through
+`20261127193129_weave_publish_from_draft`.
+
+Afterwards:
+
+- Platform's history holds 32 versions. The SQL recorded for `20261127222941` matches the file byte
+  for byte (SHA-256 `be026b54...34b514`).
+- `private.weave_save_initiative` and `private.weave_matching_preview` run as the caller, and
+  `private.weave_matching_change` as its owner. All three are owned by `postgres` with their grants
+  as before: `authenticated` may execute `private.weave_save_initiative`, and only `postgres` the
+  matching functions.
+- In a transaction that was rolled back, `weave.save_initiative` answered
+  `PT410 private_saves_retired` for a signed-in session.
+- The definitions of `private.weave_save_document`, `weave_workspace.content_command`,
+  `weave_workspace.initiative_link_guard` and `weave.save_initiative` hash the same as before the
+  apply.

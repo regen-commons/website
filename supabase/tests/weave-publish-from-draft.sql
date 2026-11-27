@@ -2,7 +2,7 @@
 -- DL-155, step 3: a need or offer is published from the device draft with no private save first. A
 -- personal project link needs no saved card and is held by the verified Certified DID that owns the
 -- project's repository. Deleting a saved card no longer erases Weave's record of its published listings,
--- no new card may take a link's ID, and publishing from a private save still works until saves retire.
+-- no new card may take a link's ID, and publishing from a saved card still works, also after DL-155 step 4.
 -- Security definer commands are called as the test owner unless a step is about the runtime's grants.
 begin;
 create function pg_temp.assert_draft(ok boolean, message text) returns void
@@ -81,7 +81,7 @@ create function pg_temp.own(p_rkey text) returns jsonb language sql immutable as
     'repositoryDid', 'did:plc:pppppppppppppppppppppppp', 'cid', 'bafyfixture') $$;
 create function pg_temp.draft_review(p_kind text, p_entry uuid, p_fields jsonb) returns jsonb language sql immutable as $$
   select jsonb_build_object('kind', p_kind, 'entryId', p_entry, 'expiresAt', null, 'entry', p_fields) $$;
--- A checked private save with one open need, as weave.save_initiative takes it.
+-- A checked private save with one open need, as a private save held it.
 create function pg_temp.card(p_entry uuid, p_title text, p_lenses jsonb) returns jsonb language sql immutable as $$
   select jsonb_build_object('version', 1,
     'initiative', jsonb_build_object('name', 'Fictional project', 'description', 'Private workspace summary', 'locations', '[]'::jsonb,
@@ -99,6 +99,10 @@ create function pg_temp.entry_revision(p_card uuid, p_entry uuid) returns bigint
   select matching_revision from private.weave_matching_entries where initiative_id = p_card and kind = 'need' and id = p_entry $$;
 create function pg_temp.listing(p_workspace uuid, p_entry uuid) returns weave_workspace.support_listings language sql stable as $$
   select * from weave_workspace.support_listings where workspace_id = p_workspace and entry_id = p_entry $$;
+-- A private save made before DL-155 step 4, which refuses new ones, through the save logic a team workspace
+-- still uses. Only the test owner can run that logic; it is setup, not a path any client has.
+create function pg_temp.saved_before(p_id uuid, p_revision integer, p_request uuid, p_document jsonb) returns jsonb
+language sql security definer as $$ select private.weave_save_document(p_id, p_revision, p_request, p_document, false) $$;
 
 -- 1. A draft links its person's own project with no saved card, through the workspace runtime.
 set local role weave_workspace_runtime;
@@ -244,9 +248,9 @@ select pg_temp.assert_draft(not exists(select from weave_workspace.support_revie
 -- 5. Publishing from a private save still works, beside a draft's listing on the same project, and only it follows the card.
 select set_config('request.jwt.claims', '{"sub":"e1000000-0000-4000-8000-000000000001","session_id":"e2000000-0000-4000-8000-000000000001","role":"authenticated","exp":4102444800}', true);
 set local role authenticated;
-select weave.save_initiative('e4000000-0000-4000-8000-000000000001', 0, 'e8000000-0000-4000-8000-000000000001',
+select pg_temp.saved_before('e4000000-0000-4000-8000-000000000001', 0, 'e8000000-0000-4000-8000-000000000001',
   pg_temp.card('e5000000-0000-4000-8000-000000000001', 'A fictional place to meet', '[]'));
-select weave.save_initiative('e4000000-0000-4000-8000-000000000002', 0, 'e8000000-0000-4000-8000-000000000002',
+select pg_temp.saved_before('e4000000-0000-4000-8000-000000000002', 0, 'e8000000-0000-4000-8000-000000000002',
   pg_temp.card('e5000000-0000-4000-8000-000000000002', 'A fictional tool library', '[]'));
 reset role;
 select pg_temp.assert_draft(pg_temp.project('alice', 'link', pg_temp.own('3mlegacyproject')
@@ -299,7 +303,7 @@ from (values ('saved published', 'e5000000-0000-4000-8000-000000000001', 'b'), (
 -- even when the card's types of work change too.
 select set_config('request.jwt.claims', '{"sub":"e1000000-0000-4000-8000-000000000001","session_id":"e2000000-0000-4000-8000-000000000001","role":"authenticated","exp":4102444800}', true);
 set local role authenticated;
-select weave.save_initiative('e4000000-0000-4000-8000-000000000001', 1, 'e8000000-0000-4000-8000-000000000003',
+select pg_temp.saved_before('e4000000-0000-4000-8000-000000000001', 1, 'e8000000-0000-4000-8000-000000000003',
   pg_temp.card('e5000000-0000-4000-8000-000000000001', 'A fictional place to meet, changed', '["research"]'));
 reset role;
 select pg_temp.assert_draft((pg_temp.listing('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000001')).status = 'withdrawal_pending',
@@ -347,13 +351,13 @@ insert into weave_workspace.project_links(id, project_uri, repository_did, cid, 
    'did:plc:pppppppppppppppppppppppp', 'bafyfixture', 'e1000000-0000-4000-8000-000000000001');
 select set_config('request.jwt.claims', '{"sub":"e1000000-0000-4000-8000-000000000002","session_id":"e2000000-0000-4000-8000-000000000003","role":"authenticated","exp":4102444800}', true);
 set local role authenticated;
-select pg_temp.assert_draft(pg_temp.refusal(format('select weave.save_initiative(%L, 0, %L, %L)', c.id, c.request,
+select pg_temp.assert_draft(pg_temp.refusal(format('select pg_temp.saved_before(%L, 0, %L, %L)', c.id, c.request,
     pg_temp.card('e5000000-0000-4000-8000-000000000009', 'Someone else''s card', '[]'))) = 'PT409 revision_conflict',
   'a new saved card must not take the ID of ' || c.label)
 from (values ('e4000000-0000-4000-8000-000000000002', 'e8000000-0000-4000-8000-000000000010', 'a deleted card''s link'),
   ('e3000000-0000-4000-8000-000000000005', 'e8000000-0000-4000-8000-000000000011', 'a draft''s link')) c(id, request, label);
-select pg_temp.assert_draft(weave.save_initiative('e4000000-0000-4000-8000-000000000009', 0, 'e8000000-0000-4000-8000-000000000012',
-    pg_temp.card('e5000000-0000-4000-8000-000000000009', 'Bob''s own card', '[]'))->>'revision' = '1', 'any other new card still saves');
+select pg_temp.assert_draft(pg_temp.saved_before('e4000000-0000-4000-8000-000000000009', 0, 'e8000000-0000-4000-8000-000000000012',
+    pg_temp.card('e5000000-0000-4000-8000-000000000009', 'Bob''s own card', '[]'))->>'revision' = '1', 'any other new card still passes the guard');
 reset role;
 select pg_temp.assert_draft(pg_temp.refusal($$insert into weave_workspace.project_links(id, project_uri, repository_did, solo_initiative_id, cid)
     values ('e3000000-0000-4000-8000-000000000006', 'at://did:plc:pppppppppppppppppppppppp/org.hypercerts.collection/3mmismatch',

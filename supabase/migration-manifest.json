@@ -156,6 +156,11 @@
       "file": "20261127193129_weave_publish_from_draft.sql",
       "owner": "platform",
       "sha256": "2fe9fe9c0706b42f15e594ed4af43dd49143edca8eb2c00a3d888a24e2502026"
+    },
+    {
+      "file": "20261127222941_weave_retire_private_saves.sql",
+      "owner": "platform",
+      "sha256": "be026b54f648e3352f10198fc2f979cbd95c8f6087917cc3121de9c62c34b514"
     }
   ]
 }
