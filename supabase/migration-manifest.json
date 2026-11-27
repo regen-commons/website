@@ -151,6 +151,11 @@
       "file": "20261127085818_weave_public_support_listings.sql",
       "owner": "platform",
       "sha256": "d26094d207136d53ca55eb6d1d0b59f70eea67dc5496f7ba0ca61fa69f8bee7f"
+    },
+    {
+      "file": "20261127100141_weave_publish_from_draft.sql",
+      "owner": "platform",
+      "sha256": "188740cb238cdae5cfc8d839e16e21bac12f6caa9a003df2ca450892823cc6d1"
     }
   ]
 }

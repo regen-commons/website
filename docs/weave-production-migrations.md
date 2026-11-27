@@ -258,3 +258,57 @@ project that has them. `supabase/tests/weave-public-support-listings.sql` proves
 filters and grants on the CI image: confirmed, open and unexpired listings for exactly the asked
 project are shown, and pending, withdrawn, conflicting, expired, malformed, closed, mismatched and
 paused ones are not.
+
+## Publish from the draft release
+
+`20261127100141_weave_publish_from_draft` matches `supabase/candidates/weave-publish-from-draft.sql` in
+Weave (branch `claude/eager-carson-37a07f`, commit `3656af8`; its pull request follows its second review) byte for byte. It is step 3 of the DL-155 removal plan: Make It
+Public publishes a need or offer from the device draft, with no private save first. It refuses to
+run before `20261127085818_weave_public_support_listings`. Every function it replaces uses
+`create or replace`, so each keeps its owner and grants. What it changes:
+
+- `weave_workspace.project_links`: a personal link may now have no saved card (the new
+  `project_links_owner_check` replaces `project_links_check1`), and its foreign key to
+  `weave.initiatives` is `on delete set null` instead of `cascade`. Deleting a saved card, which
+  the API's delete guard still refuses while a link refers to it, no longer erases the link or
+  Weave's record of the card's published listings; an entry's deletion still queues the listing's
+  withdrawal.
+- `weave_workspace.link_result`: the admin of a personal link is whoever's verified Certified DID
+  equals its `repository_did`, with or without a saved card. The user approved this rule on
+  27 November 2026. Every caller checks the DID against the live session first.
+- `weave_workspace.command`: `link` with no `initiativeId` makes a personal link with no saved
+  card, at a new ID, or answers the project's existing link. The saved-card `link` is unchanged.
+- `weave_workspace.support_command`: `support_review` with an `entry` (title, optional
+  description, kinds of support, optional types of work) builds the public record from those
+  fields, checks bytes, known values and duplicates, and names revision 0. New `source` columns
+  (`saved` or `draft`) on `support_reviews` and `support_listings` record where a review came
+  from. A draft's listing skips the saved-entry checks at publish and at the `sending` claim, and
+  the entry and lens triggers only touch listings from a saved card. The saved path is unchanged,
+  except that a personal link's saved review now needs the link to be anchored on that card.
+  Publishing an entry again is still withdraw, then create at the same record key.
+- A new `before insert` trigger on `weave.initiatives`, `weave_workspace.initiative_link_guard`,
+  refuses a new saved card at the ID of a personal link no card anchors (`PT409
+  revision_conflict`). Only the trigger runs it.
+- `weave_workspace.discovery` is not replaced: `list_workspaces` lists a personal link only with
+  its saved card, as before.
+
+`supabase/tests/weave-publish-from-draft.sql` proves these on the CI image: a card-less link through
+the workspace runtime and its retry; DID authority, with another person and a forged DID refused;
+the draft review, publish, single `sending` claim, confirmation and public read; 21 malformed entries
+refused with `PT400 invalid_support_entry`; withdrawal from a second session and republishing at the
+same record key; a draft's listing beside a saved card's on one workspace, where an edit to the card
+withdraws only the saved one; a deleted card whose link and listing remain and whose withdrawal the
+same DID finishes; the new-card guard; the link constraint; and a group editor's draft review, with
+a viewer and a missing membership refused.
+
+Order: apply this before deploying the Weave API and app that send card-less links and draft
+reviews. That code fails safely on the older functions: a card-less `link` is refused as invalid
+data and a draft review as a revision conflict, so nothing is linked or published. The deployed
+code before it keeps working on these functions, because the saved-card commands are unchanged.
+
+Applying it to Platform is not yet approved. Merge only after the Weave pull request has had its second review,
+and apply only with the user's separate approval, using the same commands as above. The dry run must
+list exactly this one version. Afterwards, check that `weave_workspace.command` and
+`weave_workspace.support_command` are still executable by `weave_workspace_runtime` only, that
+`weave_workspace.initiative_link_guard()` is executable by no API role, and that the 8 published
+listings still read through `private.weave_public_support_listings`.
