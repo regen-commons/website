@@ -335,7 +335,7 @@ approval.
 
 ## Retire private saves release
 
-`20261127211716_weave_retire_private_saves` matches `supabase/candidates/weave-retire-private-saves.sql`
+`20261127222941_weave_retire_private_saves` matches `supabase/candidates/weave-retire-private-saves.sql`
 in Weave (branch `claude/stop-private-saves`, commit `c09f8a3`) byte for byte. It is the database half of step 4 of
 the DL-155 removal plan: nothing new is saved privately or shared for matching. Weave's API refuses both
 in [regen-commons/weave#280](https://github.com/regen-commons/weave/pull/280), but a signed-in session
@@ -384,8 +384,27 @@ Order: the Weave API and app in regen-commons/weave#280 already send none of the
 applied before or after that deploys. Applied while an older Weave build is live, that build's Save
 Privately and Share For Matching fail with these errors and save or share nothing new. A share that
 committed just before, whose answer was lost, answers as it did when the build retries it; a save's
-retry is refused, and the save it repeats is already kept. Applying it to
-Platform is not yet approved. Apply only with the user's separate approval, using the same path as
-the releases above. The dry run must list exactly this one version. Afterwards, check that the three
-functions read as this file does, that `weave.save_initiative` answers `PT410` for a signed-in
-session, and that `private.weave_save_document` and `weave_workspace.content_command` are unchanged.
+retry is refused, and the save it repeats is already kept.
+
+The user approved shipping step 4 on 27 November 2026: merging regen-commons/weave#280, then applying
+and merging this. #280 merged as `c9d05c0`, and its production deploy on Vercel completed before this
+was applied, so the API's refusals were live first. The Supabase CLI was not available, so it was
+applied through the Supabase connector, as for the releases above, and the file takes the version the
+connector recorded.
+
+Before applying, Platform's history held exactly the 31 versions here, through
+`20261127193129_weave_publish_from_draft`.
+
+Afterwards:
+
+- Platform's history holds 32 versions. The SQL recorded for `20261127222941` matches the file byte
+  for byte (SHA-256 `be026b54...34b514`).
+- `private.weave_save_initiative` and `private.weave_matching_preview` run as the caller, and
+  `private.weave_matching_change` as its owner. All three are owned by `postgres` with their grants
+  as before: `authenticated` may execute `private.weave_save_initiative`, and only `postgres` the
+  matching functions.
+- In a transaction that was rolled back, `weave.save_initiative` answered
+  `PT410 private_saves_retired` for a signed-in session.
+- The definitions of `private.weave_save_document`, `weave_workspace.content_command`,
+  `weave_workspace.initiative_link_guard` and `weave.save_initiative` hash the same as before the
+  apply.
