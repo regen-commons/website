@@ -336,7 +336,7 @@ approval.
 ## Retire private saves release
 
 `20261127211716_weave_retire_private_saves` matches `supabase/candidates/weave-retire-private-saves.sql`
-in Weave (branch `claude/stop-private-saves`, commit `540c053`) byte for byte. It is the database half of step 4 of
+in Weave (branch `claude/stop-private-saves`, commit `c09f8a3`) byte for byte. It is the database half of step 4 of
 the DL-155 removal plan: nothing new is saved privately or shared for matching. Weave's API refuses both
 in [regen-commons/weave#280](https://github.com/regen-commons/weave/pull/280), but a signed-in session
 can still call `weave.save_initiative` through PostgREST with its own access token. This makes the
