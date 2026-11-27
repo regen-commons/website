@@ -380,7 +380,7 @@ select pg_temp.assert_draft(pg_temp.refusal(format('select pg_temp.support(%L, %
     'support_review', pg_temp.draft_review('need', 'e6000000-0000-4000-8000-000000000011', '{"title":"Group need","capitalForms":["social"]}'),
     'member')) = 'PT403 workspace_edit_required', 'a group viewer must not review for publishing');
 select pg_temp.assert_draft(pg_temp.refusal(format('select pg_temp.support(%L, %L, %L, %L)', 'alice', 'e3000000-0000-4000-8000-000000000010',
-    'support_review', pg_temp.draft_review('need', 'e6000000-0000-4000-8000-000000000012', '{"title":"Group need","capitalForms":["social"]}'))))
+    'support_review', pg_temp.draft_review('need', 'e6000000-0000-4000-8000-000000000012', '{"title":"Group need","capitalForms":["social"]}')))
   = 'PT404 not_found', 'a group grant without current membership opens nothing');
 
 rollback;
