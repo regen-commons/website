@@ -26,7 +26,7 @@ select pg_temp.assert_retired(not r.rolsuper, p.oid::regprocedure::text || ' mus
     'private.weave_matching_change(uuid,text,uuid,uuid,jsonb)'::regprocedure);
 select pg_temp.assert_retired(has_function_privilege('authenticated', f, 'execute'), 'a signed-in session must still reach ' || f)
   from unnest(array['weave.save_initiative(uuid,integer,uuid,jsonb)', 'private.weave_save_initiative(uuid,integer,uuid,jsonb)',
-    'weave.load_initiative(uuid)', 'weave.list_initiatives()', 'weave.delete_initiative(uuid,integer,uuid)']) f;
+    'weave.load_initiative(uuid)', 'weave.list_initiatives(integer)', 'weave.delete_initiative(uuid,integer,uuid)']) f;
 select pg_temp.assert_retired(not has_function_privilege('anon', 'weave.save_initiative(uuid,integer,uuid,jsonb)', 'execute'),
   'an anonymous caller must not reach the save');
 select pg_temp.assert_retired(not has_function_privilege(r, f, 'execute'), r || ' must not run ' || f)
