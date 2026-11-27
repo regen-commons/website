@@ -219,3 +219,31 @@ second review, and apply only with the user's separate approval, using the same 
 The dry run must list exactly this one version. Afterwards, check that
 `private.weave_delete_initiative(uuid, integer, uuid)` is still executable by `authenticated`
 only and that `weave.delete_initiative(uuid, integer, uuid)` is unchanged.
+
+## Public support listings read release
+
+`20261127082328_weave_public_support_listings` matches
+`supabase/candidates/weave-public-support-listings.sql` in Weave
+([regen-commons/weave#272](https://github.com/regen-commons/weave/pull/272), `dd3365d`) byte for
+byte. It adds `private.weave_public_support_listings(text)`, a `security definer` function with an
+empty search path. For one project it returns the needs and offers Weave published and confirmed by
+reading them back, still open and unexpired, from a project link that is not paused: each record's
+kind, record key, address, CID and the public record itself, and nothing private. Only
+`weave_index_job` may run it; `public`, `anon`, `authenticated`, `service_role` and
+`weave_workspace_runtime` may not. It refuses to run before `weave_workspace.support_listings`,
+`weave_workspace.project_links` and the `weave_index_job` role exist.
+
+Weave's public initiative page reads its listings through this function
+(`GET /api/public-initiative`, from regen-commons/weave#272). Platform does not have it, so that
+read fails, and Weave answers `public_initiative_unavailable`. This is inferred from the code and
+was not observed in production. On 26 November 2026 Platform held 8 published listings, 4 needs and
+4 offers, that no page could show. The two-place decision for needs and offers (DL-155, in
+[regen-commons/weave#278](https://github.com/regen-commons/weave/pull/278)) keeps this read:
+under D47 Weave reads published listings from its own record first.
+
+On 27 November 2026 Platform had the role and the `repository_did` and `matching_paused` columns the
+function needs, and not the function. Applying it to Platform is not yet approved. Apply only with
+the user's separate approval, using the same commands as above. The dry run must list exactly this
+one version. Afterwards, check that the function exists, that `weave_index_job` can execute it and
+`anon`, `authenticated` and `service_role` cannot, and that a public initiative page with published
+listings shows them.

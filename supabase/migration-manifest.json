@@ -146,6 +146,11 @@
       "file": "20261126041522_weave_initiative_deletion_stale_references.sql",
       "owner": "platform",
       "sha256": "83becee67466d28ceddbe37b2743fcff7a11806416d11efc71885df72dec8b2d"
+    },
+    {
+      "file": "20261127082328_weave_public_support_listings.sql",
+      "owner": "platform",
+      "sha256": "d26094d207136d53ca55eb6d1d0b59f70eea67dc5496f7ba0ca61fa69f8bee7f"
     }
   ]
 }
