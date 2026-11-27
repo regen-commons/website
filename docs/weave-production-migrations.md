@@ -222,7 +222,7 @@ only and that `weave.delete_initiative(uuid, integer, uuid)` is unchanged.
 
 ## Public support listings read release
 
-`20261127082328_weave_public_support_listings` matches
+`20261127085818_weave_public_support_listings` matches
 `supabase/candidates/weave-public-support-listings.sql` in Weave
 ([regen-commons/weave#272](https://github.com/regen-commons/weave/pull/272), `dd3365d`) byte for
 byte. It adds `private.weave_public_support_listings(text)`, a `security definer` function with an
@@ -243,16 +243,18 @@ under D47 Weave reads published listings from its own record first.
 
 On 27 November 2026 Platform had the role and the `repository_did` and `matching_paused` columns the
 function needs, and not the function. The user approved applying it to Platform on 27 November
-2026, once its review passed. Use the same commands as above; the dry run must list exactly this
-one version. Afterwards, check that only `weave_index_job` can execute it:
+2026, once its review passed. The Supabase CLI was not available, so it was applied through the
+Supabase connector, as on 21 November, and the file takes the version the connector recorded. The
+SQL recorded in Platform's history matches the file byte for byte (SHA-256 `d26094d2...8bee7f`).
+Afterwards only `weave_index_job` could execute it, from this check:
 
 ```sql
 select r, has_function_privilege(r, 'private.weave_public_support_listings(text)', 'execute')
 from unnest(array['weave_index_job', 'anon', 'authenticated', 'service_role', 'weave_workspace_runtime']) r;
 ```
 
-Only the first row may read `true`. Then open a public initiative page with published listings and
-check that it shows them. `supabase/tests/weave-public-support-listings.sql` proves the function's
+Only the first row read `true`. The function then returned all 8 published listings, for the one
+project that has them. `supabase/tests/weave-public-support-listings.sql` proves the function's
 filters and grants on the CI image: confirmed, open and unexpired listings for exactly the asked
 project are shown, and pending, withdrawn, conflicting, expired, malformed, closed, mismatched and
 paused ones are not.
