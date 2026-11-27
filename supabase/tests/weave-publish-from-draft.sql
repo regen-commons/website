@@ -2,7 +2,7 @@
 -- DL-155, step 3: a need or offer is published from the device draft with no private save first. A
 -- personal project link needs no saved card and is held by the verified Certified DID that owns the
 -- project's repository. Deleting a saved card no longer erases Weave's record of its published listings,
--- no new card may take a link's ID, and publishing from a private save still works until saves retire.
+-- no new card may take a link's ID, and publishing from a saved card still works, also after DL-155 step 4.
 -- Security definer commands are called as the test owner unless a step is about the runtime's grants.
 begin;
 create function pg_temp.assert_draft(ok boolean, message text) returns void

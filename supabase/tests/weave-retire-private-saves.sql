@@ -16,9 +16,9 @@ exception when others then
   return sqlstate || ' ' || sqlerrm;
 end $$;
 
--- Each function this migration replaces is still owned by the migration role and keeps its grants. A
--- signed-in session still reaches the personal save, so it hears the refusal by name; nothing but the
--- workspace runtime reaches matching.
+-- Each function this migration replaces is owned by a non-superuser, as the migration role creates it,
+-- and keeps its grants. A signed-in session still reaches the personal save, so it hears the refusal by
+-- name; matching is reached only through the workspace runtime's team command, never directly.
 select pg_temp.assert_retired(not r.rolsuper, p.oid::regprocedure::text || ' must be created under a non-superuser')
   from pg_proc p join pg_roles r on r.oid = p.proowner
   where p.oid in ('private.weave_save_initiative(uuid,integer,uuid,jsonb)'::regprocedure,
@@ -35,6 +35,9 @@ select pg_temp.assert_retired(not has_function_privilege(r, f, 'execute'), r || 
       'private.weave_matching_preview(uuid,integer,jsonb,timestamptz)', 'private.weave_matching_change(uuid,text,uuid,uuid,jsonb)']) f;
 select pg_temp.assert_retired(has_function_privilege('weave_workspace_runtime',
     'weave_workspace.content_command(uuid,uuid,text,uuid,text,text,text,jsonb)', 'execute'), 'the workspace runtime must still run team commands');
+select pg_temp.assert_retired(not has_function_privilege('weave_workspace_runtime', f, 'execute'), 'the workspace runtime must not run ' || f || ' directly')
+  from unnest(array['private.weave_matching_preview(uuid,integer,jsonb,timestamptz)', 'private.weave_matching_change(uuid,text,uuid,uuid,jsonb)',
+    'private.weave_save_document(uuid,integer,uuid,jsonb,boolean)']) f;
 
 -- Dana saved privately before step 4 and is an admin of a group's workspace; Eli is someone else.
 insert into auth.users(id, email_confirmed_at) values
@@ -139,6 +142,20 @@ from (values ('share', null::uuid, null::jsonb, 'a share with no review'),
   ('withdraw', null::uuid, null::jsonb, 'a withdrawal naming nothing')) c(action, review, entries, label);
 select pg_temp.assert_retired((select count(*) from private.weave_matching_reviews
     where initiative_id = 'f4000000-0000-4000-8000-000000000001') = 0, 'no review may be kept');
+-- A share that committed before step 4 answers as it did when its request is replayed, as any replay
+-- does; its request ID used for another share still conflicts, and a share naming no request is invalid.
+insert into private.weave_matching_requests(actor_id, request_id, command) values ('f1000000-0000-4000-8000-000000000001',
+  'f9000000-0000-4000-8000-000000000002', jsonb_build_array('f4000000-0000-4000-8000-000000000001'::uuid, 'share',
+    'f7000000-0000-4000-8000-000000000001'::uuid, null::jsonb));
+select pg_temp.assert_retired(jsonb_typeof(private.weave_matching_change('f4000000-0000-4000-8000-000000000001', 'share',
+    'f9000000-0000-4000-8000-000000000002', 'f7000000-0000-4000-8000-000000000001', null)) = 'object',
+  'a share that committed before must answer as it did when replayed');
+select pg_temp.assert_retired(pg_temp.refusal(format('select private.weave_matching_change(%L, %L, %L, %L, null)',
+    'f4000000-0000-4000-8000-000000000001', 'share', 'f9000000-0000-4000-8000-000000000002', gen_random_uuid()))
+  = 'PT409 matching_conflict', 'a request ID used for another share must conflict');
+select pg_temp.assert_retired(pg_temp.refusal(format('select private.weave_matching_change(%L, %L, null, %L, null)',
+    'f4000000-0000-4000-8000-000000000001', 'share', gen_random_uuid())) = 'PT400 invalid_data',
+  'a share naming no request must still be invalid data');
 select pg_temp.claims('f1000000-0000-4000-8000-000000000002', 'f2000000-0000-4000-8000-000000000002');
 select pg_temp.assert_retired(pg_temp.refusal(format('select private.weave_matching_change(%L, %L, %L, null, %L)',
     'f4000000-0000-4000-8000-000000000001', 'withdraw', gen_random_uuid(), pg_temp.need_ref('f4000000-0000-4000-8000-000000000001')))

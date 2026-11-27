@@ -338,10 +338,10 @@ approval.
 `20261127211716_weave_retire_private_saves` matches `supabase/candidates/weave-retire-private-saves.sql`
 in Weave (branch `claude/stop-private-saves`, commit `540c053`) byte for byte. It is the database half of step 4 of
 the DL-155 removal plan: nothing new is saved privately or shared for matching. Weave's API refuses both
-since [regen-commons/weave#280](https://github.com/regen-commons/weave/pull/280), but a signed-in session
+in [regen-commons/weave#280](https://github.com/regen-commons/weave/pull/280), but a signed-in session
 can still call `weave.save_initiative` through PostgREST with its own access token. This makes the
-database refuse it too, with the API's names. It refuses to run before `weave_team_content`,
-`weave_open_ended_sharing` and `weave_publish_from_draft`, and every function it replaces uses
+database refuse it too, with the API's names. It refuses to run before `weave_team_content` and
+`weave_publish_from_draft`, and every function it replaces uses
 `create or replace`, so each keeps its owner and grants. What it changes:
 
 - `private.weave_save_initiative`, behind `weave.save_initiative`, raises `PT410 private_saves_retired`
@@ -350,10 +350,12 @@ database refuse it too, with the API's names. It refuses to run before `weave_te
   `private.weave_save_document` from `weave_workspace.content_command` and is unchanged until step 6.
 - `private.weave_matching_preview` raises `PT410 matching_shares_retired` for every review, for a
   personal card or a team's. A review exists only to share. It also now runs as the caller.
-- `private.weave_matching_change` raises `PT410 matching_shares_retired` for `share` and `renew`, after
-  checking the command, so a malformed one is still `PT400 invalid_data`. `withdraw` is unchanged.
+- `private.weave_matching_change` raises `PT410 matching_shares_retired` for `share` and `renew` once
+  the command is checked and is not a replay, so a malformed one is still `PT400 invalid_data` and one
+  that committed before answers with the recorded state, as any replay does. `withdraw` is unchanged.
 
-Unchanged: loading, listing, downloading and deleting the private saves already here (D49), matching
+Unchanged: loading, listing and deleting the private saves already here, which Weave's Download reads
+(D49), matching
 state, partner search, saved partners and leads. `weave_team_content` already took the matching
 wrappers away from `authenticated`, so only `weave_workspace_runtime` reaches matching; this checks
 that too. `weave.save_initiative` stays executable by `authenticated`, so the caller hears the refusal
@@ -368,7 +370,8 @@ private functions by `postgres` only.
 - a new card, an update and a replay refused by name with nothing written;
 - the save made before loading, listing and deleting as before;
 - review, share and renewal refused for a personal card and through the workspace runtime for a team,
-  with malformed commands still invalid data;
+  with malformed commands still invalid data, a share that committed before answering as recorded when
+  replayed, and a reused request ID conflicting;
 - a share made before withdrawn by its owner and not by someone else, a replay changing nothing and a
   stale version conflicting;
 - a team workspace saving and loading through the runtime, with no actor left in the session.
@@ -379,7 +382,9 @@ save is refused.
 
 Order: the Weave API and app in regen-commons/weave#280 already send none of these, so this can be
 applied before or after that deploys. Applied while an older Weave build is live, that build's Save
-Privately and Share For Matching fail with these errors and save or share nothing. Applying it to
+Privately and Share For Matching fail with these errors and save or share nothing new. A share that
+committed just before, whose answer was lost, answers as it did when the build retries it; a save's
+retry is refused, and the save it repeats is already kept. Applying it to
 Platform is not yet approved. Apply only with the user's separate approval, using the same path as
 the releases above. The dry run must list exactly this one version. Afterwards, check that the three
 functions read as this file does, that `weave.save_initiative` answers `PT410` for a signed-in

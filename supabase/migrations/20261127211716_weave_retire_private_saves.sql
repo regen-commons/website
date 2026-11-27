@@ -1,20 +1,22 @@
 -- Candidate for the website migration owner, after weave-publish-from-draft. Not applied anywhere.
 -- Apply through the website's migration path as a new migration.
 --
--- DL-155, step 4: nothing new is saved privately or shared for matching. Weave's API has refused both
--- since regen-commons/weave#280, with `private_saves_retired` and `matching_shares_retired`. This makes
--- the database refuse them too, with the same names, so neither a session's own access token through
--- PostgREST nor any build of the Weave server can save or share:
+-- DL-155, step 4: nothing new is saved privately or shared for matching. Weave's API refuses both in
+-- regen-commons/weave#280, with `private_saves_retired` and `matching_shares_retired`. This makes the
+-- database refuse them too, with the same names, so neither a session's own access token through
+-- PostgREST nor any build of the Weave server can save or share anew:
 -- - private.weave_save_initiative, behind weave.save_initiative, refuses every personal save: a new
 --   card, an update and a retry of an earlier request alike. A team workspace's save calls
 --   private.weave_save_document with p_team from weave_workspace.content_command, and is unchanged
 --   until step 6.
 -- - private.weave_matching_preview refuses every review, for a personal card or a team's. A review
 --   exists only to share.
--- - private.weave_matching_change refuses share and renew after checking the command, so a malformed
---   one is still invalid data. Withdrawing is unchanged, as are matching state, partner search,
---   saved partners and leads, until step 5.
--- Loading, listing, downloading and deleting the private saves already here are unchanged (D49).
+-- - private.weave_matching_change refuses share and renew once the command is checked and is not a
+--   replay, so a malformed one is still invalid data and one that committed before answers as it did.
+--   Withdrawing is unchanged, as are matching state, partner search, saved partners and leads, until
+--   step 5.
+-- Loading, listing and deleting the private saves already here, which Weave's Download reads, are
+-- unchanged (D49).
 -- weave-team-content already took the matching wrappers away from authenticated, so only the
 -- workspace runtime reaches the matching functions; weave.save_initiative stays executable by
 -- authenticated and now answers with the refusal.
@@ -28,7 +30,7 @@ begin
     or to_regprocedure('private.weave_matching_preview(uuid,integer,jsonb,timestamptz)') is null
     or to_regprocedure('private.weave_matching_change(uuid,text,uuid,uuid,jsonb)') is null
     or to_regprocedure('weave_workspace.initiative_link_guard()') is null then
-    raise exception 'weave-team-content, weave-open-ended-sharing and weave-publish-from-draft must be installed first';
+    raise exception 'weave-team-content and weave-publish-from-draft must be installed first';
   end if;
 end $$;
 
@@ -46,7 +48,8 @@ begin
   raise sqlstate 'PT410' using message='matching_shares_retired';
 end $$;
 
--- Withdrawing, as before; sharing and renewing are refused once the command is known to be well formed.
+-- Withdrawing, as before. Sharing and renewing are refused once the command is known to be well formed
+-- and is not a replay: a share or renewal that committed before answers as it did, as any replay does.
 create or replace function private.weave_matching_change(
   p_id uuid,p_action text,p_request_id uuid,p_review_id uuid,p_entries jsonb
 ) returns jsonb language plpgsql security definer set search_path = '' as $$
@@ -59,8 +62,8 @@ begin
     or (p_action='withdraw' and (p_review_id is not null or p_entries is null))
     or (p_action<>'withdraw' and (p_review_id is null or p_entries is not null))
     then raise sqlstate 'PT400' using message='invalid_data'; end if;
-  if p_action<>'withdraw' then raise sqlstate 'PT410' using message='matching_shares_retired'; end if;
   if private.weave_matching_retry(private.weave_actor(),p_request_id,command) then return private.weave_matching_state(p_id); end if;
+  if p_action<>'withdraw' then raise sqlstate 'PT410' using message='matching_shares_retired'; end if;
   for entry in select * from private.weave_matching_selected(p_id,p_entries) loop
     target=case entry.kind when 'need' then 'weave.needs'::regclass else 'weave.offers'::regclass end;
     if entry.matching_audience is null or entry.matching_withdrawn then
