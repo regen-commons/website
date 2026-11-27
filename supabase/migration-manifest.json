@@ -153,7 +153,7 @@
       "sha256": "d26094d207136d53ca55eb6d1d0b59f70eea67dc5496f7ba0ca61fa69f8bee7f"
     },
     {
-      "file": "20261127100141_weave_publish_from_draft.sql",
+      "file": "20261127193129_weave_publish_from_draft.sql",
       "owner": "platform",
       "sha256": "2fe9fe9c0706b42f15e594ed4af43dd49143edca8eb2c00a3d888a24e2502026"
     }

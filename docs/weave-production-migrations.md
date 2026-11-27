@@ -261,7 +261,7 @@ paused ones are not.
 
 ## Publish from the draft release
 
-`20261127100141_weave_publish_from_draft` matches `supabase/candidates/weave-publish-from-draft.sql` in
+`20261127193129_weave_publish_from_draft` matches `supabase/candidates/weave-publish-from-draft.sql` in
 Weave (branch `claude/eager-carson-37a07f`, commit `50f1117`) byte for byte. It is step 3 of the DL-155 removal plan: Make It
 Public publishes a need or offer from the device draft, with no private save first. It refuses to
 run before `20261127085818_weave_public_support_listings`. Every function it replaces uses
@@ -309,9 +309,26 @@ a card-less `link` is refused as invalid data and a draft review as a revision c
 published, but Make It Public may already have created the person's Certified project. The deployed
 code before it keeps working on these functions, because the saved-card commands are unchanged.
 
-Applying it to Platform is not yet approved. Merge only after the Weave pull request has had its second review,
-and apply only with the user's separate approval, using the same commands as above. The dry run must
-list exactly this one version. Afterwards, check that `weave_workspace.command` and
-`weave_workspace.support_command` are still executable by `weave_workspace_runtime` only, that
-`weave_workspace.initiative_link_guard()` is executable by no API role, and that the 8 published
-listings still read through `private.weave_public_support_listings`.
+The Weave pull request, [regen-commons/weave#279](https://github.com/regen-commons/weave/pull/279),
+had two independent reviews, with their findings fixed. The user approved applying this to Platform on
+27 November 2026. The Supabase CLI was not available, so it was applied through the Supabase
+connector, as on 21 November, and the file takes the version the connector recorded.
+
+Before applying, Platform's history held exactly the 30 versions here, through
+`20261127085818_weave_public_support_listings`. The bodies of the five functions this replaces
+matched their applied migrations, and `initiative_link_guard` did not exist. Platform held 1 personal
+and 2 group project links (none without a saved card), 8 published listings and 1 open review.
+
+Afterwards:
+
+- The SQL recorded in Platform's history matches the file byte for byte (SHA-256 `2fe9fe9c...502026`).
+- `weave_workspace.command` and `weave_workspace.support_command` are executable by
+  `weave_workspace_runtime` only. `initiative_link_guard()` and `link_result` are executable by none of
+  `public`, `anon`, `authenticated`, `service_role` or `weave_workspace_runtime`. All are owned by `postgres`.
+- `project_links_owner_check` replaced `project_links_check1`, the foreign key to `weave.initiatives`
+  is `on delete set null`, and the `before insert` trigger is enabled.
+- The same 3 links and 8 published listings remain. All 8 listings and the 1 review read `source` `saved`.
+- `private.weave_public_support_listings` still returns all 8 published listings.
+
+Merging regen-commons/weave#279, which deploys the API and app that use this, needs the user's separate
+approval.
