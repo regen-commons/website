@@ -4,12 +4,16 @@
 --
 -- A personal project link no longer needs a saved card. The person whose verified Certified DID owns
 -- the project's repository holds it, which is the identity the link was already bound to. Deleting a
--- saved card no longer cascades to its project link or to Weave's record of its published listings.
+-- saved card (only an account's deletion does; the API's delete guard refuses a linked card) no longer
+-- cascades to its project link or to Weave's record of its published listings.
 -- Listings published from a private save keep their entry checks and edit triggers until saves retire;
 -- listings published from a draft are checked when reviewed and never follow later edits, since Weave
 -- never sees the draft again. Every function keeps its owner and grants through create or replace.
--- Apply this before deploying the API that sends card-less links and draft reviews: that API fails
--- safely on the older functions (nothing is linked or published), and the older API keeps working here.
+-- Apply this before deploying the API and app that send card-less links and draft reviews, and merge
+-- that code only afterwards, since Weave deploys on merge. On the older functions that API's card-less
+-- link and draft review are refused, so nothing is published, but Make It Public may already have
+-- created the person's Certified project. The API and app before it keep working here: the saved-card
+-- commands are unchanged.
 -- `discovery` stays as applied: `list_workspaces` lists a personal link only with the saved card it is
 -- anchored on, because the app opens a listed personal workspace as that card. A card-less link is
 -- reached by its project instead, through `lookup` and `link`, under the same verified-DID rule.
@@ -382,9 +386,10 @@ begin
     end if;
     source='draft'; details=draft;
   elsif p_action='support_review' then
-    -- A personal link's saved card is the one it is anchored on, never another row at its ID.
+    -- A personal link's saved card is the one it is anchored on, read only by its owner: the DID rule
+    -- holds the link, never another account's private save.
     if parent.id is null or parent.revision is distinct from (p_data->>'expectedRevision')::integer
-      or (link.group_did is null and link.solo_initiative_id is distinct from p_id) then
+      or (link.group_did is null and (link.solo_initiative_id is distinct from p_id or parent.owner_id is distinct from p_actor)) then
       raise sqlstate 'PT409' using message='revision_conflict';
     end if;
     select * into entry from private.weave_matching_entries e where (e.initiative_id,e.kind,e.id)=(p_id,k,eid);
@@ -528,4 +533,3 @@ begin
   end if;
   return weave_workspace.support_result(publication)||case when event='sending' then jsonb_build_object('claimed',claimed) else '{}'::jsonb end;
 end $$;
-

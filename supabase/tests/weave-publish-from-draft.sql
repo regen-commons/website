@@ -43,21 +43,26 @@ select pg_temp.assert_draft((select confdeltype from pg_constraint where conname
 select pg_temp.assert_draft((select count(*) from pg_trigger where tgrelid = 'weave.initiatives'::regclass
     and tgname = 'initiative_link_guard' and tgenabled = 'O') = 1, 'new saved cards must pass the link guard');
 
--- Alice holds did:plc:pppp… on two browsers; Bob is someone else.
+-- Alice holds did:plc:pppp… on two browsers; a second account also holds it, as after unlinking and relinking
+-- the identity; Bob is someone else.
 insert into auth.users(id, email_confirmed_at) values
-  ('e1000000-0000-4000-8000-000000000001', now()), ('e1000000-0000-4000-8000-000000000002', now());
+  ('e1000000-0000-4000-8000-000000000001', now()), ('e1000000-0000-4000-8000-000000000002', now()),
+  ('e1000000-0000-4000-8000-000000000003', now());
 insert into auth.sessions(id, user_id) values
   ('e2000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001'),
   ('e2000000-0000-4000-8000-000000000002', 'e1000000-0000-4000-8000-000000000001'),
-  ('e2000000-0000-4000-8000-000000000003', 'e1000000-0000-4000-8000-000000000002');
+  ('e2000000-0000-4000-8000-000000000003', 'e1000000-0000-4000-8000-000000000002'),
+  ('e2000000-0000-4000-8000-000000000004', 'e1000000-0000-4000-8000-000000000003');
 insert into auth.identities(user_id, provider, provider_id) values
   ('e1000000-0000-4000-8000-000000000001', 'custom:certified', 'https://certified.one|did:plc:pppppppppppppppppppppppp'),
-  ('e1000000-0000-4000-8000-000000000002', 'custom:certified', 'https://certified.one|did:plc:qqqqqqqqqqqqqqqqqqqqqqqq');
+  ('e1000000-0000-4000-8000-000000000002', 'custom:certified', 'https://certified.one|did:plc:qqqqqqqqqqqqqqqqqqqqqqqq'),
+  ('e1000000-0000-4000-8000-000000000003', 'custom:certified', 'https://certified.one|did:plc:pppppppppppppppppppppppp');
 create temp table actors(name text primary key, user_id uuid not null, session_id uuid not null, did text not null);
 insert into actors values
   ('alice', 'e1000000-0000-4000-8000-000000000001', 'e2000000-0000-4000-8000-000000000001', 'did:plc:pppppppppppppppppppppppp'),
   ('alice elsewhere', 'e1000000-0000-4000-8000-000000000001', 'e2000000-0000-4000-8000-000000000002', 'did:plc:pppppppppppppppppppppppp'),
-  ('bob', 'e1000000-0000-4000-8000-000000000002', 'e2000000-0000-4000-8000-000000000003', 'did:plc:qqqqqqqqqqqqqqqqqqqqqqqq');
+  ('bob', 'e1000000-0000-4000-8000-000000000002', 'e2000000-0000-4000-8000-000000000003', 'did:plc:qqqqqqqqqqqqqqqqqqqqqqqq'),
+  ('alice''s other account', 'e1000000-0000-4000-8000-000000000003', 'e2000000-0000-4000-8000-000000000004', 'did:plc:pppppppppppppppppppppppp');
 -- Values the commands answer with, by name, for later steps.
 create temp table seen(name text primary key, value jsonb not null);
 create function pg_temp.seen(p_name text) returns jsonb language sql stable as $$ select value from pg_temp.seen where name = p_name $$;
@@ -140,7 +145,7 @@ select pg_temp.keep('review', pg_temp.support('alice', (pg_temp.seen('draft')->>
 select pg_temp.assert_draft(pg_temp.seen('review') - array['reviewId', 'reviewExpiresAt', 'record'] = jsonb_build_object('audience', 'public-atproto',
     'destination', 'did:plc:pppppppppppppppppppppppp', 'expectedRevision', 0, 'expectedEntryRevision', 0),
   'a draft review names the repository and no saved revision');
-select pg_temp.assert_draft(pg_temp.seen('review')->'record' - array['createdAt', 'updatedAt'] = jsonb_build_object(
+select pg_temp.assert_draft((pg_temp.seen('review')->'record') - array['createdAt', 'updatedAt'] = jsonb_build_object(
     '$type', 'com.regencommons.weave.supportListing', 'projectUri', 'at://did:plc:pppppppppppppppppppppppp/org.hypercerts.collection/3mdraftproject',
     'kind', 'need', 'title', 'Seed packets for the valley', 'description', 'Fictional public details.',
     'capitalForms', jsonb_build_array('material', 'living'), 'lenses', jsonb_build_array('place_based'), 'status', 'open'),
@@ -260,6 +265,15 @@ select pg_temp.assert_draft((pg_temp.seen('saved review')->>'expectedRevision'):
     and pg_temp.seen('saved review')->'record'->>'title' = 'A fictional place to meet'
     and (select source from weave_workspace.support_reviews where id = (pg_temp.seen('saved review')->>'reviewId')::uuid) = 'saved',
   'a saved card''s review is built from the saved entry, as before');
+-- The DID rule holds the link, never another account's private save: the same DID on another account may
+-- review from a draft, and may not read the saved card.
+select pg_temp.assert_draft(pg_temp.refusal(format('select pg_temp.support(%L, %L, %L, %L)', 'alice''s other account',
+    'e4000000-0000-4000-8000-000000000001', 'support_review', jsonb_build_object('kind', 'need', 'entryId', 'e5000000-0000-4000-8000-000000000001',
+      'expectedRevision', 1, 'expectedEntryRevision', pg_temp.entry_revision('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000001'),
+      'expiresAt', null))) = 'PT409 revision_conflict', 'another account holding the DID must not read the saved card');
+select pg_temp.assert_draft(pg_temp.support('alice''s other account', 'e4000000-0000-4000-8000-000000000001', 'support_review',
+    pg_temp.draft_review('need', 'e6000000-0000-4000-8000-000000000004', '{"title":"Shared tools","capitalForms":["material"]}'))->>'expectedRevision' = '0',
+  'and may review a need from its own draft for the project');
 select pg_temp.keep('saved published', pg_temp.support('alice', 'e4000000-0000-4000-8000-000000000001', 'support_publish', jsonb_build_object(
   'requestId', 'e7000000-0000-4000-8000-000000000010', 'reviewId', pg_temp.seen('saved review')->>'reviewId',
   'audience', 'public-atproto', 'confirmPublic', true)));

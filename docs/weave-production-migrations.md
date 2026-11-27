@@ -262,7 +262,7 @@ paused ones are not.
 ## Publish from the draft release
 
 `20261127100141_weave_publish_from_draft` matches `supabase/candidates/weave-publish-from-draft.sql` in
-Weave (branch `claude/eager-carson-37a07f`, commit `3656af8`; its pull request follows its second review) byte for byte. It is step 3 of the DL-155 removal plan: Make It
+Weave (branch `claude/eager-carson-37a07f`, commit `50f1117`) byte for byte. It is step 3 of the DL-155 removal plan: Make It
 Public publishes a need or offer from the device draft, with no private save first. It refuses to
 run before `20261127085818_weave_public_support_listings`. Every function it replaces uses
 `create or replace`, so each keeps its owner and grants. What it changes:
@@ -284,7 +284,8 @@ run before `20261127085818_weave_public_support_listings`. Every function it rep
   (`saved` or `draft`) on `support_reviews` and `support_listings` record where a review came
   from. A draft's listing skips the saved-entry checks at publish and at the `sending` claim, and
   the entry and lens triggers only touch listings from a saved card. The saved path is unchanged,
-  except that a personal link's saved review now needs the link to be anchored on that card.
+  except that a personal link's saved review now needs the link to be anchored on that card and the
+  actor to own the card, so the DID rule never opens another account's private save.
   Publishing an entry again is still withdraw, then create at the same record key.
 - A new `before insert` trigger on `weave.initiatives`, `weave_workspace.initiative_link_guard`,
   refuses a new saved card at the ID of a personal link no card anchors (`PT409
@@ -294,7 +295,8 @@ run before `20261127085818_weave_public_support_listings`. Every function it rep
 
 `supabase/tests/weave-publish-from-draft.sql` proves these on the CI image: a card-less link through
 the workspace runtime and its retry; DID authority, with another person and a forged DID refused;
-the draft review, publish, single `sending` claim, confirmation and public read; 21 malformed entries
+the draft review, publish, single `sending` claim, confirmation and public read; another account
+holding the same DID refused a saved card's review and allowed a draft's; 21 malformed entries
 refused with `PT400 invalid_support_entry`; withdrawal from a second session and republishing at the
 same record key; a draft's listing beside a saved card's on one workspace, where an edit to the card
 withdraws only the saved one; a deleted card whose link and listing remain and whose withdrawal the
@@ -302,8 +304,9 @@ same DID finishes; the new-card guard; the link constraint; and a group editor's
 a viewer and a missing membership refused.
 
 Order: apply this before deploying the Weave API and app that send card-less links and draft
-reviews. That code fails safely on the older functions: a card-less `link` is refused as invalid
-data and a draft review as a revision conflict, so nothing is linked or published. The deployed
+reviews, and merge that code only afterwards, since Weave deploys on merge. On the older functions
+a card-less `link` is refused as invalid data and a draft review as a revision conflict, so nothing is
+published, but Make It Public may already have created the person's Certified project. The deployed
 code before it keeps working on these functions, because the saved-card commands are unchanged.
 
 Applying it to Platform is not yet approved. Merge only after the Weave pull request has had its second review,
