@@ -242,8 +242,17 @@ was not observed in production. On 26 November 2026 Platform held 8 published li
 under D47 Weave reads published listings from its own record first.
 
 On 27 November 2026 Platform had the role and the `repository_did` and `matching_paused` columns the
-function needs, and not the function. Applying it to Platform is not yet approved. Apply only with
-the user's separate approval, using the same commands as above. The dry run must list exactly this
-one version. Afterwards, check that the function exists, that `weave_index_job` can execute it and
-`anon`, `authenticated` and `service_role` cannot, and that a public initiative page with published
-listings shows them.
+function needs, and not the function. The user approved applying it to Platform on 27 November
+2026, once its review passed. Use the same commands as above; the dry run must list exactly this
+one version. Afterwards, check that only `weave_index_job` can execute it:
+
+```sql
+select r, has_function_privilege(r, 'private.weave_public_support_listings(text)', 'execute')
+from unnest(array['weave_index_job', 'anon', 'authenticated', 'service_role', 'weave_workspace_runtime']) r;
+```
+
+Only the first row may read `true`. Then open a public initiative page with published listings and
+check that it shows them. `supabase/tests/weave-public-support-listings.sql` proves the function's
+filters and grants on the CI image: confirmed, open and unexpired listings for exactly the asked
+project are shown, and pending, withdrawn, conflicting, expired, malformed, closed, mismatched and
+paused ones are not.
