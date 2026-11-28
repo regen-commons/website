@@ -1,6 +1,7 @@
 -- Disposable PostgreSQL only. All identities are synthetic and all changes roll back.
--- Nothing new is saved privately since DL-155 step 4 (weave-retire-private-saves.sql proves the refusal), so
--- the saves this suite reads are made as before it, through the save logic a team workspace still uses.
+-- Nothing is saved privately since DL-155, and weave-retire-private-data removed the personal save and list
+-- (weave-retire-private-data.sql proves it). The cards this suite reads are made through the save logic a team
+-- workspace still uses, and read through weave.load_initiative, which team load uses.
 begin;
 create function pg_temp.assert_true(ok boolean,message text) returns void language plpgsql as $$begin if ok is distinct from true then raise exception '%',message;end if;end$$;
 create function pg_temp.expect_error(statement text,expected text) returns void language plpgsql as $$begin begin execute statement;exception when others then if sqlstate=expected then return;end if;raise;end;raise exception 'Expected SQLSTATE %',expected;end$$;
@@ -27,18 +28,16 @@ set local role anon;
 select pg_temp.expect_error($q$select weave.account_access()$q$,'42501');
 select pg_temp.expect_error($q$select * from weave.initiatives$q$,'42501');
 select pg_temp.expect_error($q$select * from weave.needs$q$,'42501');
-select pg_temp.expect_error($q$select weave.save_initiative(gen_random_uuid(),0,gen_random_uuid(),pg_temp.document())$q$,'42501');
+select pg_temp.expect_error($q$select weave.load_initiative(gen_random_uuid())$q$,'42501');
 reset role;
 select set_config('request.jwt.claims', ('{"sub":"b1000000-0000-4000-8000-000000000001","session_id":"b2000000-0000-4000-8000-000000000001","role":"authenticated"}'::jsonb || jsonb_build_object('exp',extract(epoch from now())+3600))::text,true);
 set local role authenticated;
 select pg_temp.assert_true(weave.account_access(),'owner session denied');
-select pg_temp.expect_error($q$select weave.save_initiative(gen_random_uuid(),0,gen_random_uuid(),pg_temp.document())$q$,'PT410');
 select pg_temp.assert_true((pg_temp.saved_before('b3000000-0000-4000-8000-000000000001',0,'b5000000-0000-4000-8000-000000000001',pg_temp.document())->>'revision')::int=1,'initial revision wrong');
 select pg_temp.assert_true((select count(*)=1 from weave.initiatives),'owner cannot read initiative');
 select pg_temp.assert_true((select count(*)=1 from weave.needs),'needs missing');
 select pg_temp.assert_true((select count(*)=1 from weave.offers),'offers missing');
 select pg_temp.assert_true((weave.load_initiative('b3000000-0000-4000-8000-000000000001')->'document')=pg_temp.document(),'saved data did not roundtrip');
-select pg_temp.assert_true(jsonb_array_length(weave.list_initiatives())=1,'owner list wrong');
 select pg_temp.assert_true((pg_temp.saved_before('b3000000-0000-4000-8000-000000000001',0,'b5000000-0000-4000-8000-000000000001',pg_temp.document())->>'revision')::int=1,'retry created a second save');
 select pg_temp.expect_error($q$select pg_temp.saved_before('b3000000-0000-4000-8000-000000000001',0,'b5000000-0000-4000-8000-000000000001',jsonb_set(pg_temp.document(),'{initiative,name}','"Changed"'))$q$,'PT409');
 select pg_temp.expect_error($q$select pg_temp.saved_before('b3000000-0000-4000-8000-000000000001',0,gen_random_uuid(),pg_temp.document())$q$,'PT409');
@@ -63,7 +62,6 @@ select set_config('request.jwt.claims', ('{"sub":"b1000000-0000-4000-8000-000000
 set local role authenticated;
 select pg_temp.assert_true((select count(*)=0 from weave.initiatives),'another account read a private initiative');
 select pg_temp.assert_true((select count(*)=0 from weave.needs),'another account read private needs');
-select pg_temp.assert_true(jsonb_array_length(weave.list_initiatives())=0,'another account saw names');
 select pg_temp.expect_error($q$select weave.load_initiative('b3000000-0000-4000-8000-000000000001')$q$,'PT404');
 select pg_temp.expect_error($q$select pg_temp.saved_before('b3000000-0000-4000-8000-000000000001',2,gen_random_uuid(),pg_temp.document())$q$,'PT404');
 reset role;
@@ -76,7 +74,7 @@ reset role;
 select set_config('request.jwt.claims', ('{"sub":"b1000000-0000-4000-8000-000000000001","session_id":"b2000000-0000-4000-8000-000000000001","role":"authenticated","is_anonymous":true}'::jsonb || jsonb_build_object('exp',extract(epoch from now())+3600))::text,true);
 set local role authenticated;
 select pg_temp.assert_true(not weave.account_access(),'anonymous Auth session accepted');
-select pg_temp.expect_error($q$select weave.list_initiatives()$q$,'PT401');
+select pg_temp.expect_error($q$select weave.load_initiative('b3000000-0000-4000-8000-000000000001')$q$,'PT401');
 reset role;
 update auth.sessions set not_after=now()-interval '1 minute' where id='b2000000-0000-4000-8000-000000000001';
 select set_config('request.jwt.claims', ('{"sub":"b1000000-0000-4000-8000-000000000001","session_id":"b2000000-0000-4000-8000-000000000001","role":"authenticated"}'::jsonb || jsonb_build_object('exp',extract(epoch from now())+3600))::text,true);
@@ -92,7 +90,7 @@ select pg_temp.expect_error($q$select weave.load_initiative('b3000000-0000-4000-
 reset role;
 select pg_temp.assert_true((select bool_and(relrowsecurity) from pg_class where relnamespace='weave'::regnamespace and relkind='r'),'RLS missing');
 select pg_temp.assert_true(not exists(select 1 from pg_proc where pronamespace='weave'::regnamespace and prosecdef),'exposed definer function');
-select pg_temp.assert_true(not has_function_privilege('anon','weave.save_initiative(uuid,integer,uuid,jsonb)','execute'),'anonymous command grant');
+select pg_temp.assert_true(not has_function_privilege('anon','weave.load_initiative(uuid)','execute'),'anonymous read grant');
 select pg_temp.assert_true((select count(*)=0 from public.members),'saving promoted membership');
 -- Confirmed email and editable metadata cannot replace a trusted identity.
 delete from auth.identities where user_id='b1000000-0000-4000-8000-000000000002';
@@ -107,7 +105,6 @@ select pg_temp.assert_true(not has_function_privilege('authenticated','weave_wor
 select pg_temp.assert_true(not has_function_privilege('anon','weave_workspace.content_command(uuid,uuid,text,uuid,text,text,text,jsonb)','execute'),'anonymous team content bypass');
 select pg_temp.assert_true(not has_table_privilege('weave_platform_bridge','weave.initiatives','select'),'bridge reads private initiatives');
 select pg_temp.assert_true(not has_table_privilege('weave_platform_app','weave.initiatives','select'),'app-auth login reads initiatives');
-select pg_temp.assert_true((select not hybrid_enabled from private.weave_matching_retrieval_settings where singleton),'hybrid retrieval enabled');
 -- Quota is charged only for new acknowledged commands. Replays remain free.
 reset role;
 update private.weave_save_limits set total=30;

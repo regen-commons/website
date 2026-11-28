@@ -42,12 +42,13 @@ select pg_temp.assert_listing_match(has_function_privilege('weave_workspace_runt
     'weave_workspace.content_command(uuid,uuid,text,uuid,text,text,text,jsonb)', 'execute')
   and not has_function_privilege('authenticated', 'weave_workspace.content_command(uuid,uuid,text,uuid,text,text,text,jsonb)', 'execute'),
   'content_command must keep its grants');
--- content_command is weave-team-content's, with one new line. The hash is of that command as Platform held it on
--- 27 November 2026, which this replay reproduces.
+-- content_command is weave-team-content's, with one new line, as weave-retire-private-data later trimmed it of the
+-- actions sharing for matching used. The hash is of that trimmed command without the new line; before the trim it
+-- was 5923a0dc0a097363bee2b1cf9b67f6b7, the command as Platform held it on 27 November 2026.
 select pg_temp.assert_listing_match(md5(replace(pg_get_functiondef(
     'weave_workspace.content_command(uuid,uuid,text,uuid,text,text,text,jsonb)'::regprocedure),
     E'      when ''listing_shortlist'' then result := private.weave_listing_shortlist(p_id);\n', ''))
-  = '5923a0dc0a097363bee2b1cf9b67f6b7', 'content_command must be unchanged apart from listing_shortlist');
+  = 'c98e3d807a861e834996ce00330c6cf8', 'content_command must be unchanged apart from listing_shortlist');
 -- The new reads take public records only: no saved card, share, draft or matching state.
 select pg_temp.assert_listing_match(pg_get_functiondef(f) !~ 'weave\.(needs|offers|initiatives)|matching_(audience|withdrawn|reviews|leads|requests)',
   f::text || ' must not read saved cards or shares')
@@ -242,7 +243,7 @@ select pg_temp.assert_listing_match(pg_temp.refusal($q$select weave_workspace.co
     'bafyfixture', 'listing_search', '{}'::jsonb)$q$) = 'PT400 invalid_data', 'an unknown action must stay invalid');
 select pg_temp.assert_listing_match(pg_temp.refusal($q$select weave_workspace.content_command('a1000000-0000-4000-8000-000000000001',
     'a2000000-0000-4000-8000-000000000001', 'did:plc:anaaaaaaaaaaaaaaaaaaaaaa', 'a3000000-0000-4000-8000-000000000004', 'member',
-    'bafyfixture', 'matching_set_lead', '{}'::jsonb)$q$) = 'PT403 workspace_edit_required', 'a viewer must still not edit');
+    'bafyfixture', 'team_save', '{}'::jsonb)$q$) = 'PT403 workspace_edit_required', 'a viewer must still not edit');
 
 -- 5. The device's snapshot carries other shown projects' current listings, and none from Ana's own repository.
 create temporary table ana_snapshot on commit drop as
