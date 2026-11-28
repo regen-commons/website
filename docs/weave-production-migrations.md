@@ -408,3 +408,46 @@ Afterwards:
 - The definitions of `private.weave_save_document`, `weave_workspace.content_command`,
   `weave_workspace.initiative_link_guard` and `weave.save_initiative` hash the same as before the
   apply.
+
+## Matching on published listings release
+
+`20261128000000_weave_matching_published_listings` matches
+`supabase/candidates/weave-matching-published-listings.sql` in Weave (branch
+`claude/step5-match-published-listings`) byte for byte. Its version is a placeholder until it is applied:
+the file takes the version Platform records. It is the first part of step 5 of the DL-155 removal plan:
+matching reads published listings instead of private shares. It adds reads and changes nothing the deployed
+Weave server calls. What it changes:
+
+- `private.weave_current_support_listings(text)` is the one rule for a current published listing:
+  confirmed by read-back with its CID, the record naming its link's project, open, unexpired and its link not
+  paused. An expiry counts only when it has the shape Weave writes and is a real time, so a damaged one hides
+  that listing instead of failing every read. `private.weave_public_support_listings`, behind the public
+  initiative page, now reads it and returns the same rows, at most 100.
+- `private.weave_public_project_snapshot`, the snapshot Weave's device ranking reads, also returns other
+  projects' current listings: the 100 most recently created, at most ten from any one project, only for
+  projects the public list shows, never from the person's own repository. The deployed parser ignores the
+  new fields.
+- `weave_workspace.content_command` gains the read-only `listing_shortlist` action, open to anyone with
+  access to the project, viewers included. It takes the workspace's ten most recently created listings,
+  eight search words each, leaving out the words Weave's matcher treats as too common. For each it returns
+  other shown projects' current listings of the other kind from other repositories, and public project
+  evidence. The rest of the command is the one `weave_team_content` created; the suite checks its hash
+  against Platform's body of 27 November 2026.
+- New helpers `weave_shown_projects()`, `weave_listing_terms(jsonb)` and `weave_listing_query_terms(jsonb)`
+  are executable by none of `public`, `anon`, `authenticated`, `service_role`, `weave_workspace_runtime` or
+  `weave_index_job`.
+
+`supabase/tests/weave-matching-published-listings.sql` proves these on the CI image: two people's published
+needs and offers finding each other through the workspace runtime; listings left out when not current,
+damaged, in the same repository, from a project the public list does not show (never indexed, lapsed,
+failed, stale or with an older passage), or paused; a listing of only common words searching for nothing;
+viewer access, with an outsider, a forged DID, a missing workspace and a suspended grant refused; the query
+and per-project limits; the snapshot's listings; and the public read's rows.
+
+Timing on a replay of this image with synthetic load (1,000 indexed projects with 12 passages each, about
+5,100 current listings): the snapshot took 124 ms, the public read 1.5 ms, and a search without public
+evidence 0.9 s. On Platform on 28 November 2026, one public evidence lookup of eight common words took about
+100 ms, so a search of ten listings stays near a second.
+
+Order: the Weave code that sends `listing_search` merges only after this is applied. Applying it to Platform
+is not yet approved. Apply only with the user's separate approval, using the same path as the releases above.

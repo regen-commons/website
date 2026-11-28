@@ -20,19 +20,20 @@ end $$;
 -- Grants and owners. The new reads run only inside definer functions; nobody calls them directly.
 select pg_temp.assert_listing_match(not r.rolsuper, p.oid::regprocedure::text || ' must be created under a non-superuser')
   from pg_proc p join pg_roles r on r.oid = p.proowner
-  where p.oid in ('private.weave_current_support_listings()'::regprocedure,
-    'private.weave_shown_project_name(text)'::regprocedure, 'private.weave_listing_terms(jsonb)'::regprocedure,
+  where p.oid in ('private.weave_current_support_listings(text)'::regprocedure,
+    'private.weave_shown_projects()'::regprocedure, 'private.weave_listing_terms(jsonb)'::regprocedure,
+    'private.weave_listing_query_terms(jsonb)'::regprocedure,
     'private.weave_listing_shortlist(uuid)'::regprocedure, 'private.weave_public_project_snapshot(text)'::regprocedure,
     'private.weave_public_support_listings(text)'::regprocedure,
     'weave_workspace.content_command(uuid,uuid,text,uuid,text,text,text,jsonb)'::regprocedure);
 select pg_temp.assert_listing_match(not has_function_privilege(r, f, 'execute'), r || ' must not run ' || f)
   from unnest(array['anon', 'authenticated', 'service_role', 'weave_workspace_runtime', 'weave_index_job']) r,
-    unnest(array['private.weave_current_support_listings()', 'private.weave_shown_project_name(text)',
-      'private.weave_listing_terms(jsonb)', 'private.weave_listing_shortlist(uuid)',
+    unnest(array['private.weave_current_support_listings(text)', 'private.weave_shown_projects()',
+      'private.weave_listing_terms(jsonb)', 'private.weave_listing_query_terms(jsonb)', 'private.weave_listing_shortlist(uuid)',
       'private.weave_public_project_snapshot(text)']) f;
 select pg_temp.assert_listing_match(not exists(select from information_schema.routine_privileges
-  where specific_schema = 'private' and routine_name in ('weave_current_support_listings', 'weave_shown_project_name',
-    'weave_listing_terms', 'weave_listing_shortlist', 'weave_public_project_snapshot') and grantee = 'PUBLIC'),
+  where specific_schema = 'private' and routine_name in ('weave_current_support_listings', 'weave_shown_projects',
+    'weave_listing_terms', 'weave_listing_query_terms', 'weave_listing_shortlist', 'weave_public_project_snapshot') and grantee = 'PUBLIC'),
   'PUBLIC must not run the listing reads');
 select pg_temp.assert_listing_match(has_function_privilege('weave_index_job', 'private.weave_public_support_listings(text)', 'execute')
   and not has_function_privilege('weave_workspace_runtime', 'private.weave_public_support_listings(text)', 'execute'),
@@ -50,8 +51,8 @@ select pg_temp.assert_listing_match(md5(replace(pg_get_functiondef(
 -- The new reads take public records only: no saved card, share, draft or matching state.
 select pg_temp.assert_listing_match(pg_get_functiondef(f) !~ 'weave\.(needs|offers|initiatives)|matching_(audience|withdrawn|reviews|leads|requests)',
   f::text || ' must not read saved cards or shares')
-  from unnest(array['private.weave_current_support_listings()'::regprocedure, 'private.weave_listing_shortlist(uuid)'::regprocedure,
-    'private.weave_public_project_snapshot(text)'::regprocedure, 'private.weave_shown_project_name(text)'::regprocedure]) f;
+  from unnest(array['private.weave_current_support_listings(text)'::regprocedure, 'private.weave_listing_shortlist(uuid)'::regprocedure,
+    'private.weave_public_project_snapshot(text)'::regprocedure, 'private.weave_shown_projects()'::regprocedure]) f;
 
 -- Ana and Ben each publish from a personal project; Cleo is someone else. Ana's second project lives in her own
 -- repository. A group project lists Ana as a viewer. One project is not in the public list, one has dropped out of
@@ -77,29 +78,36 @@ create function pg_temp.project(p_n integer) returns text language sql immutable
     when 5 then 'at://did:plc:hidhhhhhhhhhhhhhhhhhhhhh/org.hypercerts.collection/3mlistinghid1'
     when 6 then 'at://did:plc:oldoooooooooooooooooooooo/org.hypercerts.collection/3mlistingold1'
     when 7 then 'at://did:plc:pauppppppppppppppppppppp/org.hypercerts.collection/3mlistingpau1'
+    when 8 then 'at://did:plc:faiffffffffffffffffffffff/org.hypercerts.collection/3mlistingfai1'
+    when 9 then 'at://did:plc:stassssssssssssssssssssss/org.hypercerts.collection/3mlistingsta1'
+    when 10 then 'at://did:plc:cidcccccccccccccccccccccc/org.hypercerts.collection/3mlistingcid1'
   end $$;
 create function pg_temp.link(p_n integer) returns uuid language sql immutable as $$
   select ('a3000000-0000-4000-8000-' || lpad(p_n::text, 12, '0'))::uuid $$;
 insert into weave_workspace.project_links(id, project_uri, repository_did, group_did, cid, linked_by)
 select pg_temp.link(n), pg_temp.project(n), split_part(pg_temp.project(n), '/', 3),
-  case when n in (4, 5, 6, 7) then split_part(pg_temp.project(n), '/', 3) end, 'bafyfixture',
+  case when n >= 4 then split_part(pg_temp.project(n), '/', 3) end, 'bafyfixture',
   'a1000000-0000-4000-8000-000000000001'
-from generate_series(1, 7) n;
+from generate_series(1, 10) n;
 update weave_workspace.project_links set matching_paused = true where id = pg_temp.link(7);
 insert into weave_workspace.access_grants(workspace_id, user_id, member_did, access_role) values
   (pg_temp.link(4), 'a1000000-0000-4000-8000-000000000001', 'did:plc:anaaaaaaaaaaaaaaaaaaaaaa', 'viewer');
 
--- The public list shows projects 1 to 4 and 7. Project 5 was never indexed; project 6's listing permission lapsed.
+-- The public list shows projects 1 to 4 and 7. Project 5 was never indexed, project 6's listing permission
+-- lapsed, project 8's last read failed, project 9 was last read eight days ago, and project 10's only passage
+-- is from an older version of its record.
 insert into private.weave_project_index_source(project_uri, status, permission_until, cid, checked_at, fetched_at)
-select pg_temp.project(n), 'indexed', now() + case when n = 6 then interval '-1 day' else interval '2 days' end,
-  'bafyindex' || n, now(), now()
-from unnest(array[1, 2, 3, 4, 6, 7]) n;
+select pg_temp.project(n), case when n = 8 then 'failed' else 'indexed' end,
+  now() + case when n = 6 then interval '-1 day' else interval '2 days' end,
+  'bafyindex' || n, now(), now() - case when n = 9 then interval '8 days' else interval '0' end
+from unnest(array[1, 2, 3, 4, 6, 7, 8, 9, 10]) n;
 insert into private.weave_project_index_evidence(id, project_uri, evidence, lexical_text)
 select 'evidence-' || n, pg_temp.project(n),
-  jsonb_build_object('id', 'evidence-' || n, 'projectUri', pg_temp.project(n), 'cid', 'bafyindex' || n,
+  jsonb_build_object('id', 'evidence-' || n, 'projectUri', pg_temp.project(n),
+    'cid', case when n = 10 then 'bafyolder' else 'bafyindex' || n end,
     'projectName', 'Fictional project ' || n, 'passage', 'A fictional seed library and compost commons ' || n),
   'Fictional project ' || n || ' seed library compost commons'
-from unnest(array[1, 2, 3, 4, 6, 7]) n;
+from unnest(array[1, 2, 3, 4, 6, 7, 8, 9, 10]) n;
 
 -- Listings, as support_command leaves them once read back. Each row is one case.
 with cases(n, link, kind, title, status, cid, record) as (values
@@ -126,7 +134,19 @@ with cases(n, link, kind, title, status, cid, record) as (values
   (15, 4, 'offer', 'Seed library volunteers from the group', 'published', 'b' || repeat('o', 58), '{}'),
   (16, 5, 'offer', 'Seed library volunteers, unlisted project', 'published', 'b' || repeat('p', 58), '{}'),
   (17, 6, 'offer', 'Seed library volunteers, lapsed project', 'published', 'b' || repeat('q', 58), '{}'),
-  (18, 7, 'offer', 'Seed library volunteers, paused project', 'published', 'b' || repeat('r', 58), '{}')
+  (18, 7, 'offer', 'Seed library volunteers, paused project', 'published', 'b' || repeat('r', 58), '{}'),
+  -- Offers from projects the public list does not show: a failed read, a stale read, an older record's passage.
+  (19, 8, 'offer', 'Seed library volunteers, failed read', 'published', 'b' || repeat('s', 58), '{}'),
+  (20, 9, 'offer', 'Seed library volunteers, stale read', 'published', 'b' || repeat('t', 58), '{}'),
+  (21, 10, 'offer', 'Seed library volunteers, older passage', 'published', 'b' || repeat('u', 58), '{}'),
+  -- Ben's damaged records: an expiry of the right shape that is no real time, other digits, another type. None
+  -- may appear, and none may fail a read.
+  (22, 3, 'offer', 'Seed library volunteers, impossible expiry', 'published', 'b' || repeat('v', 58), '{"expiresAt":"2026-02-30T00:00:00Z"}'),
+  (23, 3, 'offer', 'Seed library volunteers, year zero', 'published', 'b' || repeat('w', 58), '{"expiresAt":"0000-01-01T00:00:00Z"}'),
+  (24, 3, 'offer', 'Seed library volunteers, other digits', 'published', 'b' || repeat('x', 58), '{"expiresAt":"٢٠٩٩-٠١-٠١T00:00:00Z"}'),
+  (25, 3, 'offer', 'Seed library volunteers, another type', 'published', 'b' || repeat('y', 58), '{"$type":"app.example.other"}'),
+  -- Ben's offer in words too common to show a fit: current, but it searches for nothing and nothing finds it.
+  (26, 3, 'offer', 'For the people', 'published', 'b' || repeat('z', 58), '{}')
 )
 insert into weave_workspace.support_listings(workspace_id, kind, entry_id, rkey, operation_id, actor_id,
   entry_revision, record_value, status, cid, source, updated_at)
@@ -174,8 +194,11 @@ select pg_temp.assert_listing_match(pg_temp.found(result, 'Compost training for 
 -- Only Ben's current listings are his queries.
 select pg_temp.assert_listing_match((select array_agg(g->'listing'->'record'->>'title' order by g->'listing'->'record'->>'title')
     from jsonb_array_elements(result->'groups') g)
-  = array['Bike repair', 'Compost training for a school garden', 'Weekend volunteers for a seed library'],
+  = array['Bike repair', 'Compost training for a school garden', 'For the people', 'Weekend volunteers for a seed library'],
   'only current listings may be queries') from ben_found;
+select pg_temp.assert_listing_match(pg_temp.found(result, 'For the people') = '{}' and (select g->'publicEvidence' = '[]'::jsonb
+    from jsonb_array_elements(result->'groups') g where g->'listing'->'record'->>'title' = 'For the people'),
+  'a listing of only common words must search for nothing') from ben_found;
 -- A result carries the public record, its address, version and project, and nothing private.
 select pg_temp.assert_listing_match((select bool_and((select array_agg(k order by k) from jsonb_object_keys(c) k)
     = array['cid', 'kind', 'projectName', 'projectUri', 'record', 'uri'])
@@ -227,7 +250,8 @@ create temporary table ana_snapshot on commit drop as
     'did:plc:anaaaaaaaaaaaaaaaaaaaaaa', pg_temp.link(1), 'member', 'bafyfixture', 'public_evidence', '{}'::jsonb) as result;
 reset role;
 select pg_temp.assert_listing_match((select array_agg(l->'record'->>'title' order by l->'record'->>'title') from jsonb_array_elements(result->'listings') l)
-  = array['Bike repair', 'Compost training for a school garden', 'Seed library volunteers from the group', 'Weekend volunteers for a seed library'],
+  = array['Bike repair', 'Compost training for a school garden', 'For the people', 'Seed library volunteers from the group',
+    'Weekend volunteers for a seed library'],
   'the snapshot must hold only other shown projects'' current listings') from ana_snapshot;
 select pg_temp.assert_listing_match((select bool_and((select array_agg(k order by k) from jsonb_object_keys(l) k)
     = array['cid', 'kind', 'projectName', 'projectUri', 'record', 'uri']) from jsonb_array_elements(result->'listings') l)
@@ -238,10 +262,42 @@ select pg_temp.assert_listing_match((select bool_and((select array_agg(k order b
 -- 6. The public initiative read returns what it returned before, for Ben's project and for the paused one.
 set local role weave_index_job;
 select pg_temp.assert_listing_match((select array_agg(kind || ' ' || rkey) from private.weave_public_support_listings(pg_temp.project(3)))
-  = array['need 3mlsteaaaaaaa', 'offer 3mlstdaaaaaaa', 'offer 3mlstnaaaaaaa'],
+  = array['need 3mlsteaaaaaaa', 'offer 3mlstdaaaaaaa', 'offer 3mlstnaaaaaaa', 'offer 3mlstzaaaaaaa'],
   'the public read must show exactly Ben''s current listings, in its order');
 select pg_temp.assert_listing_match(not exists(select from private.weave_public_support_listings(pg_temp.project(7))),
   'a paused project link must still show no listings');
+reset role;
+
+-- 7. Limits. A search takes the workspace's ten most recently created listings as queries, the snapshot holds at
+-- most ten listings from any one project, and a suspended grant can no longer search.
+insert into weave_workspace.support_listings(workspace_id, kind, entry_id, rkey, operation_id, actor_id,
+  entry_revision, record_value, status, cid, source)
+select pg_temp.link(link), 'need', ('a6000000-0000-4000-8000-' || lpad((link * 100 + i)::text, 12, '0'))::uuid,
+  '3m' || case link when 1 then 'cap' else 'pot' end || chr(96 + i) || 'aaaaaaa',
+  ('a7000000-0000-4000-8000-' || lpad((link * 100 + i)::text, 12, '0'))::uuid, 'a1000000-0000-4000-8000-000000000001', 0,
+  jsonb_build_object('$type', 'com.regencommons.weave.supportListing', 'projectUri', pg_temp.project(link), 'kind', 'need',
+    'title', case link when 1 then 'Later need ' else 'Pottery class ' end || i, 'capitalForms', jsonb_build_array('social'),
+    'status', 'open', 'createdAt', '2026-11-' || lpad((i + 1)::text, 2, '0') || 'T00:00:00.000Z'),
+  'published', 'b' || repeat(chr(96 + i), 58), 'draft'
+from unnest(array[1, 4]) link, generate_series(1, 11) i;
+set local role weave_workspace_runtime;
+create temporary table capped on commit drop as select pg_temp.search(1, 1) as search,
+  weave_workspace.content_command('a1000000-0000-4000-8000-000000000001', 'a2000000-0000-4000-8000-000000000001',
+    'did:plc:anaaaaaaaaaaaaaaaaaaaaaa', pg_temp.link(1), 'member', 'bafyfixture', 'public_evidence', '{}'::jsonb) as snapshot;
+reset role;
+select pg_temp.assert_listing_match((select array_agg(g->'listing'->'record'->>'title' order by g->'listing'->'record'->>'title')
+    from jsonb_array_elements(search->'groups') g)
+  = (select array_agg('Later need ' || i order by 'Later need ' || i) from generate_series(2, 11) i),
+  'a search must take only the ten most recently created listings') from capped;
+select pg_temp.assert_listing_match((select count(*) from jsonb_array_elements(snapshot->'listings') l
+    where l->>'projectUri' = pg_temp.project(4)) = 10
+  and not exists(select from jsonb_array_elements(snapshot->'listings') l
+    where l->'record'->>'title' in ('Pottery class 1', 'Seed library volunteers from the group')),
+  'the snapshot must hold at most the ten most recent listings of one project') from capped;
+update weave_workspace.access_grants set suspended_at = now(), suspension_reason = 'revoked' where workspace_id = pg_temp.link(4);
+set local role weave_workspace_runtime;
+select pg_temp.assert_listing_match(pg_temp.refusal('select pg_temp.search(1, 4)') = 'PT404 not_found',
+  'a suspended grant must not search');
 reset role;
 
 rollback;
