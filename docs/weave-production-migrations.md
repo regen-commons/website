@@ -474,3 +474,60 @@ Afterwards:
 - The snapshot ran in 80 ms and listing searches for all 3 linked workspaces (8 queries) in 161 ms. All 8
   current listings belong to projects the public list does not show, so no snapshot or search offers them
   until those projects are indexed and shown.
+
+## End shares release
+
+`20261128041515_weave_matching_end_shares` matches `supabase/candidates/weave-matching-end-shares.sql` in Weave
+(branch `claude/step5-part-two`, merged in regen-commons/weave#282) byte for byte. It is the second part of step 5 of the DL-155 removal plan: sharing for matching ends,
+silently, as the user decided on 27 November 2026. What it changes:
+
+- Every share still on, whether current, expired or changed since it was shared, is withdrawn with a new share
+  version, so the prune triggers drop its query vectors and nothing is left current for matching. Only the
+  `matching_withdrawn` and `matching_share_version` columns change: the triggers on `weave.needs` and
+  `weave.offers` are the vector prune and `support_entry_changed`, which fires only when `value` changes, so no
+  published listing is touched.
+- Before withdrawing, it takes the row lock on each card with a share still on, the lock that save, share,
+  withdraw and the embedding job's store take. A store that starts during the apply waits, then finds nothing
+  shared and stores nothing; any vector stored before is dropped by the prune trigger.
+- `private.weave_matching_shortlist`, `weave_matching_leads` and `weave_matching_set_lead` raise `PT410
+  matching_shares_retired`, as Weave's API does. Through `weave_workspace.content_command`, a viewer is still
+  refused setting a lead with `PT403 workspace_edit_required` first.
+- Unchanged: `private.weave_matching_state`, which publishing a team's saved card reads until step 6, the withdraw
+  branch of `weave_matching_change`, and the tables, columns and rows, which step 7 removes.
+
+`supabase/tests/weave-matching-end-shares.sql` proves on the CI image that the three functions keep their owner and
+grants, that a team card still saves and its matching state still reads for an admin and a viewer, that searching
+shares and the saved partners are refused by name for both, that a viewer is still refused editing first, that the
+listing search answers.
+
+The suite runs after every migration, so it cannot see this one withdraw shares. An ordered replay on the same image
+did: the migrations through `20261128030237_weave_matching_published_listings`, then a synthetic card with a current
+share, an expired share, a withdrawn share and an entry never shared, two query vectors and a published listing,
+then this migration. The current and expired shares were withdrawn with new share versions, the withdrawn and
+never-shared entries were untouched, current shares went from 1 to 0 and query vectors from 2 to 0, and the entry
+values and the published listing were unchanged.
+
+Order: apply this only after the Weave API that refuses searching shares, saved partners and withdrawal is
+deployed, so no deployed build still offers them.
+
+The user approved shipping this part on 28 November 2026: merging regen-commons/weave#282, then applying and merging
+this. #282 merged first (`81c6e6c`) and its production deploy on Vercel completed before this was applied. It was
+applied through the Supabase connector, as for the releases above, and the file takes the version the connector
+recorded.
+
+Before applying, Platform's history held exactly the 33 versions here, through
+`20261128030237_weave_matching_published_listings`. The three functions this replaces hashed as their applied
+migrations created them. Platform held 8 shares still on (4 needs, 4 offers), 4 of them current for matching, no
+query vectors and no saved or hidden partners.
+
+Afterwards:
+
+- Platform's history holds 34 versions. The SQL recorded for `20261128041515` matches the file byte for byte
+  (SHA-256 `fcc1ea72...7c23`).
+- No share is still on: all 10 entries ever shared read withdrawn, the 8 still on and 2 withdrawn before. Nothing
+  is current for matching, and there are no query vectors.
+- The entries' values and revisions and every published listing are unchanged, compared by fingerprints taken
+  before and after.
+- The three replaced functions run as the caller, owned by `postgres` and executable only by it, and
+  `private.weave_matching_shortlist` answers `PT410 matching_shares_retired`. `private.weave_matching_state`
+  hashes as before.
