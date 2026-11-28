@@ -171,6 +171,11 @@
       "file": "20261128041515_weave_matching_end_shares.sql",
       "owner": "platform",
       "sha256": "fcc1ea723d3dde63c7fe14cf0d497bb91acf8296010ddbde1de9994f151e7c23"
+    },
+    {
+      "file": "20261128205950_weave_retire_private_data.sql",
+      "owner": "platform",
+      "sha256": "ee6baa8b96962ab1bab85e573c7b32cf6f6371865dcf9ab7693b8b5a8b0cd01c"
     }
   ]
 }
