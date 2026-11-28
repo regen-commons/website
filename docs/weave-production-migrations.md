@@ -408,3 +408,69 @@ Afterwards:
 - The definitions of `private.weave_save_document`, `weave_workspace.content_command`,
   `weave_workspace.initiative_link_guard` and `weave.save_initiative` hash the same as before the
   apply.
+
+## Matching on published listings release
+
+`20261128030237_weave_matching_published_listings` matches
+`supabase/candidates/weave-matching-published-listings.sql` in Weave (branch
+`claude/step5-match-published-listings`, merged in regen-commons/weave#281) byte for byte. It is the first
+part of step 5 of the DL-155 removal plan:
+matching reads published listings instead of private shares. It adds reads and changes nothing the deployed
+Weave server calls. What it changes:
+
+- `private.weave_current_support_listings(text)` is the one rule for a current published listing:
+  confirmed by read-back with its CID, the record naming its link's project, open, unexpired and its link not
+  paused. An expiry counts only when it has the shape Weave writes and is a real time, so a damaged one hides
+  that listing instead of failing every read. `private.weave_public_support_listings`, behind the public
+  initiative page, now reads it and returns the same rows, at most 100.
+- `private.weave_public_project_snapshot`, the snapshot Weave's device ranking reads, also returns other
+  projects' current listings: the 100 most recently created, at most ten from any one project, only for
+  projects the public list shows, never from the person's own repository. The deployed parser ignores the
+  new fields.
+- `weave_workspace.content_command` gains the read-only `listing_shortlist` action, open to anyone with
+  access to the project, viewers included. It takes the workspace's ten most recently created listings,
+  eight search words each, leaving out the words Weave's matcher treats as too common. For each it returns
+  other shown projects' current listings of the other kind from other repositories, and public project
+  evidence. The rest of the command is the one `weave_team_content` created; the suite checks its hash
+  against Platform's body of 27 November 2026.
+- New helpers `weave_shown_projects()`, `weave_listing_terms(jsonb)` and `weave_listing_query_terms(jsonb)`
+  are executable by none of `public`, `anon`, `authenticated`, `service_role`, `weave_workspace_runtime` or
+  `weave_index_job`.
+
+`supabase/tests/weave-matching-published-listings.sql` proves these on the CI image: two people's published
+needs and offers finding each other through the workspace runtime; listings left out when not current,
+damaged, in the same repository, from a project the public list does not show (never indexed, lapsed,
+failed, stale or with an older passage), or paused; a listing of only common words searching for nothing;
+viewer access, with an outsider, a forged DID, a missing workspace and a suspended grant refused; the query
+and per-project limits; the snapshot's listings; and the public read's rows.
+
+Timing on a replay of this image with synthetic load (1,000 indexed projects with 12 passages each, about
+5,100 current listings): the snapshot took 124 ms, the public read 1.5 ms, and a search without public
+evidence 0.9 s. On Platform on 28 November 2026, one public evidence lookup of eight common words took about
+100 ms, so a search of ten listings stays near a second.
+
+Order: the Weave code that sends `listing_search` merges only after this is applied.
+
+The user approved shipping this part on 28 November 2026: merging regen-commons/weave#281, then applying and
+merging this. #281 merged first (`3988957`); it is safe before this, since nothing sends `listing_search` yet
+and its snapshot parser reads none of the new fields as required. The Supabase CLI was not available, so this
+was applied through the Supabase connector, as for the releases above, and the file takes the version the
+connector recorded.
+
+Before applying, Platform's history held exactly the 32 versions here, through
+`20261127222941_weave_retire_private_saves`. `content_command`, the snapshot and the public read hashed as
+their applied migrations created them, none of the new functions existed, and Platform held 8 published
+listings.
+
+Afterwards:
+
+- Platform's history holds 33 versions. The SQL recorded for `20261128030237` matches the file byte for byte
+  (SHA-256 `d9aa46d8...6bb40`).
+- `content_command` without its new line hashes as before (`5923a0dc...`), so the rest of its body is
+  unchanged. It and the public read keep their owner and grants; the five new helpers are executable only by
+  their owner.
+- The public read returns the same rows for each of the 3 linked projects as before, compared by a fingerprint
+  taken before and after.
+- The snapshot ran in 80 ms and listing searches for all 3 linked workspaces (8 queries) in 161 ms. All 8
+  current listings belong to projects the public list does not show, so no snapshot or search offers them
+  until those projects are indexed and shown.
