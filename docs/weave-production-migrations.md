@@ -534,13 +534,12 @@ Afterwards:
 
 ## Retire private data release
 
-The version `20270126000000` is a placeholder; the file takes the version the connector records on apply, as for
-the releases above. The earlier personal saves were the Weave team's own test cards, so on 28 November 2026 the user
+The earlier personal saves were the Weave team's own test cards, so on 28 November 2026 the user
 set D49's 60-day window aside and approved deleting them now. The user also set the rule this release adds: a need
 or offer stays public for as long as it is published, so deleting never withdraws.
 
-`20270126000000_weave_retire_private_data` matches `supabase/candidates/weave-retire-private-data.sql` in Weave
-(branch `claude/step7-part-b-retire-saves`) byte for byte. It is step 7 of the DL-155 removal plan: the personal
+`20261128205950_weave_retire_private_data` matches `supabase/candidates/weave-retire-private-data.sql` in Weave
+(branch `claude/step7-part-b-retire-saves`, merged in regen-commons/weave#286) byte for byte. It is step 7 of the DL-155 removal plan: the personal
 private saves and the data and functions only sharing for matching used are removed. What it changes:
 
 - It refuses to run unless end-shares and retire-private-saves are installed, no share is still on, and no
@@ -627,8 +626,28 @@ Order:
    intent in progress.
 3. Apply this, then record the version, the byte match and the counts here.
 
-On 28 November 2026 Platform held 6 personal saved cards with 11 needs and 11 offers, 2 team cards with 8 entries,
-3 project links (2 for groups, 1 personal with its card), 8 published listings, all published from the personal
-card's link with `source = 'saved'`, no share on, no query vectors or saved partners, 10 share requests, 30 save
-receipts and no setup intent for a personal card. Under the old trigger, deleting the cards would have queued all 8
-listings for withdrawal; under this release they stay public.
+The user approved shipping this on 28 November 2026: merging regen-commons/weave#286, then applying and merging
+this. #286 merged first (`d72cec8`) and its production deploy on Vercel completed before this was applied. It was
+applied through the Supabase connector, as for the releases above, and the file takes the version the connector
+recorded.
+
+Before applying, Platform's history held exactly the 34 versions here, through
+`20261128041515_weave_matching_end_shares`. Platform held 6 personal saved cards with 11 needs and 11 offers, 2 team
+cards with 8 entries, 3 project links (2 for groups, 1 personal with its card), 8 published listings, all published
+from the personal card's link with `source = 'saved'`, no share on, no query vectors or saved partners, 10 share
+requests, 30 save receipts and no setup intent for a personal card. Under the old trigger, deleting the cards would
+have queued all 8 listings for withdrawal.
+
+Afterwards:
+
+- Platform's history holds 35 versions. The SQL recorded for `20261128205950` matches the file byte for byte
+  (SHA-256 `ee6baa8b...0cd01c`).
+- No personal saved card remains, and no need or offer is left without its card. All 3 project links stay, none
+  with a card reference.
+- The 2 team cards with their 4 needs and 4 offers, and all 8 published listings, are unchanged, compared by
+  fingerprints taken before and after.
+- Both `support_entry_changed` triggers fire on `update of value` only. `support_entry_changed` and
+  `content_command` are owned by `postgres`; only the workspace runtime runs `content_command`.
+- The four share tables and the personal save, list and delete functions are gone; `weave.load_initiative`,
+  `weave.matching_state`, `private.weave_save_document`, `private.weave_listing_shortlist` and
+  `private.weave_public_support_listings` remain.
