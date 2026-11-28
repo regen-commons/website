@@ -2,7 +2,8 @@
 -- DL-155, step 7: the personal private saves and sharing for matching are gone from Platform. The functions and
 -- tables only they used are dropped, and the workspace command no longer takes sharing's actions. A group
 -- project's shared team draft stays (D48): it saves, loads, reports its entries' revisions and publishes from them,
--- and an entry the team removes still queues its listing's withdrawal. This suite runs after every migration, so it
+-- and an entry the team edits still queues its listing's withdrawal. Deleting never withdraws: a listing from an
+-- entry the team removes stays public until someone withdraws it. This suite runs after every migration, so it
 -- cannot see the migration delete the personal cards; the release record gives the ordered replay that shows it.
 begin;
 create function pg_temp.assert_retired(ok boolean, message text) returns void
@@ -43,7 +44,7 @@ select pg_temp.assert_retired(not exists(select from pg_trigger where tgname = '
 select pg_temp.assert_retired(not exists(select from weave.initiatives where team_workspace_id is null),
   'no personal saved card may remain');
 
--- 2. What a team draft and the public listings read stays, with the deletion's trigger hold released.
+-- 2. What a team draft and the public listings read stays.
 select pg_temp.assert_retired(to_regprocedure(f) is not null, f || ' must remain')
   from unnest(array['weave.load_initiative(uuid)', 'weave.matching_state(uuid)', 'weave.account_access()',
     'private.weave_matching_state(uuid)', 'private.weave_matching_owner(uuid,boolean)', 'private.weave_matching_summary(jsonb)',
@@ -55,7 +56,9 @@ select pg_temp.assert_retired((select count(*) from information_schema.columns w
     and table_name in ('needs', 'offers') and column_name like 'matching\_%') = 16
   and exists(select from information_schema.columns where table_schema = 'weave_workspace' and table_name = 'project_links'
     and column_name = 'matching_paused'), 'the team entries and the project links must keep their matching columns');
-select pg_temp.assert_retired(t.tgenabled = 'O', t.tgrelid::regclass || ' must queue withdrawals again')
+-- pg_trigger.tgtype: 8 is DELETE, 16 is UPDATE.
+select pg_temp.assert_retired(t.tgenabled = 'O' and t.tgtype::int & 16 = 16 and t.tgtype::int & 8 = 0,
+    t.tgrelid::regclass || ' must queue withdrawals on an edit and never on a delete')
   from pg_trigger t where t.tgname = 'support_entry_changed';
 select pg_temp.assert_retired((select count(*) from pg_trigger where tgname = 'support_entry_changed') = 2,
   'both entry tables must keep support_entry_changed');
@@ -147,19 +150,29 @@ select pg_temp.assert_retired(pg_temp.refusal(format('select pg_temp.support(%L,
   = 'PT409 entry_conflict', 'a stale entry revision must conflict');
 reset role;
 
--- 6. A listing published from the team draft is withdrawn when the team removes its entry: the trigger the deletion
--- held off is on again.
+-- 6. Both team entries are public. The team edits the first and removes the second in one save: the edited one
+-- asks to withdraw its listing, and the removed one's listing stays public until someone withdraws it.
 insert into weave_workspace.support_listings(workspace_id, kind, entry_id, rkey, operation_id, actor_id, entry_revision,
     record_value, status, cid, source)
-  select 'e7300000-0000-4000-8000-000000000001', 'need', 'e7500000-0000-4000-8000-000000000002', '3mretireaaaaa', gen_random_uuid(),
-    'e7100000-0000-4000-8000-000000000001', revision, '{}', 'published', 'b' || repeat('r', 58), 'saved'
-  from team_entry where entry_id = 'e7500000-0000-4000-8000-000000000002';
+  select 'e7300000-0000-4000-8000-000000000001', 'need', entry_id::uuid, '3mretire' || repeat(letter, 5), gen_random_uuid(),
+    'e7100000-0000-4000-8000-000000000001', revision, '{}', 'published', 'b' || repeat(letter, 58), 'saved'
+  from team_entry, lateral (select case right(entry_id, 1) when '1' then 'r' else 's' end letter) l;
+create function pg_temp.team_listing(p_entry uuid) returns text language sql stable as $$
+  select status from weave_workspace.support_listings
+  where workspace_id = 'e7300000-0000-4000-8000-000000000001' and kind = 'need' and entry_id = p_entry $$;
 set local role weave_workspace_runtime;
 select pg_temp.team(1, 'team_save', jsonb_build_object('expectedRevision', 1, 'requestId', 'e7800000-0000-4000-8000-000000000003',
-  'document', pg_temp.card(jsonb_build_array(jsonb_build_object('id', 'e7500000-0000-4000-8000-000000000001', 'title', 'Seed swap')))));
+  'document', pg_temp.card(jsonb_build_array(jsonb_build_object('id', 'e7500000-0000-4000-8000-000000000001', 'title', 'Seed swap, changed')))));
 reset role;
-select pg_temp.assert_retired((select status from weave_workspace.support_listings
-    where workspace_id = 'e7300000-0000-4000-8000-000000000001' and entry_id = 'e7500000-0000-4000-8000-000000000002')
-  = 'withdrawal_pending', 'removing a published team entry must queue its withdrawal');
+select pg_temp.assert_retired(pg_temp.team_listing('e7500000-0000-4000-8000-000000000001') = 'withdrawal_pending',
+  'editing a published team entry must queue its withdrawal');
+select pg_temp.assert_retired(pg_temp.team_listing('e7500000-0000-4000-8000-000000000002') = 'published',
+  'removing a published team entry must leave its listing public');
+-- It is withdrawn only when someone asks, by the listing's address, with its entry gone.
+set local role weave_workspace_runtime;
+select pg_temp.assert_retired(pg_temp.support('support_withdraw', jsonb_build_object('kind', 'need',
+    'entryId', 'e7500000-0000-4000-8000-000000000002', 'requestId', 'e7800000-0000-4000-8000-000000000004'))->>'status'
+  = 'withdrawal_pending', 'a removed entry''s listing must still be withdrawn by its address');
+reset role;
 
 rollback;

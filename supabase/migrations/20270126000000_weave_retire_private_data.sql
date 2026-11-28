@@ -1,14 +1,16 @@
 -- Candidate for the website migration owner, after weave-matching-end-shares. Not applied anywhere.
--- Do not apply before 26 January 2027, and only with the user's yes (D49). Apply it only after the Weave build that
--- no longer lists, opens or deletes earlier private saves is deployed, since that build stops calling the
--- functions this drops.
+-- Apply it only after the Weave build that no longer lists, opens or deletes earlier private saves is deployed,
+-- since that build stops calling the functions this drops.
 --
--- DL-155, step 7: the personal private saves and the retired matching data go. D49 kept the saves readable and
--- downloadable for at least 60 days after new saves stopped on 27 November 2026, then asks the user again.
+-- DL-155, step 7: the personal private saves and the retired matching data go. They were the team's own test cards,
+-- so the user set D49's 60-day window aside and approved deleting them on 28 November 2026.
 -- - Every personal saved card (weave.initiatives with no team_workspace_id) is deleted, with its needs and offers.
 --   Its project link and that link's published listings stay: the link's card reference is cleared (on delete
---   set null) and the listings hang off the link. Deleting a card's entries would otherwise queue a withdrawal of
---   each listing published from it (support_entry_changed), so that trigger is held off for this delete alone.
+--   set null) and the listings hang off the link.
+-- - A need or offer stays public for as long as it is published (the user, 28 November 2026): deleting an entry,
+--   or the card that holds it, no longer queues a withdrawal of its listings. support_entry_changed now fires only
+--   when an entry's published details change, so this delete leaves every listing as it is, and so does a team
+--   removing an entry from its team draft.
 -- - The share tables (saved partners, share requests, query vectors and the retrieval setting) and every function
 --   that only sharing, the embedding job or a personal save used are dropped, as are the read, list and delete
 --   functions for personal saves.
@@ -54,13 +56,29 @@ create temporary table weave_retire_before on commit drop as select * from weave
 
 -- Save, team save and deletion take a card's row lock; taking it first makes any of them that starts now wait.
 do $$ begin perform from weave.initiatives where team_workspace_id is null for update; end $$;
-alter table weave.needs disable trigger support_entry_changed;
-alter table weave.offers disable trigger support_entry_changed;
+
+-- Deleting never withdraws: only a change to an entry's published details asks to withdraw its listings.
+drop trigger support_entry_changed on weave.needs;
+drop trigger support_entry_changed on weave.offers;
+create or replace function weave_workspace.support_entry_changed() returns trigger
+language plpgsql security definer set search_path = '' as $$
+begin
+  if (old.value->'title',old.value->'description',old.value->'capitalForms',old.value->'status') is distinct from
+      (new.value->'title',new.value->'description',new.value->'capitalForms',new.value->'status') then
+    update weave_workspace.support_listings set status='withdrawal_pending',problem=null,updated_at=clock_timestamp()
+      where workspace_id=old.initiative_id and kind=case tg_table_name when 'needs' then 'need' else 'offer' end
+        and entry_id=old.id and source='saved' and status in ('publish_pending','published');
+  end if;
+  return null;
+end $$;
+create trigger support_entry_changed after update of value on weave.needs
+  for each row execute function weave_workspace.support_entry_changed();
+create trigger support_entry_changed after update of value on weave.offers
+  for each row execute function weave_workspace.support_entry_changed();
+
 -- The cascade takes the cards' needs, offers, saved partners, query vectors, share reviews, save receipts and
 -- finished setup intents with them.
 delete from weave.initiatives where team_workspace_id is null;
-alter table weave.needs enable trigger support_entry_changed;
-alter table weave.offers enable trigger support_entry_changed;
 
 do $$
 begin

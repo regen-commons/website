@@ -532,27 +532,30 @@ Afterwards:
   `private.weave_matching_shortlist` answers `PT410 matching_shares_retired`. `private.weave_matching_state`
   hashes as before.
 
-## Retire private data release (draft)
+## Retire private data release
 
-**Do not merge or apply before 26 January 2027, and only with the user's yes.** D49 keeps the private saves made
-before 27 November 2026 readable and downloadable for at least 60 days, then asks the user again before anything is
-deleted. The version `20270126000000` is a placeholder; the file takes the version the connector records on apply,
-as for the releases above.
+The version `20270126000000` is a placeholder; the file takes the version the connector records on apply, as for
+the releases above. The earlier personal saves were the Weave team's own test cards, so on 28 November 2026 the user
+set D49's 60-day window aside and approved deleting them now. The user also set the rule this release adds: a need
+or offer stays public for as long as it is published, so deleting never withdraws.
 
 `20270126000000_weave_retire_private_data` matches `supabase/candidates/weave-retire-private-data.sql` in Weave
-(draft branch `claude/step7-part-b-retire-saves`) byte for byte. It is step 7 of the DL-155 removal plan: the
-personal private saves and the data and functions only sharing for matching used are removed. What it changes:
+(branch `claude/step7-part-b-retire-saves`) byte for byte. It is step 7 of the DL-155 removal plan: the personal
+private saves and the data and functions only sharing for matching used are removed. What it changes:
 
 - It refuses to run unless end-shares and retire-private-saves are installed, no share is still on, and no
   project is still being set up from a personal saved card (a setup intent not `linked` or `group_rejected`).
+- `support_entry_changed` on `weave.needs` and `weave.offers` now fires only on `update of value`, and only when an
+  entry's published details (title, description, kinds of support, status) change. Before, deleting an entry, or
+  the card that holds it, also queued a withdrawal of every listing published from it (`source = 'saved'`). Now a
+  listing stays public until someone withdraws it, as a listing published from a device draft already did. Editing
+  a team draft's published entry still asks to withdraw that entry's listing.
 - Every personal saved card (`weave.initiatives` with no `team_workspace_id`) is deleted with its needs and offers.
   The cascade takes their saved partners, query vectors, share reviews, save receipts and finished setup intents.
 - Project links and published listings stay. A personal link's card reference is cleared (`on delete set null`),
-  and listings hang off the link. Deleting a card's entries would fire `support_entry_changed`, which queues a
-  withdrawal of every listing published from that card (`source = 'saved'`), so the migration disables that
-  trigger on `weave.needs` and `weave.offers` for the delete alone and enables it again in the same transaction.
-  It then compares fingerprints of every listing, every link (apart from its card reference) and every team card,
-  need and offer with the ones it took before the delete, and fails if any changed.
+  and listings hang off the link. The migration compares fingerprints of every listing, every link (apart from its
+  card reference) and every team card, need and offer with the ones it took before the delete, and fails if any
+  changed.
 - `weave_workspace.content_command` loses `matching_preview`, `matching_change`, `matching_shortlist`,
   `matching_leads` and `matching_set_lead`; only `team_save` needs edit access now. The rest of its body is
   unchanged; the published-listings suite pins its hash.
@@ -581,50 +584,51 @@ Kept, because a group project's shared team draft (D48) or a public read still u
   `weave_query_embedding_job` stays; with its functions gone it can reach nothing here.
 
 Tests. `supabase/tests/weave-retire-private-data.sql` proves on the CI image that every dropped object is gone, that
-what team drafts and public reads use remains, that both `support_entry_changed` triggers are enabled again, that
-`content_command` keeps its owner and grants and names none of sharing's actions, and, through the workspace runtime,
-that an admin saves a team draft, an admin and a viewer load it and read its matching state, a viewer is refused
-editing, the listing search answers, sharing's actions are `PT400 invalid_data` for both, a team entry is reviewed
-for publishing at the revision matching state reports (a stale revision conflicts), and removing a published team
-entry still queues its withdrawal. The suite fails if the trigger is left disabled (checked by disabling it on a
-replay). `weave-retire-private-saves.sql` and `weave-matching-end-shares.sql` are removed: they tested refusals by
-functions this drops, and what of them still holds is in the new suite. `weave-private-access.sql` no longer calls
-the dropped save and list, and `weave-matching-published-listings.sql` pins the trimmed `content_command` and checks
-a viewer's edit refusal with `team_save`.
+what team drafts and public reads use remains, that both `support_entry_changed` triggers fire on an update and
+never on a delete, that `content_command` keeps its owner and grants and names none of sharing's actions, and,
+through the workspace runtime, that an admin saves a team draft, an admin and a viewer load it and read its
+matching state, a viewer is refused editing, the listing search answers, sharing's actions are `PT400 invalid_data`
+for both, and a team entry is reviewed for publishing at the revision matching state reports (a stale revision
+conflicts). It then publishes both team entries and saves the draft with the first edited and the second removed:
+the edited entry's listing is `withdrawal_pending`, the removed entry's stays `published`, and it can still be
+withdrawn by its address. `weave-publish-from-draft.sql` now expects a deleted card's listing to stay `published` at
+its address until the repository's DID asks to withdraw it. Each new expectation was checked by flipping it on a
+replay, which fails the suite. `weave-retire-private-saves.sql` and `weave-matching-end-shares.sql` are removed:
+they tested refusals by functions this drops, and what of them still holds is in the new suite.
+`weave-private-access.sql` no longer calls the dropped save and list, and `weave-matching-published-listings.sql`
+pins the trimmed `content_command` and checks a viewer's edit refusal with `team_save`.
 
 Ordered replay on `public.ecr.aws/supabase/postgres:17.11.0.011`, as `weave_migration_owner`: the migrations through
 `20261128041515_weave_matching_end_shares`, then synthetic data (two personal cards with four entries, one anchoring
-a personal link with two listings published from it, one from a draft and one withdrawn; a group link with a team
-card, two entries and its own published listing; a saved partner, a query vector, a share request, two share
-reviews and two save receipts), then this migration:
+a personal link with three listings published from its entries, one from a draft and one withdrawn; a group link
+with a team card, two entries and its own published listing), then this migration:
 
 | | Before | After |
 |---|---|---|
 | Personal cards, entries | 2, 4 | 0, 0 |
 | Team cards, entries | 1, 2 | 1, 2, same fingerprint |
 | Project links, with a card | 2, 1 | 2, 0 |
-| Listings | 3 published from saved, 1 from a draft, 1 withdrawn | the same, same fingerprint |
-| Share reviews, save receipts | 2, 2 | 1, 1 (the team's) |
-| Saved partners, query vectors, share requests | 1, 1, 1 | tables dropped |
+| Listings | 4 published from saved entries, 1 from a draft, 1 withdrawn | the same, same fingerprint |
+| `support_entry_changed` | update or delete | update only |
 
-Failure paths on the same replay, each refused with nothing changed: the migration without the trigger hold (the
-fingerprint check refuses: "a published listing, a project link or a team draft changed"), a share still on, and a
-personal card with a setup intent still `prepared`. With that intent `group_rejected` it applies and the intent goes
-with its card. Two dependencies the first drafts missed (the query vectors' check on the embedding model, and the
-word indexes on `weave_matching_terms`) failed the apply and rolled it back, which is what the no-cascade rule is for.
+Failure paths. On the same seeded replay, the migration without the trigger change is refused by the fingerprint
+check ("a published listing, a project link or a team draft changed") and changes nothing. The earlier replay of
+this release also refused it with a share still on, and with a personal card whose setup intent was still
+`prepared`; with that intent `group_rejected` it applied and the intent went with its card. Two dependencies the
+first drafts missed (the query vectors' check on the embedding model, and the word indexes on
+`weave_matching_terms`) failed the apply and rolled it back, which is what the no-cascade rule is for.
 
 Order:
 
-1. The user says yes, on or after 26 January 2027.
-2. Merge and deploy the Weave change on the same draft branch, which stops listing, opening, downloading and
-   deleting earlier private saves and stops calling `list_initiatives`, `load_initiative` for personal cards and
-   `delete_initiative`. Applying this first would break the deployed build's account read.
-3. Re-check Platform with count-only queries: the personal cards and listings to expect, no share on, no setup
+1. Merge and deploy the Weave change, which stops listing, opening, downloading and deleting earlier private saves
+   and stops calling `list_initiatives`, `load_initiative` for personal cards and `delete_initiative`. Applying
+   this first would break the deployed build's account read.
+2. Re-check Platform with count-only queries: the personal cards and listings to expect, no share on, no setup
    intent in progress.
-4. Apply this, then record the version, the byte match and the counts here.
+3. Apply this, then record the version, the byte match and the counts here.
 
 On 28 November 2026 Platform held 6 personal saved cards with 11 needs and 11 offers, 2 team cards with 8 entries,
 3 project links (2 for groups, 1 personal with its card), 8 published listings, all published from the personal
 card's link with `source = 'saved'`, no share on, no query vectors or saved partners, 10 share requests, 30 save
-receipts and no setup intent for a personal card. All 8 listings would have been queued for withdrawal without the
-trigger hold.
+receipts and no setup intent for a personal card. Under the old trigger, deleting the cards would have queued all 8
+listings for withdrawal; under this release they stay public.

@@ -335,9 +335,13 @@ select pg_temp.support('alice', 'e4000000-0000-4000-8000-000000000002', 'support
 delete from weave.initiatives where id = 'e4000000-0000-4000-8000-000000000002';
 select pg_temp.assert_draft((select solo_initiative_id is null and repository_did = 'did:plc:pppppppppppppppppppppppp'
   from weave_workspace.project_links where id = 'e4000000-0000-4000-8000-000000000002'), 'the project link outlives its saved card');
-select pg_temp.assert_draft((pg_temp.listing('e4000000-0000-4000-8000-000000000002', 'e5000000-0000-4000-8000-000000000002')).status = 'withdrawal_pending'
+-- Deleting never withdraws (DL-155, step 7): the listing stays public at its address until someone withdraws it.
+select pg_temp.assert_draft((pg_temp.listing('e4000000-0000-4000-8000-000000000002', 'e5000000-0000-4000-8000-000000000002')).status = 'published'
     and (pg_temp.listing('e4000000-0000-4000-8000-000000000002', 'e5000000-0000-4000-8000-000000000002')).rkey = pg_temp.seen('deleted published')->>'rkey',
-  'Weave keeps the public listing''s address and asks to withdraw it with its entry gone');
+  'Weave keeps the public listing at its address with its entry gone');
+select pg_temp.assert_draft(pg_temp.support('alice elsewhere', 'e4000000-0000-4000-8000-000000000002', 'support_withdraw', jsonb_build_object(
+    'kind', 'need', 'entryId', 'e5000000-0000-4000-8000-000000000002', 'requestId', 'e7000000-0000-4000-8000-000000000021'))->>'status'
+  = 'withdrawal_pending', 'the DID that owns the repository asks to withdraw it with no card');
 select pg_temp.assert_draft(pg_temp.support('alice elsewhere', 'e4000000-0000-4000-8000-000000000002', 'support_checkpoint', jsonb_build_object(
     'kind', 'need', 'entryId', 'e5000000-0000-4000-8000-000000000002', 'operationId', pg_temp.seen('deleted published')->>'operationId',
     'event', 'withdrawn'))->>'status' = 'withdrawn', 'the DID that owns the repository finishes the withdrawal with no card');
